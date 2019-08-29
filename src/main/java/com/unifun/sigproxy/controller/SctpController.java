@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping("m3ua")
+@RequestMapping("sctp")
 public class SctpController {
 
     @GetMapping(value = "/get", produces = "application/json")
