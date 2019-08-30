@@ -1,4 +1,4 @@
-package com.unifun.sigproxy.controller;
+package com.unifun.sigproxy.controller.configuration;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -6,13 +6,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping("sccp")
-public class SccpController {
+@RequestMapping("tcap")
+public class TcapController {
 
     @GetMapping(value = "/get", produces = "application/json")
     public @ResponseBody
     String getInfo() {
         return "{}";
     }
-
 }
