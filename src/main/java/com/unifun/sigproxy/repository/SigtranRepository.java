@@ -1,7 +1,7 @@
 package com.unifun.sigproxy.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.unifun.sigproxy.model.*;
+import com.unifun.sigproxy.model.config.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

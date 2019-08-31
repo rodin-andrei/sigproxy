@@ -1,9 +1,9 @@
 package com.unifun.sigproxy.service.impl;
 
 import com.unifun.sigproxy.exception.NoConfigurationException;
-import com.unifun.sigproxy.model.LinkConfig;
-import com.unifun.sigproxy.model.SctpConfig;
-import com.unifun.sigproxy.model.SigtranConfig;
+import com.unifun.sigproxy.model.config.LinkConfig;
+import com.unifun.sigproxy.model.config.SctpConfig;
+import com.unifun.sigproxy.model.config.SigtranConfig;
 import com.unifun.sigproxy.repository.SigtranRepository;
 import com.unifun.sigproxy.service.SctpConfigService;
 import lombok.RequiredArgsConstructor;

@@ -1,10 +1,12 @@
-package com.unifun.sigproxy.model;
+package com.unifun.sigproxy.model.dto;
 
 import lombok.Data;
 
 @Data
-public class RemoteLinkConfig {
+public class SctpServerLinkDto {
     private String linkName;
     private String remoteAddress;
     private int remotePort;
+    private String status;
+
 }

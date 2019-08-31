@@ -1,8 +1,8 @@
 package com.unifun.sigproxy.service;
 
 import com.unifun.sigproxy.exception.NoConfigurationException;
-import com.unifun.sigproxy.model.LinkConfig;
-import com.unifun.sigproxy.model.SctpConfig;
+import com.unifun.sigproxy.model.config.LinkConfig;
+import com.unifun.sigproxy.model.config.SctpConfig;
 
 import java.util.Optional;
 import java.util.Set;

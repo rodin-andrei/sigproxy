@@ -1,7 +1,7 @@
 package com.unifun.sigproxy.controller.configuration;
 
-import com.unifun.sigproxy.model.M3uaConfig;
-import com.unifun.sigproxy.model.SigtranConfig;
+import com.unifun.sigproxy.model.config.M3uaConfig;
+import com.unifun.sigproxy.model.config.SigtranConfig;
 import com.unifun.sigproxy.repository.SigtranRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

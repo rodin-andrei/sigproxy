@@ -2,10 +2,10 @@ package com.unifun.sigproxy.service;
 
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.exception.NoConfigurationException;
-import com.unifun.sigproxy.model.LinkConfig;
-import com.unifun.sigproxy.model.SctpLinkDto;
-import com.unifun.sigproxy.model.SctpServerConfig;
-import com.unifun.sigproxy.model.SctpServerDto;
+import com.unifun.sigproxy.model.config.LinkConfig;
+import com.unifun.sigproxy.model.config.SctpServerConfig;
+import com.unifun.sigproxy.model.dto.SctpLinkDto;
+import com.unifun.sigproxy.model.dto.SctpServerDto;
 
 import java.util.Set;
 
