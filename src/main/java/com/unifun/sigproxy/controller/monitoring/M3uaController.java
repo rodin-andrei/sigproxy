@@ -1,4 +1,4 @@
-package com.unifun.sigproxy.controller.configuration;
+package com.unifun.sigproxy.controller.monitoring;
 
 import com.unifun.sigproxy.model.config.M3uaConfig;
 import com.unifun.sigproxy.model.config.SigtranConfig;

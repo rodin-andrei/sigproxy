@@ -1,4 +1,4 @@
-package com.unifun.sigproxy.controller.configuration;
+package com.unifun.sigproxy.controller.monitoring;
 
 import com.unifun.sigproxy.model.dto.SctpLinkDto;
 import com.unifun.sigproxy.model.dto.SctpServerDto;
