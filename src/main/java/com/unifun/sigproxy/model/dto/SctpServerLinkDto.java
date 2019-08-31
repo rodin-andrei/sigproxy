@@ -7,6 +7,6 @@ public class SctpServerLinkDto {
     private String linkName;
     private String remoteAddress;
     private int remotePort;
-    private String status;
-
+    private boolean up;
+    private boolean started;
 }

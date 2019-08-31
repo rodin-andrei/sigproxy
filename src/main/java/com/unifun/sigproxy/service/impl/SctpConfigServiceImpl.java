@@ -3,9 +3,11 @@ package com.unifun.sigproxy.service.impl;
 import com.unifun.sigproxy.exception.NoConfigurationException;
 import com.unifun.sigproxy.model.config.LinkConfig;
 import com.unifun.sigproxy.model.config.SctpConfig;
+import com.unifun.sigproxy.model.config.SctpServerConfig;
 import com.unifun.sigproxy.model.config.SigtranConfig;
 import com.unifun.sigproxy.repository.SigtranRepository;
 import com.unifun.sigproxy.service.SctpConfigService;
+import com.unifun.sigproxy.service.SctpService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,22 +22,20 @@ public class SctpConfigServiceImpl implements SctpConfigService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SctpConfigServiceImpl.class);
 
     private final SigtranRepository sigtranRepository;
+    private final SctpService sctpService;
 
     @Override
     public SctpConfig getSctpConfiguration() throws NoConfigurationException {
-        SigtranConfig sigtranConfig = getSigtranConfig();
-        return sigtranConfig.getSctpConfig();
+        SctpConfig sctpConfig = getSigtranConfig().getSctpConfig();
+        if (sctpConfig == null) {
+            throw new NoConfigurationException("No SCTP Configuration.");
+        }
+        return sctpConfig;
     }
 
     @Override
-    public Optional<LinkConfig> getLinkConfig(String linkName) throws NoConfigurationException {
-        SctpConfig sctpConfiguration = getSctpConfiguration();
-        if (sctpConfiguration != null) {
-            return sctpConfiguration.getLinkConfig().stream()
-                    .filter(link -> link.getLinkName() != null && link.getLinkName().equals(linkName))
-                    .findFirst();
-        }
-        throw new NoConfigurationException("No Sctp configuration.");
+    public Set<LinkConfig> getLinkConfig() throws NoConfigurationException {
+        return getSctpConfiguration().getLinkConfig();
     }
 
     @Override
@@ -50,7 +50,55 @@ public class SctpConfigServiceImpl implements SctpConfigService {
         linksSet.add(newLink);
         LOGGER.info("Added new link: {}", newLink.getLinkName());
 
-        updateSigtranLink(newLink);
+        sctpService.updateSctpLink(newLink);
+    }
+
+    @Override
+    public void setLinkConfig(Set<LinkConfig> newLinks) throws NoConfigurationException {
+        getSctpConfiguration().setLinkConfig(newLinks);
+        //TODO: Stop all links...
+        newLinks.forEach(sctpService::updateSctpLink);
+    }
+
+    @Override
+    public Optional<LinkConfig> getLinkConfig(String linkName) throws NoConfigurationException {
+        return getSctpConfiguration().getLinkConfig().stream()
+                .filter(link -> link.getLinkName() != null && link.getLinkName().equals(linkName))
+                .findFirst();
+    }
+
+    @Override
+    public Set<SctpServerConfig> getServerConfig() throws NoConfigurationException {
+        return getSctpConfiguration().getSctpServerConfig();
+    }
+
+    @Override
+    public void setServerConfig(SctpServerConfig newServer) throws NoConfigurationException {
+        Set<SctpServerConfig> servers = getSctpConfiguration().getSctpServerConfig();
+
+        servers.stream()
+                .filter(link -> link.getServerName().equals(newServer.getServerName()))
+                .findFirst()
+                .ifPresent(servers::remove);
+
+        servers.add(newServer);
+        LOGGER.info("Added new server: {}", newServer.getServerName());
+
+        sctpService.updateSctpServer(newServer);
+    }
+
+    @Override
+    public void setServerConfig(Set<SctpServerConfig> newServers) throws NoConfigurationException {
+        getSctpConfiguration().setSctpServerConfig(newServers);
+        //TODO: Stop all servers
+        newServers.forEach(sctpService::updateSctpServer);
+    }
+
+    @Override
+    public Optional<SctpServerConfig> getServerConfig(String serverName) throws NoConfigurationException {
+        return getSctpConfiguration().getSctpServerConfig().stream()
+                .filter(link -> link.getServerName() != null && link.getServerName().equals(serverName))
+                .findFirst();
     }
 
     @Override
@@ -65,14 +113,26 @@ public class SctpConfigServiceImpl implements SctpConfigService {
                     oldLink.setRemotePort(newLink.getRemotePort());
                     oldLink.setLocalAddress(newLink.getLocalAddress());
                     oldLink.setLocalPort(newLink.getLocalPort());
+                    sctpService.updateSctpLink(oldLink);
                 });
         LOGGER.info("Updated link: {}", newLink.getLinkName());
-        updateSigtranLink(newLink);
     }
 
     @Override
-    public void setLinkConfig(Set<LinkConfig> newLinks) throws NoConfigurationException {
-        //TODO: Reset all links
+    public void updateServerConfig(SctpServerConfig newServer) throws NoConfigurationException {
+        Set<SctpServerConfig> servers = getSctpConfiguration().getSctpServerConfig();
+        servers.stream()
+                .filter(server -> server.getServerName().equals(newServer.getServerName()))
+                .findFirst()
+                .ifPresent(oldServer -> {
+                    oldServer.setLinkType(newServer.getLinkType());
+                    oldServer.setLocalAddress(newServer.getLocalAddress());
+                    oldServer.setLocalPort(newServer.getLocalPort());
+                    oldServer.setExtraAddresses(newServer.getExtraAddresses());
+                    oldServer.setRemoteLinkConfig(newServer.getRemoteLinkConfig());
+                    sctpService.updateSctpServer(oldServer);
+                });
+        LOGGER.info("Updated server: {}", newServer.getServerName());
     }
 
     private SigtranConfig getSigtranConfig() throws NoConfigurationException {
@@ -82,9 +142,5 @@ public class SctpConfigServiceImpl implements SctpConfigService {
             throw new NoConfigurationException("No Sigtran configuration");
         }
         return sigtranConfig;
-    }
-
-    private void updateSigtranLink(LinkConfig linkConfig) {
-        //TODO: Make updating of link in SctpService
     }
 }

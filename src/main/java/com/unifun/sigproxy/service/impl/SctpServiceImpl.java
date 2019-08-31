@@ -9,38 +9,34 @@ import com.unifun.sigproxy.model.dto.SctpLinkDto;
 import com.unifun.sigproxy.model.dto.SctpServerDto;
 import com.unifun.sigproxy.model.dto.SctpServerLinkDto;
 import com.unifun.sigproxy.repository.SigtranRepository;
-import com.unifun.sigproxy.service.SctpConfigService;
 import com.unifun.sigproxy.service.SctpService;
 import com.unifun.sigproxy.util.GateConstants;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.mobicents.protocols.api.Association;
 import org.mobicents.protocols.api.AssociationType;
 import org.mobicents.protocols.api.IpChannelType;
 import org.mobicents.protocols.sctp.netty.NettySctpManagementImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.testng.collections.Lists;
 
-import javax.annotation.PostConstruct;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class SctpServiceImpl implements SctpService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SctpServiceImpl.class);
 
-    @Getter
-    private final NettySctpManagementImpl sctpManagement;
-
     private final SigtranRepository sigtranRepository;
-    private final SctpConfigService sctpConfigService;
 
-    @Autowired
-    public SctpServiceImpl(SigtranRepository sigtranRepository, SctpConfigService sctpConfigService) throws InitializingException {
-        this.sigtranRepository = sigtranRepository;
-        this.sctpConfigService = sctpConfigService;
+    @Getter
+    private NettySctpManagementImpl sctpManagement;
+
+    @Override
+    public void initialize(final SctpConfig sctpConfig) throws NoConfigurationException, InitializingException {
         try {
             LOGGER.info("Initializing SCTP management...");
             sctpManagement = new NettySctpManagementImpl(GateConstants.STACKNAME);
@@ -50,12 +46,6 @@ public class SctpServiceImpl implements SctpService {
             LOGGER.error("Can't initialize sctp management. Stopping app. Stacktrace: ", e);
             throw new InitializingException("Can't initialize sctp management.");
         }
-    }
-
-    @Override
-    @PostConstruct
-    public void initialize() throws NoConfigurationException, InitializingException {
-        final SctpConfig sctpConfig = sctpConfigService.getSctpConfiguration();
         Set<LinkConfig> linkConfig = sctpConfig.getLinkConfig();
         Set<SctpServerConfig> sctpServerConfig = sctpConfig.getSctpServerConfig();
         if (linkConfig.isEmpty() && sctpServerConfig.isEmpty()) {
@@ -136,7 +126,8 @@ public class SctpServiceImpl implements SctpService {
                     sctpLinkDto.setRemoteAddress(assoc.getPeerAddress());
                     sctpLinkDto.setRemotePort(assoc.getPeerPort());
                     sctpLinkDto.setExtraAddresses(assoc.getExtraHostAddresses());
-                    sctpLinkDto.setStatus(assoc.isUp() ? "UP" : "DOWN");
+                    sctpLinkDto.setUp(assoc.isUp());
+                    sctpLinkDto.setStarted(assoc.isStarted());
                     return sctpLinkDto;
                 })
                 .collect(Collectors.toSet());
@@ -164,7 +155,8 @@ public class SctpServiceImpl implements SctpService {
                                             linkDto.setLinkName(association.getName());
                                             linkDto.setRemoteAddress(association.getPeerAddress());
                                             linkDto.setRemotePort(association.getPeerPort());
-                                            linkDto.setStatus(association.isUp() ? "UP" : "DOWN");
+                                            linkDto.setUp(association.isUp());
+                                            linkDto.setStarted(association.isStarted());
                                             return linkDto;
                                         } catch (Exception e) {
                                             LOGGER.warn("Can't found link {} for server {}.", assocName, server.getName());

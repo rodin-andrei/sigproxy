@@ -3,6 +3,7 @@ package com.unifun.sigproxy.service;
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.exception.NoConfigurationException;
 import com.unifun.sigproxy.model.config.LinkConfig;
+import com.unifun.sigproxy.model.config.SctpConfig;
 import com.unifun.sigproxy.model.config.SctpServerConfig;
 import com.unifun.sigproxy.model.dto.SctpLinkDto;
 import com.unifun.sigproxy.model.dto.SctpServerDto;
@@ -10,7 +11,7 @@ import com.unifun.sigproxy.model.dto.SctpServerDto;
 import java.util.Set;
 
 public interface SctpService {
-    void initialize() throws NoConfigurationException, InitializingException;
+    void initialize(SctpConfig sctpConfig) throws NoConfigurationException, InitializingException;
 
     void updateSctpLink(LinkConfig linkConfig);
 

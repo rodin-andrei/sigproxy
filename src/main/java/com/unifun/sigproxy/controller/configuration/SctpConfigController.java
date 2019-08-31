@@ -3,6 +3,7 @@ package com.unifun.sigproxy.controller.configuration;
 import com.unifun.sigproxy.exception.NoConfigurationException;
 import com.unifun.sigproxy.model.config.LinkConfig;
 import com.unifun.sigproxy.model.config.SctpConfig;
+import com.unifun.sigproxy.model.config.SctpServerConfig;
 import com.unifun.sigproxy.service.SctpConfigService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Controller
 @RequestMapping("sctp/conf")
@@ -28,9 +30,9 @@ public class SctpConfigController {
         }
     }
 
-    @GetMapping(value = "/link", produces = "application/json")
+    @GetMapping(value = "/link/{linkName}", produces = "application/json")
     @ResponseBody
-    public ResponseEntity<LinkConfig> getLinkInfo(@RequestParam("name") String linkName) {
+    public ResponseEntity<LinkConfig> getLinkInfo(@PathVariable String linkName) {
         try {
             Optional<LinkConfig> linkConfig = sctpConfigService.getLinkConfig(linkName);
             if (linkConfig.isPresent()) {
@@ -42,14 +44,72 @@ public class SctpConfigController {
         }
     }
 
-    @PostMapping(value = "/link", consumes = "application/json")
-    public void postLinkInfo(@RequestBody LinkConfig linkConfig) throws NoConfigurationException {
+    @PostMapping(value = "/link/{linkName}", consumes = "application/json")
+    public void postLinkInfo(@RequestBody LinkConfig linkConfig, @PathVariable String linkName) throws NoConfigurationException {
+        if (!linkConfig.getLinkName().equals(linkName)) {
+            throw new IllegalArgumentException("Incorrect mapping between config and request. Link name are not the same.");
+        }
         sctpConfigService.setLinkConfig(linkConfig);
     }
 
-    @PutMapping(value = "/link", consumes = "application/json")
-    public void putLinkInfo(@RequestBody LinkConfig linkConfig) throws NoConfigurationException {
+    @PutMapping(value = "/link/{linkName}", consumes = "application/json")
+    public void putLinkInfo(@RequestBody LinkConfig linkConfig, @PathVariable String linkName) throws NoConfigurationException {
+        if (!linkConfig.getLinkName().equals(linkName)) {
+            throw new IllegalArgumentException("Incorrect mapping between config and request. Link name are not the same.");
+        }
         sctpConfigService.updateLinkConfig(linkConfig);
+    }
+
+    @GetMapping(value = "/link", produces = "application/json")
+    @ResponseBody
+    public ResponseEntity<Set<LinkConfig>> getLinkInfo() throws NoConfigurationException {
+        return ResponseEntity.ok(sctpConfigService.getLinkConfig());
+    }
+
+    @PostMapping(value = "/link", consumes = "application/json")
+    public void postLinkInfo(@RequestBody Set<LinkConfig> linkConfig) throws NoConfigurationException {
+        sctpConfigService.setLinkConfig(linkConfig);
+    }
+
+    @GetMapping(value = "/server", produces = "application/json")
+    @ResponseBody
+    public ResponseEntity<Set<SctpServerConfig>> getServerInfo() throws NoConfigurationException {
+        return ResponseEntity.ok(sctpConfigService.getServerConfig());
+    }
+
+    @PostMapping(value = "/server", consumes = "application/json")
+    public void postServerInfo(@RequestBody Set<SctpServerConfig> serverConfig) throws NoConfigurationException {
+        sctpConfigService.setServerConfig(serverConfig);
+    }
+
+    @GetMapping(value = "/server/{serverName}", produces = "application/json")
+    @ResponseBody
+    public ResponseEntity<SctpServerConfig> getServerInfo(@PathVariable String serverName) {
+        try {
+            Optional<SctpServerConfig> serverConfig = sctpConfigService.getServerConfig(serverName);
+            if (serverConfig.isPresent()) {
+                return ResponseEntity.ok(serverConfig.get());
+            }
+            return ResponseEntity.noContent().build();
+        } catch (NoConfigurationException e) {
+            return ResponseEntity.noContent().build();
+        }
+    }
+
+    @PostMapping(value = "/server/{serverName}", consumes = "application/json")
+    public void postServerInfo(@RequestBody SctpServerConfig serverConfig, @PathVariable String serverName) throws NoConfigurationException {
+        if (!serverConfig.getServerName().equals(serverName)) {
+            throw new IllegalArgumentException("Incorrect mapping between config and request. Link name are not the same.");
+        }
+        sctpConfigService.setServerConfig(serverConfig);
+    }
+
+    @PutMapping(value = "/server/{serverName}", consumes = "application/json")
+    public void putServerInfo(@RequestBody SctpServerConfig serverConfig, @PathVariable String serverName) throws NoConfigurationException {
+        if (!serverConfig.getServerName().equals(serverName)) {
+            throw new IllegalArgumentException("Incorrect mapping between config and request. Link name are not the same.");
+        }
+        sctpConfigService.updateServerConfig(serverConfig);
     }
 
 

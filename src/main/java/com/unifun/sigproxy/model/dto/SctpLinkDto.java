@@ -9,6 +9,8 @@ public class SctpLinkDto {
     private int localPort;
     private String remoteAddress;
     private int remotePort;
-    private String status;
+    private boolean up;
+    private boolean started;
+
     private String[] extraAddresses;
 }
