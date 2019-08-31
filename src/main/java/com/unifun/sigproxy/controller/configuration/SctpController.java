@@ -1,56 +1,31 @@
 package com.unifun.sigproxy.controller.configuration;
 
-import com.unifun.sigproxy.exception.NoConfigurationException;
-import com.unifun.sigproxy.model.LinkConfig;
-import com.unifun.sigproxy.model.SctpConfig;
-import com.unifun.sigproxy.service.SctpConfigService;
+import com.unifun.sigproxy.model.SctpLinkDto;
+import com.unifun.sigproxy.model.SctpServerDto;
+import com.unifun.sigproxy.service.SctpService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.Optional;
+import java.util.Set;
 
 @Controller
-@RestController
 @RequestMapping("sctp")
 @RequiredArgsConstructor
 public class SctpController {
 
-    private final SctpConfigService sctpConfigService;
+    private final SctpService sctpService;
 
-    @GetMapping(value = {"/full", "/", ""}, produces = "application/json")
-    @ResponseBody
-    public ResponseEntity<SctpConfig> getInfo() {
-        try {
-            return ResponseEntity.ok(sctpConfigService.getSctpConfiguration());
-        } catch (NoConfigurationException e) {
-            return ResponseEntity.noContent().build();
-        }
+    @GetMapping(value = "/link/status", produces = "application/json")
+    public ResponseEntity<Set<SctpLinkDto>> getLinkStatus() {
+        return ResponseEntity.ok(sctpService.getLinkStatus());
     }
 
-    @GetMapping(value = "/link", produces = "application/json")
-    @ResponseBody
-    public ResponseEntity<LinkConfig> getLinkInfo(@RequestParam("name") String linkName) {
-        try {
-            Optional<LinkConfig> linkConfig = sctpConfigService.getLinkConfig(linkName);
-            if (linkConfig.isPresent()) {
-                return ResponseEntity.ok(linkConfig.get());
-            }
-            return ResponseEntity.noContent().build();
-        } catch (NoConfigurationException e) {
-            return ResponseEntity.noContent().build();
-        }
-    }
-
-    @PostMapping(value = "/link", consumes = "application/json")
-    public void postLinkInfo(@RequestBody LinkConfig linkConfig) throws NoConfigurationException {
-        sctpConfigService.setLinkConfig(linkConfig);
-    }
-
-    @PutMapping(value = "/link", consumes = "application/json")
-    public void putLinkInfo(@RequestBody LinkConfig linkConfig) throws NoConfigurationException {
-        sctpConfigService.updateLinkConfig(linkConfig);
+    @GetMapping(value = "/server/status", produces = "application/json")
+    public ResponseEntity<Set<SctpServerDto>> getServerLinksStatus() {
+        return ResponseEntity.ok(sctpService.getServerLinkStatuses());
     }
 
 
