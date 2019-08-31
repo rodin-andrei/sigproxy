@@ -185,6 +185,7 @@ hs_err_pid*
 **/nbproject/Package-*.bash
 #build/
 nbbuild/
+target/
 dist/
 nbdist/
 .nb-gradle/
