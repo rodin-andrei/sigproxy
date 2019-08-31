@@ -56,8 +56,8 @@ public class SctpConfigServiceImpl implements SctpConfigService {
     @Override
     public void setLinkConfig(Set<LinkConfig> newLinks) throws NoConfigurationException {
         getSctpConfiguration().setLinkConfig(newLinks);
-        //TODO: Stop all links...
-        newLinks.forEach(sctpService::updateSctpLink);
+        sctpService.removeAllLinks();
+        sctpService.addNewSctpLinks(newLinks);
     }
 
     @Override
@@ -90,8 +90,8 @@ public class SctpConfigServiceImpl implements SctpConfigService {
     @Override
     public void setServerConfig(Set<SctpServerConfig> newServers) throws NoConfigurationException {
         getSctpConfiguration().setSctpServerConfig(newServers);
-        //TODO: Stop all servers
-        newServers.forEach(sctpService::updateSctpServer);
+        sctpService.removeAllServers();
+        sctpService.addNewSctpServers(newServers);
     }
 
     @Override

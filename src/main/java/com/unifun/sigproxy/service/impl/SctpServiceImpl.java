@@ -64,52 +64,80 @@ public class SctpServiceImpl implements SctpService {
     }
 
     @Override
+    public void removeAllLinks() {
+        sctpManagement.getAssociations().values()
+                .forEach(assoc -> {
+                    try {
+                        sctpManagement.stopAssociation(assoc.getName());
+                    } catch (Exception e) {
+                        LOGGER.warn("Can't stop association: {}. {}", assoc.getName(), e.getMessage());
+                    }
+                    try {
+                        sctpManagement.removeAssociation(assoc.getName());
+                    } catch (Exception e) {
+                        LOGGER.warn("Can't remove association: {}. {}", assoc.getName(), e.getMessage());
+                    }
+                });
+    }
+
+    @Override
+    public void removeAllServers() {
+        sctpManagement.getServers()
+                .forEach(server -> {
+                    try {
+                        sctpManagement.stopServer(server.getName());
+                    } catch (Exception e) {
+                        LOGGER.warn("Can't stop association: {}. {}", server.getName(), e.getMessage());
+                    }
+                    try {
+                        sctpManagement.removeServer(server.getName());
+                    } catch (Exception e) {
+                        LOGGER.warn("Can't remove association: {}. {}", server.getName(), e.getMessage());
+                    }
+                });
+    }
+
+    @Override
     public void updateSctpLink(LinkConfig link) {
         try {
             removeAssociation(link);
-            sctpManagement.addAssociation(
-                    link.getLocalAddress(),
-                    link.getLocalPort(),
-                    link.getRemoteAddress(),
-                    link.getRemotePort(),
-                    link.getLinkName(),
-                    IpChannelType.getInstance(link.getLinkType()),
-                    link.getExtraAddresses()
-            );
+            addSctpLink(link);
         } catch (Exception e) {
             LOGGER.error("Can't create link association " + link.getLinkName() + " .", e);
         }
     }
 
     @Override
-    public void updateSctpServer(SctpServerConfig serverConfig) {
-        final String serverName = serverConfig.getServerName();
+    public void addNewSctpLinks(Set<LinkConfig> newLinks) {
+        newLinks.forEach(link -> {
+            try {
+                addSctpLink(link);
+            } catch (Exception e) {
+                LOGGER.error("Can't create new association: {}. {}", link.getLinkName(), e.getMessage());
+            }
+        });
+
+    }
+
+    @Override
+    public void updateSctpServer(SctpServerConfig server) {
         try {
-            removeServer(serverConfig);
-            sctpManagement.addServer(
-                    serverName,
-                    serverConfig.getLocalAddress(),
-                    serverConfig.getLocalPort(),
-                    IpChannelType.getInstance(serverConfig.getLinkType()),
-                    serverConfig.getExtraAddresses()
-            );
-            serverConfig.getRemoteLinkConfig().forEach(remoteLink -> {
-                try {
-                    sctpManagement.addServerAssociation(
-                            remoteLink.getRemoteAddress(),
-                            remoteLink.getRemotePort(),
-                            serverName,
-                            remoteLink.getLinkName(),
-                            IpChannelType.getInstance(serverConfig.getLinkType())
-                    );
-                } catch (Exception e) {
-                    LOGGER.error("Can't create serverAssociation " + remoteLink.getLinkName() + " .", e);
-                }
-            });
-            startServer(serverName);
+            removeServer(server);
+            addSctpServer(server);
         } catch (Exception e) {
-            LOGGER.error("Can't create server " + serverName + " .", e);
+            LOGGER.error("Can't create server {}. {}", server.getServerName(), e.getMessage());
         }
+    }
+
+    @Override
+    public void addNewSctpServers(Set<SctpServerConfig> newServers) {
+        newServers.forEach(server -> {
+            try {
+                addSctpServer(server);
+            } catch (Exception e) {
+                LOGGER.error("Can't create server {}. {}", server.getServerName(), e.getMessage());
+            }
+        });
     }
 
     @Override
@@ -204,6 +232,43 @@ public class SctpServiceImpl implements SctpService {
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());
         }
+    }
+
+    private void addSctpLink(LinkConfig link) throws Exception {
+        sctpManagement.addAssociation(
+                link.getLocalAddress(),
+                link.getLocalPort(),
+                link.getRemoteAddress(),
+                link.getRemotePort(),
+                link.getLinkName(),
+                IpChannelType.getInstance(link.getLinkType()),
+                link.getExtraAddresses()
+        );
+    }
+
+    private void addSctpServer(SctpServerConfig serverConfig) throws Exception {
+        final String serverName = serverConfig.getServerName();
+        sctpManagement.addServer(
+                serverName,
+                serverConfig.getLocalAddress(),
+                serverConfig.getLocalPort(),
+                IpChannelType.getInstance(serverConfig.getLinkType()),
+                serverConfig.getExtraAddresses()
+        );
+        serverConfig.getRemoteLinkConfig().forEach(remoteLink -> {
+            try {
+                sctpManagement.addServerAssociation(
+                        remoteLink.getRemoteAddress(),
+                        remoteLink.getRemotePort(),
+                        serverName,
+                        remoteLink.getLinkName(),
+                        IpChannelType.getInstance(serverConfig.getLinkType())
+                );
+            } catch (Exception e) {
+                LOGGER.error("Can't create serverAssociation " + remoteLink.getLinkName() + " .", e);
+            }
+        });
+        startServer(serverName);
     }
 
     private void removeAssociation(LinkConfig link) {

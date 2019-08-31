@@ -13,9 +13,17 @@ import java.util.Set;
 public interface SctpService {
     void initialize(SctpConfig sctpConfig) throws NoConfigurationException, InitializingException;
 
+    void removeAllLinks();
+
+    void removeAllServers();
+
     void updateSctpLink(LinkConfig linkConfig);
 
+    void addNewSctpLinks(Set<LinkConfig> newLinks);
+
     void updateSctpServer(SctpServerConfig serverConfig);
+
+    void addNewSctpServers(Set<SctpServerConfig> newServers);
 
     Set<SctpLinkDto> getLinkStatus();
 
