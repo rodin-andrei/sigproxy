@@ -1,5 +1,6 @@
 package com.unifun.sigproxy.service.impl;
 
+import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.exception.NoConfigurationException;
 import com.unifun.sigproxy.model.config.LinkConfig;
 import com.unifun.sigproxy.model.config.SctpConfig;
@@ -13,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.Optional;
 import java.util.Set;
 
@@ -23,6 +26,21 @@ public class SctpConfigServiceImpl implements SctpConfigService {
 
     private final SigtranRepository sigtranRepository;
     private final SctpService sctpService;
+
+    @PostConstruct
+    public void init() {
+        try {
+            LOGGER.info("Initializing SCTP Layer.");
+            sctpService.initialize(getSctpConfiguration());
+        } catch (NoConfigurationException | InitializingException e) {
+            LOGGER.error("Can't initialize sctp configuration: ", e);
+        }
+    }
+
+    @PreDestroy
+    public void destroy() {
+        sctpService.stop();
+    }
 
     @Override
     public SctpConfig getSctpConfiguration() throws NoConfigurationException {

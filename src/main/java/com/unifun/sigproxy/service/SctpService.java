@@ -13,6 +13,8 @@ import java.util.Set;
 public interface SctpService {
     void initialize(SctpConfig sctpConfig) throws NoConfigurationException, InitializingException;
 
+    void stop();
+
     void removeAllLinks();
 
     void removeAllServers();

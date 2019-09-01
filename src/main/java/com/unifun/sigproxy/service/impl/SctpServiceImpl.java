@@ -8,7 +8,6 @@ import com.unifun.sigproxy.model.config.SctpServerConfig;
 import com.unifun.sigproxy.model.dto.SctpLinkDto;
 import com.unifun.sigproxy.model.dto.SctpServerDto;
 import com.unifun.sigproxy.model.dto.SctpServerLinkDto;
-import com.unifun.sigproxy.repository.SigtranRepository;
 import com.unifun.sigproxy.service.SctpService;
 import com.unifun.sigproxy.util.GateConstants;
 import lombok.Getter;
@@ -29,8 +28,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SctpServiceImpl implements SctpService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SctpServiceImpl.class);
-
-    private final SigtranRepository sigtranRepository;
 
     @Getter
     private NettySctpManagementImpl sctpManagement;
@@ -61,6 +58,15 @@ public class SctpServiceImpl implements SctpService {
             sctpManagement.getServers().forEach(server -> LOGGER.trace("ServerName: {}", server.getName()));
         }
 
+    }
+
+    @Override
+    public void stop() {
+        try {
+            sctpManagement.removeAllResourses();
+        } catch (Exception e) {
+            LOGGER.error("Can't stop sctpManagement: ", e);
+        }
     }
 
     @Override
