@@ -6,6 +6,8 @@ import lombok.Data;
 public class AspConfig {
     private String aspName;
     private String sctpAssocName;
+    private int aspId;
     private boolean heartbeat = false;
+    @Deprecated
     private String asName;
 }

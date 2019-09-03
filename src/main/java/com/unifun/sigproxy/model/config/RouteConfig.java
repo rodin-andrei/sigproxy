@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class RouteConfig {
     private String asName;
-    private String opc;
-    private String dpc;
-    private String ssn;
+    private int opc;
+    private int dpc;
+    private int ssn;
 }

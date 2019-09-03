@@ -10,6 +10,6 @@ public class AsConfig {
     private String ipspType;
     private String trafficMode;
     private String networkIndicator;
-    private int routingContext = -1;
     private int networkAppearance = -1;
+    private long[] routingContext;
 }
