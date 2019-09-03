@@ -7,6 +7,7 @@ import com.unifun.sigproxy.model.config.SctpConfig;
 import com.unifun.sigproxy.model.config.SctpServerConfig;
 import com.unifun.sigproxy.model.dto.SctpLinkDto;
 import com.unifun.sigproxy.model.dto.SctpServerDto;
+import org.mobicents.protocols.api.Management;
 
 import java.util.Set;
 
@@ -14,6 +15,8 @@ public interface SctpService {
     void initialize(SctpConfig sctpConfig) throws NoConfigurationException, InitializingException;
 
     void stop();
+
+    Management getTransportManagement();
 
     void removeAllLinks();
 

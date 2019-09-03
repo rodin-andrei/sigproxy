@@ -10,11 +10,11 @@ import com.unifun.sigproxy.model.dto.SctpServerDto;
 import com.unifun.sigproxy.model.dto.SctpServerLinkDto;
 import com.unifun.sigproxy.service.SctpService;
 import com.unifun.sigproxy.util.GateConstants;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.mobicents.protocols.api.Association;
 import org.mobicents.protocols.api.AssociationType;
 import org.mobicents.protocols.api.IpChannelType;
+import org.mobicents.protocols.api.Management;
 import org.mobicents.protocols.sctp.netty.NettySctpManagementImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 public class SctpServiceImpl implements SctpService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SctpServiceImpl.class);
 
-    @Getter
     private NettySctpManagementImpl sctpManagement;
 
     @Override
@@ -40,8 +39,7 @@ public class SctpServiceImpl implements SctpService {
             sctpManagement.start();
             sctpManagement.removeAllResourses();
         } catch (Exception e) {
-            LOGGER.error("Can't initialize sctp management. Stopping app. Stacktrace: ", e);
-            throw new InitializingException("Can't initialize sctp management.");
+            throw new InitializingException("Can't initialize sctp management.", e);
         }
         Set<LinkConfig> linkConfig = sctpConfig.getLinkConfig();
         Set<SctpServerConfig> sctpServerConfig = sctpConfig.getSctpServerConfig();
@@ -65,8 +63,13 @@ public class SctpServiceImpl implements SctpService {
         try {
             sctpManagement.removeAllResourses();
         } catch (Exception e) {
-            LOGGER.error("Can't stop sctpManagement: ", e);
+            LOGGER.error("Can't stop SCTP management: ", e);
         }
+    }
+
+    @Override
+    public Management getTransportManagement() {
+        return sctpManagement;
     }
 
     @Override

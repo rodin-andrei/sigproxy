@@ -1,4 +1,4 @@
-package com.unifun.sigproxy.controller.configuration;
+package com.unifun.sigproxy.controller.config;
 
 import com.unifun.sigproxy.exception.NoConfigurationException;
 import com.unifun.sigproxy.model.config.LinkConfig;
