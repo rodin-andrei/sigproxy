@@ -1,39 +1,26 @@
 package com.unifun.sigproxy.controller.monitoring;
 
-import com.unifun.sigproxy.model.config.M3uaConfig;
-import com.unifun.sigproxy.model.config.SigtranConfig;
-import com.unifun.sigproxy.repository.SigtranRepository;
+import com.unifun.sigproxy.model.dto.M3uaAsDTO;
+import com.unifun.sigproxy.service.impl.M3uaServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Set;
+
 @Controller
-@RequestMapping("m3ua")
+@RequestMapping("monitoring/m3ua")
+@RequiredArgsConstructor
 public class M3uaController {
-    private final SigtranRepository sigtranRepository;
+    private final M3uaServiceImpl m3uaService;
 
-    public M3uaController(SigtranRepository sigtranRepository) {
-        this.sigtranRepository = sigtranRepository;
-    }
-
-    @GetMapping(value = "/get", produces = "application/json")
+    @GetMapping(value = "/asStatuses", produces = "application/json")
     @ResponseBody
-    public ResponseEntity<M3uaConfig> getInfo() {
-        SigtranConfig sigtranConfig = sigtranRepository.getSigtranConfig();
-        if (sigtranConfig != null) {
-            return ResponseEntity.ok(sigtranConfig.getM3uaConfig());
-        }
-        return ResponseEntity.noContent().build();
-    }
-
-    @PutMapping(value = "/put", consumes = "application/json")
-    @ResponseBody
-    public ResponseEntity<M3uaConfig> updateM3ua() {
-
-        return ResponseEntity.accepted().build();
+    public ResponseEntity<Set<M3uaAsDTO>> getAsStatuses() {
+       return ResponseEntity.ok(m3uaService.getM3uaStatuses());
     }
 
 }

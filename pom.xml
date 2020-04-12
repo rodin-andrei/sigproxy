@@ -47,52 +47,115 @@
                     <groupId>junit</groupId>
                     <artifactId>junit</artifactId>
                 </exclusion>
+                <exclusion>  <!-- declare the exclusion here -->
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-all</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>org.restcomm.protocols.ss7.sccp</groupId>
             <artifactId>sccp-api</artifactId>
             <version>${mobicents.jss7}</version>
+            <exclusions>
+                <exclusion>  <!-- declare the exclusion here -->
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-all</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.restcomm.protocols.ss7.sccp</groupId>
             <artifactId>sccp-impl</artifactId>
             <version>${mobicents.jss7}</version>
+            <exclusions>
+                <exclusion>  <!-- declare the exclusion here -->
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-all</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.restcomm.protocols.ss7.map</groupId>
             <artifactId>map-impl</artifactId>
             <version>${mobicents.jss7}</version>
+            <exclusions>
+                <exclusion>  <!-- declare the exclusion here -->
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-all</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.restcomm.protocols.ss7.m3ua</groupId>
             <artifactId>m3ua-api</artifactId>
             <version>${mobicents.jss7}</version>
+            <exclusions>
+                <exclusion>  <!-- declare the exclusion here -->
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-all</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.restcomm.protocols.ss7.m3ua</groupId>
             <artifactId>m3ua-impl</artifactId>
             <version>${mobicents.jss7}</version>
+            <exclusions>
+                <exclusion>  <!-- declare the exclusion here -->
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-all</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.restcomm.protocols.ss7.isup</groupId>
             <artifactId>isup-api</artifactId>
             <version>${mobicents.jss7}</version>
+            <exclusions>
+                <exclusion>  <!-- declare the exclusion here -->
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-all</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.restcomm.protocols.ss7.isup</groupId>
             <artifactId>isup-impl</artifactId>
             <version>${mobicents.jss7}</version>
+            <exclusions>
+                <exclusion>  <!-- declare the exclusion here -->
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-all</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.restcomm.protocols.ss7.cap</groupId>
             <artifactId>cap-api</artifactId>
             <version>${mobicents.jss7}</version>
+            <exclusions>
+                <exclusion>  <!-- declare the exclusion here -->
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-all</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.restcomm.protocols.ss7.cap</groupId>
             <artifactId>cap-impl</artifactId>
             <version>${mobicents.jss7}</version>
+            <exclusions>
+                <exclusion>  <!-- declare the exclusion here -->
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-all</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.0.33.Final</version>
         </dependency>
     </dependencies>
 

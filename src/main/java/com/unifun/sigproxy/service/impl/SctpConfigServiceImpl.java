@@ -1,11 +1,8 @@
 package com.unifun.sigproxy.service.impl;
 
-import com.unifun.sigproxy.exception.InitializingException;
-import com.unifun.sigproxy.exception.NoConfigurationException;
-import com.unifun.sigproxy.model.config.LinkConfig;
-import com.unifun.sigproxy.model.config.SctpConfig;
-import com.unifun.sigproxy.model.config.SctpServerConfig;
-import com.unifun.sigproxy.model.config.SigtranConfig;
+import com.unifun.sigproxy.model.config.sctp.LinkConfig;
+import com.unifun.sigproxy.model.config.sctp.SctpConfig;
+import com.unifun.sigproxy.model.config.sctp.SctpServerConfig;
 import com.unifun.sigproxy.repository.SigtranRepository;
 import com.unifun.sigproxy.service.SctpConfigService;
 import com.unifun.sigproxy.service.SctpService;
@@ -14,8 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.util.Optional;
 import java.util.Set;
 
@@ -27,38 +22,19 @@ public class SctpConfigServiceImpl implements SctpConfigService {
     private final SigtranRepository sigtranRepository;
     private final SctpService sctpService;
 
-    @PostConstruct
-    public void init() {
-        try {
-            LOGGER.info("Initializing SCTP Layer.");
-            sctpService.initialize(getSctpConfiguration());
-        } catch (NoConfigurationException | InitializingException e) {
-            LOGGER.error("Can't initialize sctp configuration: ", e);
-        }
-    }
-
-    @PreDestroy
-    public void destroy() {
-        sctpService.stop();
+    @Override
+    public SctpConfig getSctpConfiguration() {
+        return this.sigtranRepository.getSctpConfig();
     }
 
     @Override
-    public SctpConfig getSctpConfiguration() throws NoConfigurationException {
-        SctpConfig sctpConfig = getSigtranConfig().getSctpConfig();
-        if (sctpConfig == null) {
-            throw new NoConfigurationException("No SCTP Configuration.");
-        }
-        return sctpConfig;
+    public Set<LinkConfig> getLinkConfig() {
+        return sigtranRepository.getSctpConfig().getLinkConfig();
     }
 
     @Override
-    public Set<LinkConfig> getLinkConfig() throws NoConfigurationException {
-        return getSctpConfiguration().getLinkConfig();
-    }
-
-    @Override
-    public void setLinkConfig(LinkConfig newLink) throws NoConfigurationException {
-        Set<LinkConfig> linksSet = getSctpConfiguration().getLinkConfig();
+    public void setLinkConfig(LinkConfig newLink) {
+        Set<LinkConfig> linksSet = sigtranRepository.getSctpConfig().getLinkConfig();
 
         linksSet.stream()
                 .filter(link -> link.getLinkName().equals(newLink.getLinkName()))
@@ -72,27 +48,27 @@ public class SctpConfigServiceImpl implements SctpConfigService {
     }
 
     @Override
-    public void setLinkConfig(Set<LinkConfig> newLinks) throws NoConfigurationException {
-        getSctpConfiguration().setLinkConfig(newLinks);
+    public void setLinkConfig(Set<LinkConfig> newLinks) {
+        sigtranRepository.getSctpConfig().setLinkConfig(newLinks);
         sctpService.removeAllLinks();
         sctpService.addNewSctpLinks(newLinks);
     }
 
     @Override
-    public Optional<LinkConfig> getLinkConfig(String linkName) throws NoConfigurationException {
-        return getSctpConfiguration().getLinkConfig().stream()
+    public Optional<LinkConfig> getLinkConfig(String linkName) {
+        return sigtranRepository.getSctpConfig().getLinkConfig().stream()
                 .filter(link -> link.getLinkName() != null && link.getLinkName().equals(linkName))
                 .findFirst();
     }
 
     @Override
-    public Set<SctpServerConfig> getServerConfig() throws NoConfigurationException {
-        return getSctpConfiguration().getSctpServerConfig();
+    public Set<SctpServerConfig> getServerConfig() {
+        return sigtranRepository.getSctpConfig().getSctpServerConfig();
     }
 
     @Override
-    public void setServerConfig(SctpServerConfig newServer) throws NoConfigurationException {
-        Set<SctpServerConfig> servers = getSctpConfiguration().getSctpServerConfig();
+    public void setServerConfig(SctpServerConfig newServer) {
+        Set<SctpServerConfig> servers = sigtranRepository.getSctpConfig().getSctpServerConfig();
 
         servers.stream()
                 .filter(link -> link.getServerName().equals(newServer.getServerName()))
@@ -106,22 +82,22 @@ public class SctpConfigServiceImpl implements SctpConfigService {
     }
 
     @Override
-    public void setServerConfig(Set<SctpServerConfig> newServers) throws NoConfigurationException {
-        getSctpConfiguration().setSctpServerConfig(newServers);
+    public void setServerConfig(Set<SctpServerConfig> newServers) {
+        sigtranRepository.getSctpConfig().setSctpServerConfig(newServers);
         sctpService.removeAllServers();
         sctpService.addNewSctpServers(newServers);
     }
 
     @Override
-    public Optional<SctpServerConfig> getServerConfig(String serverName) throws NoConfigurationException {
-        return getSctpConfiguration().getSctpServerConfig().stream()
+    public Optional<SctpServerConfig> getServerConfig(String serverName) {
+        return sigtranRepository.getSctpConfig().getSctpServerConfig().stream()
                 .filter(link -> link.getServerName() != null && link.getServerName().equals(serverName))
                 .findFirst();
     }
 
     @Override
-    public void updateLinkConfig(LinkConfig newLink) throws NoConfigurationException {
-        Set<LinkConfig> linksSet = getSctpConfiguration().getLinkConfig();
+    public void updateLinkConfig(LinkConfig newLink) {
+        Set<LinkConfig> linksSet = sigtranRepository.getSctpConfig().getLinkConfig();
         linksSet.stream()
                 .filter(link -> link.getLinkName().equals(newLink.getLinkName()))
                 .findFirst()
@@ -137,8 +113,8 @@ public class SctpConfigServiceImpl implements SctpConfigService {
     }
 
     @Override
-    public void updateServerConfig(SctpServerConfig newServer) throws NoConfigurationException {
-        Set<SctpServerConfig> servers = getSctpConfiguration().getSctpServerConfig();
+    public void updateServerConfig(SctpServerConfig newServer) {
+        Set<SctpServerConfig> servers = sigtranRepository.getSctpConfig().getSctpServerConfig();
         servers.stream()
                 .filter(server -> server.getServerName().equals(newServer.getServerName()))
                 .findFirst()
@@ -151,14 +127,5 @@ public class SctpConfigServiceImpl implements SctpConfigService {
                     sctpService.updateSctpServer(oldServer);
                 });
         LOGGER.info("Updated server: {}", newServer.getServerName());
-    }
-
-    private SigtranConfig getSigtranConfig() throws NoConfigurationException {
-        SigtranConfig sigtranConfig = sigtranRepository.getSigtranConfig();
-        if (sigtranConfig == null) {
-            LOGGER.error("Sigtran Configuration is null.");
-            throw new NoConfigurationException("No Sigtran configuration");
-        }
-        return sigtranConfig;
     }
 }

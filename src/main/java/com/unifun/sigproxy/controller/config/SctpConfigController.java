@@ -1,9 +1,9 @@
 package com.unifun.sigproxy.controller.config;
 
 import com.unifun.sigproxy.exception.NoConfigurationException;
-import com.unifun.sigproxy.model.config.LinkConfig;
-import com.unifun.sigproxy.model.config.SctpConfig;
-import com.unifun.sigproxy.model.config.SctpServerConfig;
+import com.unifun.sigproxy.model.config.sctp.LinkConfig;
+import com.unifun.sigproxy.model.config.sctp.SctpConfig;
+import com.unifun.sigproxy.model.config.sctp.SctpServerConfig;
 import com.unifun.sigproxy.service.SctpConfigService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -2,9 +2,9 @@ package com.unifun.sigproxy.service;
 
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.exception.NoConfigurationException;
-import com.unifun.sigproxy.model.config.LinkConfig;
-import com.unifun.sigproxy.model.config.SctpConfig;
-import com.unifun.sigproxy.model.config.SctpServerConfig;
+import com.unifun.sigproxy.model.config.sctp.LinkConfig;
+import com.unifun.sigproxy.model.config.sctp.SctpConfig;
+import com.unifun.sigproxy.model.config.sctp.SctpServerConfig;
 import com.unifun.sigproxy.model.dto.SctpLinkDto;
 import com.unifun.sigproxy.model.dto.SctpServerDto;
 import org.mobicents.protocols.api.Management;
@@ -18,6 +18,10 @@ public interface SctpService {
 
     Management getTransportManagement();
 
+    Set<SctpLinkDto> getLinkStatuses();
+
+    Set<SctpServerDto> getServerLinkStatuses();
+
     void removeAllLinks();
 
     void removeAllServers();
@@ -29,10 +33,6 @@ public interface SctpService {
     void updateSctpServer(SctpServerConfig serverConfig);
 
     void addNewSctpServers(Set<SctpServerConfig> newServers);
-
-    Set<SctpLinkDto> getLinkStatus();
-
-    Set<SctpServerDto> getServerLinkStatuses();
 
     void stopLink(String linkName);
 

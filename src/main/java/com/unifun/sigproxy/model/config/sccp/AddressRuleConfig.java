@@ -1,4 +1,4 @@
-package com.unifun.sigproxy.model.config;
+package com.unifun.sigproxy.model.config.sccp;
 
 import lombok.Data;
 
@@ -19,4 +19,12 @@ public class AddressRuleConfig {
     private String loadsharingAlgorithm;
     private String newCallingPartyAddressId;
     private String originationType;
+
+    @Data
+    public static class RemoteSubSystem {
+        private int rssId;
+        private int dpc; //remote service point code
+        private int ssn; //remote ssn
+        private int rssFlag = 0;
+    }
 }

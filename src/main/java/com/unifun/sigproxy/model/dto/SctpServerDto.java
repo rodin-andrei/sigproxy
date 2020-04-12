@@ -1,6 +1,7 @@
 package com.unifun.sigproxy.model.dto;
 
 import lombok.Data;
+import org.mobicents.protocols.api.Server;
 
 import java.util.Set;
 
@@ -13,4 +14,5 @@ public class SctpServerDto {
     private String[] extraAddresses;
 
     private Set<SctpServerLinkDto> serverLinks;
+
 }

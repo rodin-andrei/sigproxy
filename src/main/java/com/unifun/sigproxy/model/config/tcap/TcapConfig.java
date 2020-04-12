@@ -1,4 +1,4 @@
-package com.unifun.sigproxy.model.config;
+package com.unifun.sigproxy.model.config.tcap;
 
 import lombok.Data;
 

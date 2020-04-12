@@ -2,25 +2,26 @@ package com.unifun.sigproxy.service.impl;
 
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.exception.NoConfigurationException;
-import com.unifun.sigproxy.model.config.LinkConfig;
-import com.unifun.sigproxy.model.config.SctpConfig;
-import com.unifun.sigproxy.model.config.SctpServerConfig;
+import com.unifun.sigproxy.model.config.sctp.LinkConfig;
+import com.unifun.sigproxy.model.config.sctp.SctpConfig;
+import com.unifun.sigproxy.model.config.sctp.SctpServerConfig;
 import com.unifun.sigproxy.model.dto.SctpLinkDto;
 import com.unifun.sigproxy.model.dto.SctpServerDto;
 import com.unifun.sigproxy.model.dto.SctpServerLinkDto;
 import com.unifun.sigproxy.service.SctpService;
 import com.unifun.sigproxy.util.GateConstants;
 import lombok.RequiredArgsConstructor;
-import org.mobicents.protocols.api.Association;
-import org.mobicents.protocols.api.AssociationType;
-import org.mobicents.protocols.api.IpChannelType;
-import org.mobicents.protocols.api.Management;
+import org.mobicents.protocols.api.*;
 import org.mobicents.protocols.sctp.netty.NettySctpManagementImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.testng.collections.Lists;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,6 +30,8 @@ import java.util.stream.Collectors;
 public class SctpServiceImpl implements SctpService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SctpServiceImpl.class);
 
+    @Value("${jss.persist.dir}")
+    private String jssPersistDir;
     private NettySctpManagementImpl sctpManagement;
 
     @Override
@@ -36,11 +39,13 @@ public class SctpServiceImpl implements SctpService {
         try {
             LOGGER.info("Initializing SCTP management...");
             sctpManagement = new NettySctpManagementImpl(GateConstants.STACKNAME);
+            sctpManagement.setPersistDir(this.jssPersistDir);
             sctpManagement.start();
             sctpManagement.removeAllResourses();
         } catch (Exception e) {
             throw new InitializingException("Can't initialize sctp management.", e);
         }
+
         Set<LinkConfig> linkConfig = sctpConfig.getLinkConfig();
         Set<SctpServerConfig> sctpServerConfig = sctpConfig.getSctpServerConfig();
         if (linkConfig.isEmpty() && sctpServerConfig.isEmpty()) {
@@ -61,7 +66,7 @@ public class SctpServiceImpl implements SctpService {
     @Override
     public void stop() {
         try {
-            sctpManagement.removeAllResourses();
+            sctpManagement.stop();
         } catch (Exception e) {
             LOGGER.error("Can't stop SCTP management: ", e);
         }
@@ -108,8 +113,8 @@ public class SctpServiceImpl implements SctpService {
 
     @Override
     public void updateSctpLink(LinkConfig link) {
+        removeSctpLink(link);
         try {
-            removeAssociation(link);
             addSctpLink(link);
         } catch (Exception e) {
             LOGGER.error("Can't create link association " + link.getLinkName() + " .", e);
@@ -125,7 +130,6 @@ public class SctpServiceImpl implements SctpService {
                 LOGGER.error("Can't create new association: {}. {}", link.getLinkName(), e.getMessage());
             }
         });
-
     }
 
     @Override
@@ -150,7 +154,7 @@ public class SctpServiceImpl implements SctpService {
     }
 
     @Override
-    public Set<SctpLinkDto> getLinkStatus() {
+    public Set<SctpLinkDto> getLinkStatuses() {
         return sctpManagement.getAssociations()
                 .values()
                 .stream()
@@ -280,7 +284,7 @@ public class SctpServiceImpl implements SctpService {
         startServer(serverName);
     }
 
-    private void removeAssociation(LinkConfig link) {
+    private void removeSctpLink(LinkConfig link) {
         try {
             sctpManagement.stopAssociation(link.getLinkName());
         } catch (Exception e) {

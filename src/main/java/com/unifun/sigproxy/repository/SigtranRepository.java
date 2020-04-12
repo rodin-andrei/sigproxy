@@ -2,6 +2,10 @@ package com.unifun.sigproxy.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unifun.sigproxy.model.config.*;
+import com.unifun.sigproxy.model.config.m3ua.M3uaConfig;
+import com.unifun.sigproxy.model.config.sccp.SccpConfig;
+import com.unifun.sigproxy.model.config.sctp.SctpConfig;
+import com.unifun.sigproxy.model.config.tcap.TcapConfig;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -10,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Repository;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -25,10 +28,14 @@ public class SigtranRepository {
 
     @Value("${sigtran.file.path}")
     private String jsonConfigPath;
+
     @Getter
     private SigtranConfig sigtranConfig;
+    @Getter
+    private SctpConfig sctpConfig;
+    @Getter
+    private M3uaConfig m3uaConfig;
 
-    @PostConstruct
     public void init() {
         try {
             Path path = Paths.get(jsonConfigPath);
@@ -43,5 +50,7 @@ public class SigtranRepository {
             sigtranConfig.setSccpConfig(new SccpConfig());
             sigtranConfig.setTcapConfig(new TcapConfig());
         }
+        this.sctpConfig = this.sigtranConfig.getSctpConfig();
+        this.m3uaConfig = this.sigtranConfig.getM3uaConfig();
     }
 }

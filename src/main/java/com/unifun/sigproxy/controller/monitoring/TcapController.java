@@ -6,9 +6,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping("tcap")
+@RequestMapping("monitoring/tcap")
 public class TcapController {
-
     @GetMapping(value = "/get", produces = "application/json")
     public @ResponseBody
     String getInfo() {

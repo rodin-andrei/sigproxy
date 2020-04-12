@@ -1,4 +1,4 @@
-package com.unifun.sigproxy.model.config;
+package com.unifun.sigproxy.model.config.m3ua;
 
 import lombok.Data;
 
@@ -8,6 +8,5 @@ public class AspConfig {
     private String sctpAssocName;
     private int aspId;
     private boolean heartbeat = false;
-    @Deprecated
     private String asName;
 }
