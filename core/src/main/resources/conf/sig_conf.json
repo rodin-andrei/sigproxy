@@ -1,0 +1,88 @@
+{
+  "sctpConfig": {
+    "linkConfig": [
+      {
+        "linkName": "SCTP-01",
+        "linkType": "TCP",
+        "remoteAddress": "127.0.0.1",
+        "remotePort": 2234,
+        "localAddress": "127.0.0.1",
+        "localPort": 2235,
+        "extraAddresses": [
+          "127.0.0.2",
+          "127.0.0.3",
+          "127.0.0.4",
+          "127.0.0.5"
+        ]
+      },
+      {
+        "linkName": "SCTP-02",
+        "linkType": "TCP",
+        "remoteAddress": "127.0.0.1",
+        "remotePort": 2222,
+        "localAddress": "127.0.0.1",
+        "localPort": 2223,
+        "extraAddresses": [
+          "127.0.0.2",
+          "127.0.0.3",
+          "127.0.0.4",
+          "127.0.0.5"
+        ]
+      }
+    ],
+    "sctpServerConfig": [
+      {
+        "serverName": "SCTP-SERVER-01",
+        "linkType": "TCP",
+        "localAddress": "127.0.0.1",
+        "localPort": 5000,
+        "extraAddresses": [
+          "192.168.0.106"
+        ],
+        "remoteLinkConfig": [
+          {
+            "linkName": "SCTP-REMOTE-01",
+            "remoteAddress": "192.168.100.2",
+            "remotePort": 2000
+          }
+        ]
+      }
+    ]
+  },
+  "m3uaConfig": {
+    "asConfig": [
+      {
+        "asName": "AS-01",
+        "functionality": "IPSP",
+        "exchangeType": "SE",
+        "ipspType": "CLIENT",
+        "trafficMode": "loadshare",
+        "networkIndicator": 0,
+        "routingContext": [
+          -1
+        ],
+        "networkAppearance": -1
+      }
+    ],
+    "aspConfig": [
+      {
+        "aspName": "ASP-01",
+        "sctpAssocName": "SCTP-01",
+        "heartbeat": true,
+        "asName": "AS-01"
+      }
+    ],
+    "routeConfig": []
+  },
+  "sccpConfig": {
+    "sapConfig": [],
+    "destConfig": [],
+    "rspConfig": [],
+    "rssConfig": [],
+    "addressConfig": [],
+    "addressRuleConfig": []
+  },
+  "tcapConfig": {
+    "localSsn": 0
+  }
+}
