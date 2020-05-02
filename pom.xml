@@ -7,7 +7,7 @@
         <module>core</module>
         <module>jsonModels</module>
         <module>webInterface</module>
-
+        <module>starters</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -16,7 +16,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.unifun</groupId>
+    <groupId>com.unifun.sig-proxy</groupId>
     <artifactId>sig-proxy</artifactId>
     <version>1.0.0</version>
     <name>sig-proxy</name>
@@ -29,5 +29,13 @@
         <lombok.ver>1.18.12</lombok.ver>
         <tomcat.url>sigproxy.server</tomcat.url>
     </properties>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

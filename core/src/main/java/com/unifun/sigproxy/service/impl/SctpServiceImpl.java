@@ -32,7 +32,7 @@ public class SctpServiceImpl implements SctpService {
 
     @Value("${jss.persist.dir}")
     private String jssPersistDir;
-    private NettySctpManagementImpl sctpManagement;
+    private Management sctpManagement;
 
     @Override
     public void initialize(final SctpConfig sctpConfig) throws NoConfigurationException, InitializingException {

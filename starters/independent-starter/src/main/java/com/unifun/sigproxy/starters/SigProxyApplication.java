@@ -1,4 +1,4 @@
-package com.unifun.sigproxy;
+package com.unifun.sigproxy.starters;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

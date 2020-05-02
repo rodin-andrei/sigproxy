@@ -27,24 +27,20 @@ public class SigtranServiceImpl implements SigtranService {
     @PostConstruct
     private void init() {
         sigtranRepository.init();
-
+        LOGGER.info("Initializing Sigtran stack.");
         try {
-            LOGGER.info("Initializing Sigtran stack.");
-            LOGGER.info("Initializing SCTP layer.");
             initSctp();
-            LOGGER.info("Initializing M3UA layer.");
             initM3ua();
-        } catch (NoConfigurationException| InitializingException e) {
+        } catch (NoConfigurationException | InitializingException e) {
             LOGGER.error("Can't initialize Sigtran Stack: ", e);
         }
     }
 
     private void initM3ua() throws NoConfigurationException, InitializingException {
         try {
-            LOGGER.info("Initializing M3ua Layer.");
+            LOGGER.info("Initializing M3UA Layer.");
             m3uaService.initialize(sigtranRepository.getM3uaConfig());
         } catch (NoConfigurationException | InitializingException e) {
-            LOGGER.error("Can't initialize M3ua configuration: ", e);
             throw e;
         }
     }
@@ -54,7 +50,6 @@ public class SigtranServiceImpl implements SigtranService {
             LOGGER.info("Initializing SCTP Layer.");
             sctpService.initialize(sigtranRepository.getSctpConfig());
         } catch (NoConfigurationException | InitializingException e) {
-            LOGGER.error("Can't initialize sctp configuration: ", e);
             throw e;
         }
     }
