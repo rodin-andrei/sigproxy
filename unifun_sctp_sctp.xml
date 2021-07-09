@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<connectdelay value="5000"/>
+<congControl_DelayThreshold_1 value="2.5"/>
+<congControl_DelayThreshold_2 value="8.0"/>
+<congControl_DelayThreshold_3 value="14.0"/>
+<congControl_BackToNormalDelayThreshold_1 value="1.5"/>
+<congControl_BackToNormalDelayThreshold_2 value="5.5"/>
+<congControl_BackToNormalDelayThreshold_3 value="10.0"/>
+<servers>
+<server name="server2" started="true" hostAddress="127.0.0.1" hostPort="13000" ipChannelType="1"
+        acceptAnonymousConnections="false" maxConcurrentConnectionsCount="0" extraHostAddresseSize="0">
+    <associations>
+        <string value="unifun2"/>
+    </associations>
+</server>
+</servers>
+<associations>
+<name value="unifun2"/>
+<association name="unifun2" assoctype="SERVER" hostPort="0" peerAddress="127.0.0.1" peerPort="12000"
+             serverName="server2" ipChannelType="1" extraHostAddresseSize="0"/>
+<name value="unifun1"/>
+<association name="unifun1" assoctype="CLIENT" hostAddress="127.0.0.1" hostPort="12000" peerAddress="127.0.0.1"
+             peerPort="13000" ipChannelType="1" extraHostAddresseSize="0"/>
+</associations>
