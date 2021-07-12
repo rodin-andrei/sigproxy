@@ -1,7 +1,7 @@
 package com.unifun.sigproxy.controller.monitoring;
 
-import com.unifun.sigproxy.dto.SctpLinkDto;
-import com.unifun.sigproxy.dto.SctpServerDto;
+import com.unifun.sigproxy.controller.dto.SctpLinkDto;
+import com.unifun.sigproxy.controller.dto.SctpServerDto;
 import com.unifun.sigproxy.service.SctpService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

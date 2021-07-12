@@ -1,6 +1,6 @@
 package com.unifun.sigproxy.controller.monitoring;
 
-import com.unifun.sigproxy.dto.M3uaAsDTO;
+import com.unifun.sigproxy.controller.dto.M3uaAsDTO;
 import com.unifun.sigproxy.service.impl.M3uaServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

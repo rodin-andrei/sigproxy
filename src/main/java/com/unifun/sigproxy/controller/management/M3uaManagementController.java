@@ -1,6 +1,6 @@
 package com.unifun.sigproxy.controller.management;
 
-import com.unifun.sigproxy.dto.M3uaMessageDto;
+import com.unifun.sigproxy.controller.dto.M3uaMessageDto;
 import com.unifun.sigproxy.service.impl.M3uaServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

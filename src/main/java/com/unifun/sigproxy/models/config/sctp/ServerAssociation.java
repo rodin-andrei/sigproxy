@@ -1,5 +1,6 @@
 package com.unifun.sigproxy.models.config.sctp;
 
+import com.unifun.sigproxy.models.config.SigtranStack;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -20,4 +21,8 @@ public class ServerAssociation {
     @ManyToOne
     @JoinColumn(name = "server_id", nullable = false)
     private SctpServer sctpServer;
+
+    @ManyToOne
+    @JoinColumn(name = "stack_id", nullable = false)
+    private SigtranStack sigtranStack;
 }

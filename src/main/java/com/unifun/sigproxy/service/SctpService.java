@@ -1,9 +1,8 @@
 package com.unifun.sigproxy.service;
 
-import com.unifun.sigproxy.dto.SctpLinkDto;
-import com.unifun.sigproxy.dto.SctpServerDto;
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.exception.NoConfigurationException;
+import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.sctp.ClientAssociation;
 import com.unifun.sigproxy.models.config.sctp.SctpServer;
 import org.mobicents.protocols.api.Management;
@@ -11,33 +10,34 @@ import org.mobicents.protocols.api.Management;
 import java.util.Set;
 
 public interface SctpService {
-    void initialize() throws NoConfigurationException, InitializingException;
 
-    void stop();
+    void initialize(SigtranStack sigtranStack) throws NoConfigurationException, InitializingException;
 
-    Management getTransportManagement();
+    void stopStack(String sigtranStack);
 
-    Set<SctpLinkDto> getLinkStatuses();
+    Management getTransportManagement(String sigtranStack);
 
-    Set<SctpServerDto> getServerLinkStatuses();
+    void addLink(ClientAssociation link, String sigtranStack);
 
-    void removeAllLinks();
+    void addLinks(Set<ClientAssociation> newLinks, String sigtranStack);
 
-    void removeAllServers();
+    void removeSctpLink(ClientAssociation link, String sigtranStack);
 
-    void addLink(ClientAssociation clientAssociation);
+    void addServer(SctpServer serverConfig, String sigtranStack);
 
-    void addLinks(Set<ClientAssociation> newLinks);
+    void addServers(Set<SctpServer> newServers, String sigtranStack);
 
-    void addServer(SctpServer serverConfig);
+    void removeAllLinks(String sigtranStack);
 
-    void addServers(Set<SctpServer> newServers);
+    void startLink(String linkName, String sigtranStack);
 
-    void stopLink(String linkName);
+    void stopLink(String linkName, String sigtranStack);
 
-    void startLink(String linkName);
+    void startServer(String serverName, String sigtranStack);
 
-    void stopServer(String serverName);
+    void stopServer(String serverName, String sigtranStack);
 
-    void startServer(String serverName);
+    void removeServer(SctpServer serverConfig, String sigtranStack);
+
+    void removeAllServers(String sigtranStack);
 }

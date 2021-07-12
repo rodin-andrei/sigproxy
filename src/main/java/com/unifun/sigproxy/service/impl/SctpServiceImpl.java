@@ -1,32 +1,24 @@
 package com.unifun.sigproxy.service.impl;
 
-import com.unifun.sigproxy.dto.SctpLinkDto;
-import com.unifun.sigproxy.dto.SctpServerDto;
-import com.unifun.sigproxy.dto.SctpServerLinkDto;
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.exception.NoConfigurationException;
+import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.sctp.ClientAssociation;
 import com.unifun.sigproxy.models.config.sctp.SctpServer;
-import com.unifun.sigproxy.repository.sctp.RemoteSctpLinkRepository;
-import com.unifun.sigproxy.repository.sctp.SctpLinkRepository;
-import com.unifun.sigproxy.repository.sctp.SctpServerRepository;
 import com.unifun.sigproxy.service.SctpService;
-import com.unifun.sigproxy.util.GateConstants;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mobicents.protocols.api.Association;
-import org.mobicents.protocols.api.AssociationType;
 import org.mobicents.protocols.api.IpChannelType;
 import org.mobicents.protocols.api.Management;
 import org.mobicents.protocols.sctp.netty.NettySctpManagementImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.testng.collections.Lists;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -34,115 +26,124 @@ import java.util.stream.Collectors;
 public class SctpServiceImpl implements SctpService {
     @Value("${jss.persist.dir}")
     private String jssPersistDir;
-
-    private final SctpLinkRepository sctpLinkRepository;
-    private final SctpServerRepository sctpServerRepository;
-    private final RemoteSctpLinkRepository remoteSctpLinkRepository;
     @Getter
-    private Management sctpManagement;
+    private final Map<String, Management> sctpManagements = new HashMap<>();
 
     @Override
-    public void initialize() throws NoConfigurationException, InitializingException {
+    public void initialize(SigtranStack sigtranStack) throws NoConfigurationException, InitializingException {
         try {
             log.info("Initializing SCTP management...");
-            sctpManagement = new NettySctpManagementImpl(GateConstants.STACKNAME + "_sctp");
+            if (sctpManagements.containsKey(sigtranStack.getStackName())) {
+                throw new InitializingException("SctpManagement: " + sigtranStack.getStackName() + " already exist");
+            }
+            var sctpManagement = new NettySctpManagementImpl(sigtranStack.getStackName());
+            sctpManagements.put(sigtranStack.getStackName(), sctpManagement);
             sctpManagement.setPersistDir(this.jssPersistDir);
             sctpManagement.start();
             sctpManagement.removeAllResourses();
         } catch (Exception e) {
-            throw new InitializingException("Can't initialize sctp management.", e);
+            throw new InitializingException("Can't initialize sctp management: " + sigtranStack.getStackName(), e);
         }
 
-        List<ClientAssociation> clientAssociation = sctpLinkRepository.findAll();
-        List<SctpServer> sctpServer = sctpServerRepository.findAll();
-        if (clientAssociation.isEmpty() && sctpServer.isEmpty()) {
-            throw new NoConfigurationException("No links or servers to configure for SCTP.");
+        var clientAssociations = sigtranStack.getAssociations();
+        var sctpServers = sigtranStack.getSctpServers();
+        if (clientAssociations.isEmpty() && sctpServers.isEmpty()) {
+            throw new NoConfigurationException("No links or servers to configure for SCTP managment: " + sigtranStack.getStackName());
         }
-        sctpServer.forEach(this::addServer);
-        clientAssociation.forEach(this::addLink);
+
+        addServers(sctpServers, sigtranStack.getStackName());
+        addLinks(clientAssociations, sigtranStack.getStackName());
 
         if (log.isTraceEnabled()) {
             log.trace("Get Configured Associations...");
-            sctpManagement.getAssociations().forEach((key, value) -> log.trace("Key: {} Value: {}", key, value));
+            sctpManagements.get(sigtranStack.getStackName())
+                    .getAssociations()
+                    .forEach((key, value) -> log.trace("Key: {} Value: {}", key, value));
             log.trace("Get Configured Servers...");
-            sctpManagement.getServers().forEach(server -> log.trace("ServerName: {}", server.getName()));
+            sctpManagements.get(sigtranStack.getStackName())
+                    .getServers()
+                    .forEach(server -> log.trace("ServerName: {}", server.getName()));
         }
     }
 
     @Override
-    public void stop() {
+    public void stopStack(String sigtranStack) {
         try {
-            sctpManagement.stop();
+            sctpManagements.get(sigtranStack).stop();
         } catch (Exception e) {
-            log.error("Can't stop SCTP management: ", e);
+            log.error("Can't stop SCTP management: {}", sigtranStack, e);
         }
     }
 
     @Override
-    public Management getTransportManagement() {
-        return this.sctpManagement;
+    public Management getTransportManagement(String sigtranStack) {
+        return this.sctpManagements.get(sigtranStack);
     }
 
     @Override
-    public void addLink(ClientAssociation link) {
+    public void addLink(ClientAssociation link, String sigtranStack) {
         //TODO add check already exist assoc
         try {
-            Association association = sctpManagement.addAssociation(
-                    link.getLocalAddress(),
-                    link.getLocalPort(),
-                    link.getRemoteAddress(),
-                    link.getRemotePort(),
-                    link.getLinkName(),
-                    IpChannelType.TCP,
-                    link.getMultihomingAddresses()
-            );
+            Association association = sctpManagements.get(sigtranStack)
+                    .addAssociation(
+                            link.getLocalAddress(),
+                            link.getLocalPort(),
+                            link.getRemoteAddress(),
+                            link.getRemotePort(),
+                            link.getLinkName(),
+                            IpChannelType.TCP,
+                            link.getMultihomingAddresses()
+                    );
+            log.info("Added client association: {} to {} sigtran stack", link.getLinkName(), sigtranStack);
         } catch (Exception e) {
             log.error("Can't create link association " + link.getLinkName() + " . ", e);
         }
     }
 
     @Override
-    public void addLinks(Set<ClientAssociation> newLinks) {
-        newLinks.forEach(this::addLink);
+    public void addLinks(Set<ClientAssociation> newLinks, String sigtranStack) {
+        newLinks.forEach(clientAssociation -> addLink(clientAssociation, sigtranStack));
     }
 
     @Override
-    public void addServer(SctpServer serverConfig) {
+    @Deprecated
+    public void startLink(String linkName, String sigtranStack) {
         try {
-            sctpManagement.addServer(
-                    serverConfig.getServerName(),
-                    serverConfig.getLocalAddress(),
-                    serverConfig.getLocalPort(),
-                    IpChannelType.TCP,
-                    serverConfig.getMultihomingAddresses()
-            );
-            serverConfig.getServerAssociations().forEach(remoteLink -> {
-                try {
-                    sctpManagement.addServerAssociation(
-                            remoteLink.getRemoteAddress(),
-                            remoteLink.getRemotePort(),
-                            serverConfig.getServerName(),
-                            remoteLink.getLinkName(),
-                            IpChannelType.TCP);
-                } catch (Exception e) {
-                    log.error("Can't create serverAssociation " + remoteLink.getLinkName() + " .", e);
-                }
-            });
-            startServer(serverConfig.getServerName());
+            sctpManagements.get(sigtranStack).startAssociation(linkName);
+            log.info("Started link: {}, sigtran stack: {}", linkName, sigtranStack);
 
         } catch (Exception e) {
-            log.error("Can't create server {}. {}", serverConfig.getServerName(), e.getMessage(), e);
+            log.warn(e.getMessage(), e);
         }
     }
 
     @Override
-    public void addServers(Set<SctpServer> newServers) {
-        newServers.forEach(this::addServer);
+    public void stopLink(String linkName, String sigtranStack) {
+        try {
+            sctpManagements.get(sigtranStack).stopAssociation(linkName);
+            log.info("Stopped link: {}, sigtran stack: {}", linkName, sigtranStack);
+        } catch (Exception e) {
+            log.warn(e.getMessage(), e);
+        }
     }
 
+    @Override
+    public void removeSctpLink(ClientAssociation link, String sigtranStack) {
+        try {
+            sctpManagements.get(sigtranStack).stopAssociation(link.getLinkName());
+        } catch (Exception e) {
+            log.info(e.getMessage());
+        }
+        try {
+            sctpManagements.get(sigtranStack).removeAssociation(link.getLinkName());
+        } catch (Exception e) {
+            log.warn(e.getMessage(), e);
+        }
+    }
 
     @Override
-    public void removeAllLinks() {
+    public void removeAllLinks(String sigtranStack) {
+        Management sctpManagement = sctpManagements.get(sigtranStack);
         sctpManagement.getAssociations().values()
                 .forEach(assoc -> {
                     try {
@@ -159,128 +160,82 @@ public class SctpServiceImpl implements SctpService {
     }
 
     @Override
-    public Set<SctpLinkDto> getLinkStatuses() {
-        return sctpManagement.getAssociations()
-                .values()
-                .stream()
-                .filter(assoc -> assoc.getAssociationType().equals(AssociationType.CLIENT))
-                .map(assoc -> {
-                    SctpLinkDto sctpLinkDto = new SctpLinkDto();
-                    sctpLinkDto.setLinkName(assoc.getName());
-                    sctpLinkDto.setLocalAddress(assoc.getHostAddress());
-                    sctpLinkDto.setLocalPort(assoc.getHostPort());
-                    sctpLinkDto.setRemoteAddress(assoc.getPeerAddress());
-                    sctpLinkDto.setRemotePort(assoc.getPeerPort());
-                    sctpLinkDto.setExtraAddresses(assoc.getExtraHostAddresses());
-                    sctpLinkDto.setUp(assoc.isUp());
-                    sctpLinkDto.setStarted(assoc.isStarted());
-                    return sctpLinkDto;
-                })
-                .collect(Collectors.toSet());
-    }
-
-    @Override
-    public Set<SctpServerDto> getServerLinkStatuses() {
-        //TODO: 30-08-2019 Check if we have alternative of working with this type of lists
-        return Lists.newArrayList(sctpManagement.getServers())
-                .stream()
-                .map(server -> {
-                    SctpServerDto sctpServerDto = new SctpServerDto();
-                    sctpServerDto.setServerName(server.getName());
-                    sctpServerDto.setLocalAddress(server.getHostAddress());
-                    sctpServerDto.setLocalPort(server.getHostport());
-                    sctpServerDto.setExtraAddresses(server.getExtraHostAddresses());
-
-                    sctpServerDto.setServerLinks(
-                            Lists.newArrayList(server.getAssociations())
-                                    .stream()
-                                    .map(assocName -> {
-                                        try {
-                                            final Association association = sctpManagement.getAssociation(assocName);
-                                            SctpServerLinkDto linkDto = new SctpServerLinkDto();
-                                            linkDto.setLinkName(association.getName());
-                                            linkDto.setRemoteAddress(association.getPeerAddress());
-                                            linkDto.setRemotePort(association.getPeerPort());
-                                            linkDto.setUp(association.isUp());
-                                            linkDto.setStarted(association.isStarted());
-                                            return linkDto;
-                                        } catch (Exception e) {
-                                            log.warn("Can't found link {} for server {}.",
-                                                    assocName, server.getName(), e);
-                                            return null;
-                                        }
-                                    })
-                                    .collect(Collectors.toSet())
+    public void addServer(SctpServer serverConfig, String sigtranStack) {
+        try {
+            sctpManagements.get(sigtranStack)
+                    .addServer(
+                            serverConfig.getName(),
+                            serverConfig.getLocalAddress(),
+                            serverConfig.getLocalPort(),
+                            IpChannelType.TCP,
+                            serverConfig.getMultihomingAddresses()
                     );
-                    return sctpServerDto;
-                })
-                .collect(Collectors.toSet());
-    }
+            log.info("Added server: {} to {} sigtran stack", serverConfig.getName(), sigtranStack);
 
-    @Override
-    public void startLink(String linkName) {
-        try {
-            sctpManagement.startAssociation(linkName);
-        } catch (Exception e) {
-            log.warn(e.getMessage(), e);
-        }
-    }
+            serverConfig.getServerAssociations().forEach(serverAssociation -> {
+                try {
+                    sctpManagements.get(sigtranStack)
+                            .addServerAssociation(
+                                    serverAssociation.getRemoteAddress(),
+                                    serverAssociation.getRemotePort(),
+                                    serverConfig.getName(),
+                                    serverAssociation.getLinkName(),
+                                    IpChannelType.TCP);
+                    log.info("Added server association: {} to {} sigtran stack", serverAssociation.getLinkName(),
+                            sigtranStack);
+                } catch (Exception e) {
+                    log.error("Can't create serverAssociation {}.", serverAssociation.getLinkName(), e);
+                }
+            });
 
-    @Override
-    public void stopLink(String linkName) {
-        try {
-            sctpManagement.stopAssociation(linkName);
+            startServer(serverConfig.getName(), sigtranStack);
         } catch (Exception e) {
-            log.warn(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public void startServer(String serverName) {
-        try {
-            sctpManagement.startServer(serverName);
-        } catch (Exception e) {
-            log.warn(e.getMessage(), e);
+            log.error("Can't create server {}. {}", serverConfig.getName(), e.getMessage(), e);
         }
     }
 
     @Override
-    public void stopServer(String serverName) {
-        try {
-            sctpManagement.stopServer(serverName);
-        } catch (Exception e) {
-            log.warn(e.getMessage(), e);
-        }
+    public void addServers(Set<SctpServer> newServers, String sigtranStack) {
+        newServers.forEach(sctpServer -> addServer(sctpServer, sigtranStack));
     }
 
-    private void removeSctpLink(ClientAssociation link) {
+    @Override
+    public void startServer(String serverName, String sigtranStack) {
         try {
-            sctpManagement.stopAssociation(link.getLinkName());
-        } catch (Exception e) {
-            log.info(e.getMessage());
-        }
-        try {
-            sctpManagement.removeAssociation(link.getLinkName());
-        } catch (Exception e) {
-            log.warn(e.getMessage(), e);
-        }
-    }
+            sctpManagements.get(sigtranStack).startServer(serverName);
+            log.info("Started server: {}, sigtran stack: {}", serverName, sigtranStack);
 
-    private void removeServer(SctpServer serverConfig) {
-        try {
-            sctpManagement.stopServer(serverConfig.getServerName());
-        } catch (Exception e) {
-            log.warn(e.getMessage(), e);
-        }
-        try {
-            sctpManagement.removeServer(serverConfig.getServerName());
         } catch (Exception e) {
             log.warn(e.getMessage(), e);
         }
     }
 
     @Override
-    public void removeAllServers() {
+    public void stopServer(String serverName, String sigtranStack) {
+        try {
+            sctpManagements.get(sigtranStack).stopServer(serverName);
+        } catch (Exception e) {
+            log.warn(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void removeServer(SctpServer serverConfig, String sigtranStack) {
+        try {
+            sctpManagements.get(sigtranStack).stopServer(serverConfig.getName());
+        } catch (Exception e) {
+            log.warn(e.getMessage(), e);
+        }
+        try {
+            sctpManagements.get(sigtranStack).removeServer(serverConfig.getName());
+        } catch (Exception e) {
+            log.warn(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void removeAllServers(String sigtranStack) {
+        Management sctpManagement = sctpManagements.get(sigtranStack);
         sctpManagement.getServers()
                 .forEach(server -> {
                     try {

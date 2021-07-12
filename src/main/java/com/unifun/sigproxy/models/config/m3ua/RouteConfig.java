@@ -1,5 +1,6 @@
 package com.unifun.sigproxy.models.config.m3ua;
 
+import com.unifun.sigproxy.models.config.SigtranStack;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -23,4 +24,8 @@ public class RouteConfig {
 
     @Enumerated(EnumType.STRING)
     private TrafficModeType trafficModeType;
+
+    @ManyToOne
+    @JoinColumn(name = "stack_id", nullable = false)
+    private SigtranStack sigtranStack;
 }

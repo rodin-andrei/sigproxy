@@ -1,5 +1,6 @@
 package com.unifun.sigproxy.models.config.m3ua;
 
+import com.unifun.sigproxy.models.config.SigtranStack;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,10 +23,7 @@ public class AspConfig {
 
     private String sctpAssocName;
 
-    private Integer aspId;
-
     private boolean heartbeat;
-
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -34,4 +32,8 @@ public class AspConfig {
             inverseJoinColumns = {@JoinColumn(name = "as_id")}
     )
     private Set<AsConfig> applicationServers;
+
+    @ManyToOne
+    @JoinColumn(name = "stack_id", nullable = false)
+    private SigtranStack sigtranStack;
 }

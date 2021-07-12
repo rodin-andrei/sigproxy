@@ -53,7 +53,7 @@ public class TestService {
         SctpServer sctpServer = new SctpServer();
         sctpServer.setLocalAddress("127.0.0.1");
         sctpServer.setLocalPort(13000);
-        sctpServer.setServerName("server2");
+        sctpServer.setName("server2");
         sctpServerRepository.save(sctpServer);
 
 
@@ -69,7 +69,6 @@ public class TestService {
         HashSet<AspConfig> applicationServerPoints = new HashSet<>();
 
         AspConfig aspConfig = new AspConfig();
-        aspConfig.setAspId(1);
         aspConfig.setName("unifun2_asp");
         aspConfig.setSctpAssocName(serverAssociation.getLinkName());
         aspConfig.setHeartbeat(true);
@@ -106,7 +105,6 @@ public class TestService {
         HashSet<AspConfig> applicationServerPoints = new HashSet<>();
 
         AspConfig aspConfig = new AspConfig();
-        aspConfig.setAspId(1);
         aspConfig.setName("unifun1_asp");
         aspConfig.setSctpAssocName(s.getLinkName());
         aspConfig.setHeartbeat(true);
