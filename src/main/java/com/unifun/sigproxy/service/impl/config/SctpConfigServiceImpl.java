@@ -1,6 +1,6 @@
-package com.unifun.sigproxy.service.impl;
+package com.unifun.sigproxy.service.impl.config;
 
-import com.unifun.sigproxy.models.config.sctp.ClientLink;
+import com.unifun.sigproxy.models.config.sctp.ClientAssociation;
 import com.unifun.sigproxy.models.config.sctp.SctpServer;
 import com.unifun.sigproxy.repository.sctp.RemoteSctpLinkRepository;
 import com.unifun.sigproxy.repository.sctp.SctpLinkRepository;
@@ -24,8 +24,8 @@ public class SctpConfigServiceImpl implements SctpConfigService {
 
 
     @Override
-    public void addLink(ClientLink newLink) {
-        List<ClientLink> existLinks = sctpLinkRepository.findAll();
+    public void addLink(ClientAssociation newLink) {
+        List<ClientAssociation> existLinks = sctpLinkRepository.findAll();
 
         boolean present = existLinks.stream()
                 .anyMatch(link -> link.getLinkName().equals(newLink.getLinkName()));
@@ -37,17 +37,17 @@ public class SctpConfigServiceImpl implements SctpConfigService {
     }
 
     @Override
-    public void addLinks(Set<ClientLink> newLinks) {
+    public void addLinks(Set<ClientAssociation> newLinks) {
         newLinks.forEach(this::addLink);
     }
 
     @Override
-    public List<ClientLink> getLinkConfigs() {
+    public List<ClientAssociation> getLinkConfigs() {
         return sctpLinkRepository.findAll();
     }
 
     @Override
-    public Optional<ClientLink> getLinkConfig(String linkName) {
+    public Optional<ClientAssociation> getLinkConfig(String linkName) {
         //TODO replace to findByName
         return sctpLinkRepository.findAll().stream()
                 .filter(link -> link.getLinkName() != null && link.getLinkName().equals(linkName))

@@ -9,7 +9,7 @@ import javax.persistence.Id;
 
 @Data
 @Entity
-public class ClientLink {
+public class ClientAssociation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

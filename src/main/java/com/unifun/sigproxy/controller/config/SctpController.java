@@ -1,6 +1,6 @@
 package com.unifun.sigproxy.controller.config;
 
-import com.unifun.sigproxy.models.config.sctp.ClientLink;
+import com.unifun.sigproxy.models.config.sctp.ClientAssociation;
 import com.unifun.sigproxy.models.config.sctp.SctpServer;
 import com.unifun.sigproxy.service.SctpConfigService;
 import com.unifun.sigproxy.service.SctpService;
@@ -23,27 +23,27 @@ public class SctpController {
 
     @GetMapping(value = "/link", produces = "application/json")
     @ResponseBody
-    public ResponseEntity<List<ClientLink>> getLinkInfo() {
+    public ResponseEntity<List<ClientAssociation>> getLinkInfo() {
         return ResponseEntity.ok(sctpConfigService.getLinkConfigs());
     }
 
     @GetMapping(value = "/link/{linkName}", produces = "application/json")
     @ResponseBody
-    public ResponseEntity<ClientLink> getLinkInfo(@PathVariable String linkName) {
-        Optional<ClientLink> linkConfig = sctpConfigService.getLinkConfig(linkName);
+    public ResponseEntity<ClientAssociation> getLinkInfo(@PathVariable String linkName) {
+        Optional<ClientAssociation> linkConfig = sctpConfigService.getLinkConfig(linkName);
         return linkConfig.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());
     }
 
     @PostMapping(value = "/link", consumes = "application/json")
-    public void postLinkInfo(@RequestBody ClientLink clientLink) {
-        sctpConfigService.addLink(clientLink);
-        sctpService.addLink(clientLink);
+    public void postLinkInfo(@RequestBody ClientAssociation clientAssociation) {
+        sctpConfigService.addLink(clientAssociation);
+        sctpService.addLink(clientAssociation);
     }
 
     @PostMapping(value = "/links", consumes = "application/json")
-    public void postLinkInfo(@RequestBody Set<ClientLink> clientLinks) {
-        sctpConfigService.addLinks(clientLinks);
-        sctpService.addLinks(clientLinks);
+    public void postLinkInfo(@RequestBody Set<ClientAssociation> clientAssociations) {
+        sctpConfigService.addLinks(clientAssociations);
+        sctpService.addLinks(clientAssociations);
     }
 
 

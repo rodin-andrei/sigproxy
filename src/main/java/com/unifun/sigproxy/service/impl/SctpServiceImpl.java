@@ -5,7 +5,7 @@ import com.unifun.sigproxy.dto.SctpServerDto;
 import com.unifun.sigproxy.dto.SctpServerLinkDto;
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.exception.NoConfigurationException;
-import com.unifun.sigproxy.models.config.sctp.ClientLink;
+import com.unifun.sigproxy.models.config.sctp.ClientAssociation;
 import com.unifun.sigproxy.models.config.sctp.SctpServer;
 import com.unifun.sigproxy.repository.sctp.RemoteSctpLinkRepository;
 import com.unifun.sigproxy.repository.sctp.SctpLinkRepository;
@@ -53,13 +53,13 @@ public class SctpServiceImpl implements SctpService {
             throw new InitializingException("Can't initialize sctp management.", e);
         }
 
-        List<ClientLink> clientLink = sctpLinkRepository.findAll();
+        List<ClientAssociation> clientAssociation = sctpLinkRepository.findAll();
         List<SctpServer> sctpServer = sctpServerRepository.findAll();
-        if (clientLink.isEmpty() && sctpServer.isEmpty()) {
+        if (clientAssociation.isEmpty() && sctpServer.isEmpty()) {
             throw new NoConfigurationException("No links or servers to configure for SCTP.");
         }
         sctpServer.forEach(this::addServer);
-        clientLink.forEach(this::addLink);
+        clientAssociation.forEach(this::addLink);
 
         if (log.isTraceEnabled()) {
             log.trace("Get Configured Associations...");
@@ -84,7 +84,7 @@ public class SctpServiceImpl implements SctpService {
     }
 
     @Override
-    public void addLink(ClientLink link) {
+    public void addLink(ClientAssociation link) {
         //TODO add check already exist assoc
         try {
             Association association = sctpManagement.addAssociation(
@@ -102,7 +102,7 @@ public class SctpServiceImpl implements SctpService {
     }
 
     @Override
-    public void addLinks(Set<ClientLink> newLinks) {
+    public void addLinks(Set<ClientAssociation> newLinks) {
         newLinks.forEach(this::addLink);
     }
 
@@ -116,7 +116,7 @@ public class SctpServiceImpl implements SctpService {
                     IpChannelType.TCP,
                     serverConfig.getMultihomingAddresses()
             );
-            serverConfig.getServerLinks().forEach(remoteLink -> {
+            serverConfig.getServerAssociations().forEach(remoteLink -> {
                 try {
                     sctpManagement.addServerAssociation(
                             remoteLink.getRemoteAddress(),
@@ -205,7 +205,8 @@ public class SctpServiceImpl implements SctpService {
                                             linkDto.setStarted(association.isStarted());
                                             return linkDto;
                                         } catch (Exception e) {
-                                            log.warn("Can't found link {} for server {}.", assocName, server.getName(), e);
+                                            log.warn("Can't found link {} for server {}.",
+                                                    assocName, server.getName(), e);
                                             return null;
                                         }
                                     })
@@ -252,7 +253,7 @@ public class SctpServiceImpl implements SctpService {
         }
     }
 
-    private void removeSctpLink(ClientLink link) {
+    private void removeSctpLink(ClientAssociation link) {
         try {
             sctpManagement.stopAssociation(link.getLinkName());
         } catch (Exception e) {

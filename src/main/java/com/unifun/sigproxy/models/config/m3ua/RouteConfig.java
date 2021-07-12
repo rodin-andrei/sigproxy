@@ -17,9 +17,9 @@ public class RouteConfig {
 
     private int ssn;
 
-//    @ManyToOne
-//    @JoinColumn(name = "as_id", nullable = false)
-//    private AsConfig as;
+    @ManyToOne
+    @JoinColumn(name = "as_id", nullable = false)
+    private AsConfig as;
 
     @Enumerated(EnumType.STRING)
     private TrafficModeType trafficModeType;

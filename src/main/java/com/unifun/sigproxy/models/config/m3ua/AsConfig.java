@@ -44,8 +44,8 @@ public class AsConfig {
     @ManyToMany(mappedBy = "applicationServers")
     private Set<AspConfig> applicationServerPoints;
 
-//    @OneToMany(fetch = FetchType.EAGER, mappedBy = "as")
-//    private Set<RouteConfig> routes;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "as")
+    private Set<RouteConfig> routes;
 
 
 }

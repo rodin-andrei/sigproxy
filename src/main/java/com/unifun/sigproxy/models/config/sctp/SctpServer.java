@@ -25,6 +25,6 @@ public class SctpServer {
     private String[] multihomingAddresses;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "sctpServer")
-    private Set<ServerLink> serverLinks;
+    private Set<ServerAssociation> serverAssociations;
 
 }

@@ -1,6 +1,6 @@
 package com.unifun.sigproxy.service;
 
-import com.unifun.sigproxy.models.config.sctp.ClientLink;
+import com.unifun.sigproxy.models.config.sctp.ClientAssociation;
 import com.unifun.sigproxy.models.config.sctp.SctpServer;
 
 import java.util.List;
@@ -9,13 +9,13 @@ import java.util.Set;
 
 public interface SctpConfigService {
 
-    void addLink(ClientLink newLink);
+    void addLink(ClientAssociation newLink);
 
-    void addLinks(Set<ClientLink> newLinks);
+    void addLinks(Set<ClientAssociation> newLinks);
 
-    List<ClientLink> getLinkConfigs();
+    List<ClientAssociation> getLinkConfigs();
 
-    Optional<ClientLink> getLinkConfig(String linkName);
+    Optional<ClientAssociation> getLinkConfig(String linkName);
 
     void addServerConfig(SctpServer newServer);
 

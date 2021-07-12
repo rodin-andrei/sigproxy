@@ -11,6 +11,5 @@ public class SctpLinkDto {
     private int remotePort;
     private boolean up;
     private boolean started;
-
     private String[] extraAddresses;
 }

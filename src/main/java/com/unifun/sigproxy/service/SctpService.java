@@ -4,7 +4,7 @@ import com.unifun.sigproxy.dto.SctpLinkDto;
 import com.unifun.sigproxy.dto.SctpServerDto;
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.exception.NoConfigurationException;
-import com.unifun.sigproxy.models.config.sctp.ClientLink;
+import com.unifun.sigproxy.models.config.sctp.ClientAssociation;
 import com.unifun.sigproxy.models.config.sctp.SctpServer;
 import org.mobicents.protocols.api.Management;
 
@@ -25,9 +25,9 @@ public interface SctpService {
 
     void removeAllServers();
 
-    void addLink(ClientLink clientLink);
+    void addLink(ClientAssociation clientAssociation);
 
-    void addLinks(Set<ClientLink> newLinks);
+    void addLinks(Set<ClientAssociation> newLinks);
 
     void addServer(SctpServer serverConfig);
 

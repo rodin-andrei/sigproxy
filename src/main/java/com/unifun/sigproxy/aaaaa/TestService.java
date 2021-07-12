@@ -3,9 +3,9 @@ package com.unifun.sigproxy.aaaaa;
 import com.unifun.sigproxy.models.config.m3ua.AsConfig;
 import com.unifun.sigproxy.models.config.m3ua.AspConfig;
 import com.unifun.sigproxy.models.config.m3ua.TrafficModeType;
-import com.unifun.sigproxy.models.config.sctp.ClientLink;
+import com.unifun.sigproxy.models.config.sctp.ClientAssociation;
 import com.unifun.sigproxy.models.config.sctp.SctpServer;
-import com.unifun.sigproxy.models.config.sctp.ServerLink;
+import com.unifun.sigproxy.models.config.sctp.ServerAssociation;
 import com.unifun.sigproxy.repository.m3ua.AsRepository;
 import com.unifun.sigproxy.repository.m3ua.AspRepository;
 import com.unifun.sigproxy.repository.sctp.RemoteSctpLinkRepository;
@@ -57,12 +57,12 @@ public class TestService {
         sctpServerRepository.save(sctpServer);
 
 
-        ServerLink serverLink = new ServerLink();
-        serverLink.setLinkName("unifun2");
-        serverLink.setRemoteAddress("127.0.0.1");
-        serverLink.setRemotePort(12000);
-        serverLink.setSctpServer(sctpServer);
-        remoteSctpLinkRepository.save(serverLink);
+        ServerAssociation serverAssociation = new ServerAssociation();
+        serverAssociation.setLinkName("unifun2");
+        serverAssociation.setRemoteAddress("127.0.0.1");
+        serverAssociation.setRemotePort(12000);
+        serverAssociation.setSctpServer(sctpServer);
+        remoteSctpLinkRepository.save(serverAssociation);
 
 
         HashSet<AsConfig> applicationServers = new HashSet<>();
@@ -71,7 +71,7 @@ public class TestService {
         AspConfig aspConfig = new AspConfig();
         aspConfig.setAspId(1);
         aspConfig.setName("unifun2_asp");
-        aspConfig.setSctpAssocName(serverLink.getLinkName());
+        aspConfig.setSctpAssocName(serverAssociation.getLinkName());
         aspConfig.setHeartbeat(true);
         aspConfig.setApplicationServers(applicationServers);
 
@@ -93,7 +93,7 @@ public class TestService {
     }
 
     private void initClient() {
-        ClientLink s = new ClientLink();
+        ClientAssociation s = new ClientAssociation();
         s.setLinkName("unifun1");
         s.setLocalAddress("127.0.0.1");
         s.setLocalPort(12000);

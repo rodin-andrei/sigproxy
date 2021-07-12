@@ -36,7 +36,7 @@ public class M3uaServiceImpl implements M3uaService {
     private String jssPersistDir;
 
     @Getter
-    private M3UAManagementImpl m3uaManagement;
+    private  M3UAManagementImpl m3uaManagement;
 
     @Override
     public void initialize() throws InitializingException {

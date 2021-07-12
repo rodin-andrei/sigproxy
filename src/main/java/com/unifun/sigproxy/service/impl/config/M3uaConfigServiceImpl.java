@@ -1,4 +1,4 @@
-package com.unifun.sigproxy.service.impl;
+package com.unifun.sigproxy.service.impl.config;
 
 import com.unifun.sigproxy.service.M3uaConfigService;
 import com.unifun.sigproxy.service.M3uaService;

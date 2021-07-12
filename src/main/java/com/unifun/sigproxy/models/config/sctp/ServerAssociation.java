@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 @Data
 @Entity
-public class ServerLink {
+public class ServerAssociation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
