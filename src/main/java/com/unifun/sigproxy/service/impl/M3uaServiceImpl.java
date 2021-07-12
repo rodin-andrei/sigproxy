@@ -1,10 +1,8 @@
 package com.unifun.sigproxy.service.impl;
 
-import com.unifun.sigproxy.controller.dto.M3uaAsDTO;
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.m3ua.AspConfig;
-import com.unifun.sigproxy.models.config.m3ua.RouteConfig;
 import com.unifun.sigproxy.repository.m3ua.AsRepository;
 import com.unifun.sigproxy.repository.m3ua.AspRepository;
 import com.unifun.sigproxy.service.M3uaService;
@@ -21,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -31,11 +28,9 @@ public class M3uaServiceImpl implements M3uaService {
     private final SctpService sctpService;
     private final AsRepository asRepository;
     private final AspRepository aspRepository;
-
+    private final Map<String, M3UAManagementImpl> m3uaManagements = new HashMap<>();
     @Value("${jss.persist.dir}")
     private String jssPersistDir;
-
-    private final Map<String, M3UAManagementImpl> m3uaManagements = new HashMap<>();
 
     @Override
     public void initialize(SigtranStack sigtranStack) throws InitializingException {
@@ -51,6 +46,7 @@ public class M3uaServiceImpl implements M3uaService {
             m3uaManagement.setTransportManagement(sctpService.getTransportManagement(sigtranStack.getStackName()));
             m3uaManagement.start();
             m3uaManagement.removeAllResourses();
+            log.info("Created m3ua management: {}", sigtranStack.getStackName());
         } catch (Exception e) {
             throw new InitializingException("Can't initialize M3ua Layer. ", e);
         }
@@ -69,7 +65,7 @@ public class M3uaServiceImpl implements M3uaService {
                                 10,
                                 parameterFactory.createNetworkAppearance(asConfig.getNetworkAppearance())
                         );
-                log.info("Created AS {}", asConfig.getName());
+                log.info("Created AS: {}, sigtran stack: {}", asConfig.getName(), sigtranStack.getStackName());
             } catch (Exception e) {
                 log.error("Error created AS:" + asConfig.getName(), e);
             }
@@ -92,7 +88,7 @@ public class M3uaServiceImpl implements M3uaService {
             try {
                 AspFactory aspFactory = m3uaManagements.get(sigtranStack.getStackName())
                         .createAspFactory(aspConfig.getName(), aspConfig.getSctpAssocName(), aspConfig.isHeartbeat());
-                log.info("Created ASP {}", aspConfig.getName());
+                log.info("Created ASP {}, sigtran stack: {}", aspConfig.getName(), sigtranStack.getStackName());
             } catch (Exception e) {
                 log.warn("Error created ASP:" + aspConfig.getName(), e);
             }
@@ -100,7 +96,7 @@ public class M3uaServiceImpl implements M3uaService {
             aspConfig.getApplicationServers()
                     .forEach(asConfig -> {
                         try {
-                            m3uaManagement.assignAspToAs(asConfig.getName(), aspConfig.getName());
+                            m3uaManagements.get(sigtranStack.getStackName()).assignAspToAs(asConfig.getName(), aspConfig.getName());
                             log.info("Assign asp {} to as {}", aspConfig.getName(), asConfig.getName());
                         } catch (Exception e) {
                             log.warn("Error create simple dimple:" + aspConfig.getName() + " it's popit:" + asConfig.getName(), e);
@@ -108,7 +104,7 @@ public class M3uaServiceImpl implements M3uaService {
                     });
 
             try {
-                m3uaManagement.startAsp(aspConfig.getName());
+                m3uaManagements.get(sigtranStack.getStackName()).startAsp(aspConfig.getName());
                 log.info("Started asp {}", aspConfig.getName());
 
             } catch (Exception e) {
@@ -128,46 +124,17 @@ public class M3uaServiceImpl implements M3uaService {
     }
 
     @Override
-    public void stopAsp(AspConfig aspConfig) {
+    public void stopAsp(AspConfig aspConfig, String stackName) {
         try {
-            m3uaManagements.get(aspConfig.getSigtranStack().getStackName())
-                    .stopAsp(aspConfig.getName());
+            m3uaManagements.get(stackName).stopAsp(aspConfig.getName());
         } catch (Exception e) {
             log.error("Can't stop ASP: {}, cause: {}", aspConfig.getName(), e.getMessage(), e);
         }
     }
 
     @Override
-    public void removeAsp(AspConfig aspConfig) {
-//        try {
-//            m3uaManagement.unassignAspFromAs(aspConfig.getAsName(), aspConfig.getAspName());
-//            m3uaManagement.destroyAspFactory(aspConfig.getAspName());
-//            AspFactory aspFactory = m3uaManagement.getAspfactories().get(0);
-//        } catch (Exception e) {
-//            log.error("Can`t destroy ASP");
-//        }
-    }
+    public void removeAsp(AspConfig aspConfig, String stackName) {
 
-    @Override
-    public void removeRoute(RouteConfig routeConfig) {
-//        try {
-//            m3uaManagement.removeRoute(routeConfig.getDpc(), routeConfig.getOpc(), routeConfig.getSsn(), routeConfig.getAs().getName());
-//        } catch (Exception e) {
-//            log.error("Can`t remove Route", e);
-//        }
-    }
-
-    @Override
-    public Set<M3uaAsDTO> getM3uaStatuses() {
-        return this.m3uaManagement.getAppServers().stream().map(as ->
-        {
-            M3uaAsDTO m3uaAsDTO = new M3uaAsDTO();
-            m3uaAsDTO.setName(as.getName());
-            m3uaAsDTO.setIpspType(as.getIpspType().getType());
-            m3uaAsDTO.setRoutingContexts(as.getRoutingContext().getRoutingContexts());
-            m3uaAsDTO.setState(as.getState().getName());
-
-            return m3uaAsDTO;
-        }).collect(Collectors.toSet());
     }
 }
+

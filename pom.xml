@@ -15,9 +15,19 @@
     <name>sig-proxy</name>
     <description>Sigtran Proxy</description>
 
-
+    <repositories>
+        <repository>
+            <id>testFeed</id>
+            <url>https://pkgs.dev.azure.com/sigProxy/Sigproxy/_packaging/testFeed/maven/v1</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
     <properties>
-        <java.version>1.8</java.version>
         <mobicents.jss7>8.0.0-179</mobicents.jss7>
         <mobicents.sctp>2.0.10</mobicents.sctp>
         <lombok.ver>1.18.12</lombok.ver>

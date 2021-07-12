@@ -15,16 +15,16 @@ public class SccpServiceImpl {
     private SccpStackImpl sccpStack;
 
     private void init() {
-        this.sccpStack = new SccpStackImpl(GateConstants.STACKNAME + "_sccp", null);
-        sccpStack.setMtp3UserPart(1, m3uaService.getM3uaManagement());
-        sccpStack.start();
-        sccpStack.removeAllResourses();
-
-        try {
-            sccpStack.setZMarginXudtMessage(160);
-        } catch (Exception e) {
-            log.warn("Can not set sccp parameter ZMarginXudtMessage, cause {}", e.getMessage(), e);
-        }
+//        this.sccpStack = new SccpStackImpl(GateConstants.STACKNAME + "_sccp", null);
+//        sccpStack.setMtp3UserPart(1, m3uaService.getM3uaManagement());
+//        sccpStack.start();
+//        sccpStack.removeAllResourses();
+//
+//        try {
+//            sccpStack.setZMarginXudtMessage(160);
+//        } catch (Exception e) {
+//            log.warn("Can not set sccp parameter ZMarginXudtMessage, cause {}", e.getMessage(), e);
+//        }
 //        SccpManagement sccpManagement = new SccpManagement();
 
     }
