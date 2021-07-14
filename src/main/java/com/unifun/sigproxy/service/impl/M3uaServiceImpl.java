@@ -3,8 +3,6 @@ package com.unifun.sigproxy.service.impl;
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.m3ua.AspConfig;
-import com.unifun.sigproxy.repository.m3ua.AsRepository;
-import com.unifun.sigproxy.repository.m3ua.AspRepository;
 import com.unifun.sigproxy.service.M3uaService;
 import com.unifun.sigproxy.service.SctpService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +12,7 @@ import org.restcomm.protocols.ss7.m3ua.AspFactory;
 import org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl;
 import org.restcomm.protocols.ss7.m3ua.impl.parameter.ParameterFactoryImpl;
 import org.restcomm.protocols.ss7.m3ua.parameter.ParameterFactory;
+import org.restcomm.protocols.ss7.mtp.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -26,8 +25,6 @@ import java.util.Map;
 public class M3uaServiceImpl implements M3uaService {
     private final ParameterFactory parameterFactory = new ParameterFactoryImpl();
     private final SctpService sctpService;
-    private final AsRepository asRepository;
-    private final AspRepository aspRepository;
     private final Map<String, M3UAManagementImpl> m3uaManagements = new HashMap<>();
     @Value("${jss.persist.dir}")
     private String jssPersistDir;
@@ -45,6 +42,32 @@ public class M3uaServiceImpl implements M3uaService {
             m3uaManagement.setTransportManagement(sctpService.getTransportManagement(sigtranStack.getStackName()));
             m3uaManagement.start();
             m3uaManagement.removeAllResourses();
+            m3uaManagement.addMtp3UserPartListener(new Mtp3UserPartListener() {
+                @Override
+                public void onMtp3TransferMessage(Mtp3TransferPrimitive mtp3TransferPrimitive) {
+                    log.error(new String(mtp3TransferPrimitive.getData()));
+                }
+
+                @Override
+                public void onMtp3PauseMessage(Mtp3PausePrimitive mtp3PausePrimitive) {
+
+                }
+
+                @Override
+                public void onMtp3ResumeMessage(Mtp3ResumePrimitive mtp3ResumePrimitive) {
+
+                }
+
+                @Override
+                public void onMtp3StatusMessage(Mtp3StatusPrimitive mtp3StatusPrimitive) {
+
+                }
+
+                @Override
+                public void onMtp3EndCongestionMessage(Mtp3EndCongestionPrimitive mtp3EndCongestionPrimitive) {
+
+                }
+            });
             log.info("Created m3ua management: {}", sigtranStack.getStackName());
         } catch (Exception e) {
             throw new InitializingException("Can't initialize M3ua Layer. ", e);
@@ -61,7 +84,7 @@ public class M3uaServiceImpl implements M3uaService {
                                 asConfig.getIpspType(),
                                 parameterFactory.createRoutingContext(asConfig.getRoutingContexts()),
                                 parameterFactory.createTrafficModeType(asConfig.getTrafficModeType().getType()),
-                                10,
+                                1,
                                 parameterFactory.createNetworkAppearance(asConfig.getNetworkAppearance())
                         );
                 log.info("Created AS: {}, sigtran stack: {}", asConfig.getName(), sigtranStack.getStackName());
@@ -77,6 +100,12 @@ public class M3uaServiceImpl implements M3uaService {
                                     routeConfig.getSsn(),
                                     asConfig.getName(),
                                     routeConfig.getTrafficModeType().getType());
+                    log.info("Added route to AS:{}, DPC: {}, OPC: {}, SSN: {}, Traffic-mode: {}",
+                            asConfig.getName(),
+                            routeConfig.getDpc(),
+                            routeConfig.getOpc(),
+                            routeConfig.getSsn(),
+                            routeConfig.getTrafficModeType());
                 } catch (Exception e) {
                     log.error("Error add Route to AS:" + asConfig.getName(), e);
 
@@ -134,7 +163,12 @@ public class M3uaServiceImpl implements M3uaService {
 
     @Override
     public void removeAsp(AspConfig aspConfig, String stackName) {
+        //TODO add implementation
+    }
 
+    @Override
+    public M3UAManagementImpl getManagement(String stackName) {
+        return this.m3uaManagements.get(stackName);
     }
 }
 

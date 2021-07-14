@@ -3,6 +3,7 @@ package com.unifun.sigproxy.aaaaa;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.m3ua.AsConfig;
 import com.unifun.sigproxy.models.config.m3ua.AspConfig;
+import com.unifun.sigproxy.models.config.m3ua.RouteConfig;
 import com.unifun.sigproxy.models.config.m3ua.TrafficModeType;
 import com.unifun.sigproxy.models.config.sctp.ClientAssociation;
 import com.unifun.sigproxy.models.config.sctp.SctpServer;
@@ -10,6 +11,7 @@ import com.unifun.sigproxy.models.config.sctp.ServerAssociation;
 import com.unifun.sigproxy.repository.SigtranStackRepository;
 import com.unifun.sigproxy.repository.m3ua.AsRepository;
 import com.unifun.sigproxy.repository.m3ua.AspRepository;
+import com.unifun.sigproxy.repository.m3ua.RouteRepository;
 import com.unifun.sigproxy.repository.sctp.RemoteSctpLinkRepository;
 import com.unifun.sigproxy.repository.sctp.SctpLinkRepository;
 import com.unifun.sigproxy.repository.sctp.SctpServerRepository;
@@ -38,6 +40,7 @@ public class TestService {
     private final AsRepository asRepository;
     private final AspRepository aspRepository;
     private final SigtranStackRepository sigtranStackRepository;
+    private final RouteRepository routeRepository;
 
     private final SigtranService service;
 
@@ -46,10 +49,7 @@ public class TestService {
         initClient();
         initServer();
 
-
         service.init();
-
-
     }
 
     private void initServer() {
@@ -64,7 +64,6 @@ public class TestService {
         sctpServer.setSigtranStack(sigtranStack);
         sctpServerRepository.save(sctpServer);
 
-
         ServerAssociation serverAssociation = new ServerAssociation();
         serverAssociation.setLinkName("unifun2");
         serverAssociation.setRemoteAddress("127.0.0.1");
@@ -72,7 +71,6 @@ public class TestService {
         serverAssociation.setSctpServer(sctpServer);
         serverAssociation.setSigtranStack(sigtranStack);
         remoteSctpLinkRepository.save(serverAssociation);
-
 
         HashSet<AsConfig> applicationServers = new HashSet<>();
         HashSet<AspConfig> applicationServerPoints = new HashSet<>();
@@ -83,16 +81,15 @@ public class TestService {
         aspConfig.setHeartbeat(true);
         aspConfig.setApplicationServers(applicationServers);
 
-
         AsConfig asConfig = new AsConfig();
         asConfig.setName("as2");
         asConfig.setFunctionality(Functionality.IPSP);
         asConfig.setExchangeType(ExchangeType.SE);
-        asConfig.setIpspType(IPSPType.CLIENT);
+        asConfig.setIpspType(IPSPType.SERVER);
         asConfig.setTrafficModeType(TrafficModeType.Loadshare);
         asConfig.setNetworkIndicator(12);
         asConfig.setNetworkAppearance(10);
-        asConfig.setRoutingContexts(new long[]{5, 4});
+        asConfig.setRoutingContexts(new long[]{6});
         asConfig.setApplicationServerPoints(applicationServerPoints);
         asConfig.setSigtranStack(sigtranStack);
         asConfig = asRepository.save(asConfig);
@@ -100,6 +97,14 @@ public class TestService {
         aspConfig.getApplicationServers().add(asConfig);
         aspConfig.setSigtranStack(sigtranStack);
         aspConfig = aspRepository.save(aspConfig);
+
+        RouteConfig routeConfig = new RouteConfig();
+        routeConfig.setAs(asConfig);
+        routeConfig.setDpc(100);
+        routeConfig.setOpc(200);
+        routeConfig.setTrafficModeType(TrafficModeType.Loadshare);
+        routeConfig.setSsn(6);
+        routeRepository.save(routeConfig);
     }
 
     private void initClient() {
@@ -135,7 +140,7 @@ public class TestService {
         asConfig.setTrafficModeType(TrafficModeType.Loadshare);
         asConfig.setNetworkIndicator(12);
         asConfig.setNetworkAppearance(10);
-        asConfig.setRoutingContexts(new long[]{5, 4});
+        asConfig.setRoutingContexts(new long[]{6});
         asConfig.setApplicationServerPoints(applicationServerPoints);
         asConfig.setSigtranStack(sigtranStack);
         asConfig = asRepository.save(asConfig);
@@ -143,5 +148,13 @@ public class TestService {
         aspConfig.getApplicationServers().add(asConfig);
         aspConfig.setSigtranStack(sigtranStack);
         aspConfig = aspRepository.save(aspConfig);
+
+        RouteConfig routeConfig = new RouteConfig();
+        routeConfig.setAs(asConfig);
+        routeConfig.setDpc(200);
+        routeConfig.setOpc(100);
+        routeConfig.setTrafficModeType(TrafficModeType.Loadshare);
+        routeConfig.setSsn(6);
+        routeRepository.save(routeConfig);
     }
 }
