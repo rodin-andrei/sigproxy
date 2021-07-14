@@ -11,8 +11,6 @@ import java.util.Set;
 
 @Getter
 @Setter
-@EqualsAndHashCode(exclude = {"applicationServers"})
-@ToString(exclude = {"applicationServers"})
 @Entity
 public class AspConfig {
     @Id
@@ -31,6 +29,8 @@ public class AspConfig {
             joinColumns = {@JoinColumn(name = "asp_id")},
             inverseJoinColumns = {@JoinColumn(name = "as_id")}
     )
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<AsConfig> applicationServers;
 
     @ManyToOne

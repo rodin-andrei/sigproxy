@@ -10,8 +10,6 @@ import java.util.Set;
 
 @Data
 @Entity
-@EqualsAndHashCode(exclude = {"serverAssociations"})
-@ToString(exclude = {"serverAssociations"})
 public class SctpServer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +24,8 @@ public class SctpServer {
     private String[] multihomingAddresses;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "sctpServer")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<ServerAssociation> serverAssociations;
 
     @ManyToOne

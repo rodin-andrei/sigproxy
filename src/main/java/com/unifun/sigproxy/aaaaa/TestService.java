@@ -1,11 +1,13 @@
 package com.unifun.sigproxy.aaaaa;
 
+import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.m3ua.AsConfig;
 import com.unifun.sigproxy.models.config.m3ua.AspConfig;
 import com.unifun.sigproxy.models.config.m3ua.TrafficModeType;
 import com.unifun.sigproxy.models.config.sctp.ClientAssociation;
 import com.unifun.sigproxy.models.config.sctp.SctpServer;
 import com.unifun.sigproxy.models.config.sctp.ServerAssociation;
+import com.unifun.sigproxy.repository.SigtranStackRepository;
 import com.unifun.sigproxy.repository.m3ua.AsRepository;
 import com.unifun.sigproxy.repository.m3ua.AspRepository;
 import com.unifun.sigproxy.repository.sctp.RemoteSctpLinkRepository;
@@ -35,6 +37,7 @@ public class TestService {
     private final RemoteSctpLinkRepository remoteSctpLinkRepository;
     private final AsRepository asRepository;
     private final AspRepository aspRepository;
+    private final SigtranStackRepository sigtranStackRepository;
 
     private final SigtranService service;
 
@@ -50,10 +53,15 @@ public class TestService {
     }
 
     private void initServer() {
+        SigtranStack sigtranStack = new SigtranStack();
+        sigtranStack.setStackName("stack1");
+        sigtranStack = sigtranStackRepository.save(sigtranStack);
+
         SctpServer sctpServer = new SctpServer();
         sctpServer.setLocalAddress("127.0.0.1");
         sctpServer.setLocalPort(13000);
-        sctpServer.setName("server2");
+        sctpServer.setName("server1");
+        sctpServer.setSigtranStack(sigtranStack);
         sctpServerRepository.save(sctpServer);
 
 
@@ -62,6 +70,7 @@ public class TestService {
         serverAssociation.setRemoteAddress("127.0.0.1");
         serverAssociation.setRemotePort(12000);
         serverAssociation.setSctpServer(sctpServer);
+        serverAssociation.setSigtranStack(sigtranStack);
         remoteSctpLinkRepository.save(serverAssociation);
 
 
@@ -85,19 +94,26 @@ public class TestService {
         asConfig.setNetworkAppearance(10);
         asConfig.setRoutingContexts(new long[]{5, 4});
         asConfig.setApplicationServerPoints(applicationServerPoints);
+        asConfig.setSigtranStack(sigtranStack);
         asConfig = asRepository.save(asConfig);
 
         aspConfig.getApplicationServers().add(asConfig);
+        aspConfig.setSigtranStack(sigtranStack);
         aspConfig = aspRepository.save(aspConfig);
     }
 
     private void initClient() {
+        SigtranStack sigtranStack = new SigtranStack();
+        sigtranStack.setStackName("stack");
+        sigtranStack = sigtranStackRepository.save(sigtranStack);
+
         ClientAssociation s = new ClientAssociation();
         s.setLinkName("unifun1");
         s.setLocalAddress("127.0.0.1");
         s.setLocalPort(12000);
         s.setRemoteAddress("127.0.0.1");
         s.setRemotePort(13000);
+        s.setSigtranStack(sigtranStack);
         sctpLinkRepository.save(s);
 
 
@@ -121,9 +137,11 @@ public class TestService {
         asConfig.setNetworkAppearance(10);
         asConfig.setRoutingContexts(new long[]{5, 4});
         asConfig.setApplicationServerPoints(applicationServerPoints);
+        asConfig.setSigtranStack(sigtranStack);
         asConfig = asRepository.save(asConfig);
 
         aspConfig.getApplicationServers().add(asConfig);
+        aspConfig.setSigtranStack(sigtranStack);
         aspConfig = aspRepository.save(aspConfig);
     }
 }

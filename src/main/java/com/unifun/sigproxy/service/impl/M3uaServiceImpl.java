@@ -41,7 +41,6 @@ public class M3uaServiceImpl implements M3uaService {
             }
             var m3uaManagement = new M3UAManagementImpl(sigtranStack.getStackName(), sigtranStack.getStackName(), null);
             m3uaManagements.put(m3uaManagement.getName(), m3uaManagement);
-
             m3uaManagement.setPersistDir(this.jssPersistDir);
             m3uaManagement.setTransportManagement(sctpService.getTransportManagement(sigtranStack.getStackName()));
             m3uaManagement.start();
@@ -70,18 +69,19 @@ public class M3uaServiceImpl implements M3uaService {
                 log.error("Error created AS:" + asConfig.getName(), e);
             }
 
-//            asConfig.getRoutes().forEach(routeConfig -> {
-//                try {
-//                    m3uaManagement.addRoute(routeConfig.getDpc(),
-//                            routeConfig.getOpc(),
-//                            routeConfig.getSsn(),
-//                            asConfig.getName(),
-//                            routeConfig.getTrafficModeType().getType());
-//                } catch (Exception e) {
-//                    log.error("Error add Route to AS:" + asConfig.getName(), e);
-//
-//                }
-//            });
+            asConfig.getRoutes().forEach(routeConfig -> {
+                try {
+                    m3uaManagements.get(sigtranStack.getStackName())
+                            .addRoute(routeConfig.getDpc(),
+                                    routeConfig.getOpc(),
+                                    routeConfig.getSsn(),
+                                    asConfig.getName(),
+                                    routeConfig.getTrafficModeType().getType());
+                } catch (Exception e) {
+                    log.error("Error add Route to AS:" + asConfig.getName(), e);
+
+                }
+            });
         });
 
         sigtranStack.getApplicationServerPoints().forEach(aspConfig -> {

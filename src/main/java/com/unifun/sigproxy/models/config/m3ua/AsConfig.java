@@ -14,8 +14,6 @@ import java.util.Set;
 
 @Getter
 @Setter
-@EqualsAndHashCode(exclude = {"applicationServerPoints"})
-@ToString(exclude = {"applicationServerPoints"})
 @Entity
 public class AsConfig {
     @Id
@@ -43,9 +41,13 @@ public class AsConfig {
     private long[] routingContexts;
 
     @ManyToMany(mappedBy = "applicationServers")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<AspConfig> applicationServerPoints;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "as")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<RouteConfig> routes;
 
     @ManyToOne
