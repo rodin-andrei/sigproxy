@@ -1,10 +1,10 @@
-package com.unifun.sigproxy.service.impl;
+package com.unifun.sigproxy.service.m3ua.impl;
 
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.m3ua.AspConfig;
-import com.unifun.sigproxy.service.M3uaService;
-import com.unifun.sigproxy.service.SctpService;
+import com.unifun.sigproxy.service.m3ua.M3uaService;
+import com.unifun.sigproxy.service.sctp.SctpService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.restcomm.protocols.ss7.m3ua.As;
@@ -12,7 +12,6 @@ import org.restcomm.protocols.ss7.m3ua.AspFactory;
 import org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl;
 import org.restcomm.protocols.ss7.m3ua.impl.parameter.ParameterFactoryImpl;
 import org.restcomm.protocols.ss7.m3ua.parameter.ParameterFactory;
-import org.restcomm.protocols.ss7.mtp.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -42,32 +41,6 @@ public class M3uaServiceImpl implements M3uaService {
             m3uaManagement.setTransportManagement(sctpService.getTransportManagement(sigtranStack.getStackName()));
             m3uaManagement.start();
             m3uaManagement.removeAllResourses();
-            m3uaManagement.addMtp3UserPartListener(new Mtp3UserPartListener() {
-                @Override
-                public void onMtp3TransferMessage(Mtp3TransferPrimitive mtp3TransferPrimitive) {
-                    log.error(new String(mtp3TransferPrimitive.getData()));
-                }
-
-                @Override
-                public void onMtp3PauseMessage(Mtp3PausePrimitive mtp3PausePrimitive) {
-
-                }
-
-                @Override
-                public void onMtp3ResumeMessage(Mtp3ResumePrimitive mtp3ResumePrimitive) {
-
-                }
-
-                @Override
-                public void onMtp3StatusMessage(Mtp3StatusPrimitive mtp3StatusPrimitive) {
-
-                }
-
-                @Override
-                public void onMtp3EndCongestionMessage(Mtp3EndCongestionPrimitive mtp3EndCongestionPrimitive) {
-
-                }
-            });
             log.info("Created m3ua management: {}", sigtranStack.getStackName());
         } catch (Exception e) {
             throw new InitializingException("Can't initialize M3ua Layer. ", e);
@@ -84,7 +57,7 @@ public class M3uaServiceImpl implements M3uaService {
                                 asConfig.getIpspType(),
                                 parameterFactory.createRoutingContext(asConfig.getRoutingContexts()),
                                 parameterFactory.createTrafficModeType(asConfig.getTrafficModeType().getType()),
-                                1,
+                                10,
                                 parameterFactory.createNetworkAppearance(asConfig.getNetworkAppearance())
                         );
                 log.info("Created AS: {}, sigtran stack: {}", asConfig.getName(), sigtranStack.getStackName());

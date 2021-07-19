@@ -1,7 +1,7 @@
-package com.unifun.sigproxy.service.impl.config;
+package com.unifun.sigproxy.service.m3ua.impl;
 
-import com.unifun.sigproxy.service.M3uaConfigService;
-import com.unifun.sigproxy.service.M3uaService;
+import com.unifun.sigproxy.service.m3ua.M3uaConfigService;
+import com.unifun.sigproxy.service.m3ua.M3uaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

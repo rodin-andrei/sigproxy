@@ -1,4 +1,4 @@
-package com.unifun.sigproxy.service;
+package com.unifun.sigproxy.service.m3ua;
 
 
 import com.unifun.sigproxy.exception.InitializingException;

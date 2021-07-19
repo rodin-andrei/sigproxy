@@ -1,6 +1,6 @@
 package com.unifun.sigproxy.controller.management;
 
-import com.unifun.sigproxy.service.impl.M3uaServiceImpl;
+import com.unifun.sigproxy.service.m3ua.impl.M3uaServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.restcomm.protocols.ss7.mtp.Mtp3TransferPrimitiveFactory;

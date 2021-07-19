@@ -1,11 +1,11 @@
-package com.unifun.sigproxy.service.impl;
+package com.unifun.sigproxy.service.sctp.impl;
 
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.exception.NoConfigurationException;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.sctp.ClientAssociation;
 import com.unifun.sigproxy.models.config.sctp.SctpServer;
-import com.unifun.sigproxy.service.SctpService;
+import com.unifun.sigproxy.service.sctp.SctpService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

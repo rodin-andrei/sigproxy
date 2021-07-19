@@ -1,6 +1,6 @@
 package com.unifun.sigproxy.controller.monitoring;
 
-import com.unifun.sigproxy.service.impl.M3uaServiceImpl;
+import com.unifun.sigproxy.service.m3ua.impl.M3uaServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

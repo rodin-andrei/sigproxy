@@ -86,7 +86,7 @@ public class TestService {
         asConfig.setFunctionality(Functionality.IPSP);
         asConfig.setExchangeType(ExchangeType.SE);
         asConfig.setIpspType(IPSPType.SERVER);
-        asConfig.setTrafficModeType(TrafficModeType.Loadshare);
+        asConfig.setTrafficModeType(TrafficModeType.Override);
         asConfig.setNetworkIndicator(12);
         asConfig.setNetworkAppearance(10);
         asConfig.setRoutingContexts(new long[]{6});
@@ -102,7 +102,7 @@ public class TestService {
         routeConfig.setAs(asConfig);
         routeConfig.setDpc(100);
         routeConfig.setOpc(200);
-        routeConfig.setTrafficModeType(TrafficModeType.Loadshare);
+        routeConfig.setTrafficModeType(TrafficModeType.Override);
         routeConfig.setSsn(6);
         routeRepository.save(routeConfig);
     }
@@ -137,7 +137,7 @@ public class TestService {
         asConfig.setFunctionality(Functionality.IPSP);
         asConfig.setExchangeType(ExchangeType.SE);
         asConfig.setIpspType(IPSPType.CLIENT);
-        asConfig.setTrafficModeType(TrafficModeType.Loadshare);
+        asConfig.setTrafficModeType(TrafficModeType.Override);
         asConfig.setNetworkIndicator(12);
         asConfig.setNetworkAppearance(10);
         asConfig.setRoutingContexts(new long[]{6});
@@ -153,7 +153,7 @@ public class TestService {
         routeConfig.setAs(asConfig);
         routeConfig.setDpc(200);
         routeConfig.setOpc(100);
-        routeConfig.setTrafficModeType(TrafficModeType.Loadshare);
+        routeConfig.setTrafficModeType(TrafficModeType.Override);
         routeConfig.setSsn(6);
         routeRepository.save(routeConfig);
     }

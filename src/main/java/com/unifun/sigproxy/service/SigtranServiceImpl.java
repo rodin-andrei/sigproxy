@@ -1,12 +1,11 @@
-package com.unifun.sigproxy.service.impl;
+package com.unifun.sigproxy.service;
 
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.exception.NoConfigurationException;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.repository.SigtranStackRepository;
-import com.unifun.sigproxy.service.M3uaService;
-import com.unifun.sigproxy.service.SctpService;
-import com.unifun.sigproxy.service.SigtranService;
+import com.unifun.sigproxy.service.m3ua.M3uaService;
+import com.unifun.sigproxy.service.sctp.SctpService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

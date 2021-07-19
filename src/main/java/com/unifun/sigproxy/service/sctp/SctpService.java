@@ -1,4 +1,4 @@
-package com.unifun.sigproxy.service;
+package com.unifun.sigproxy.service.sctp;
 
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.exception.NoConfigurationException;
