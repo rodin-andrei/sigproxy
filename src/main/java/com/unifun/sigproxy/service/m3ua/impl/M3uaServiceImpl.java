@@ -57,7 +57,7 @@ public class M3uaServiceImpl implements M3uaService {
                                 asConfig.getIpspType(),
                                 parameterFactory.createRoutingContext(asConfig.getRoutingContexts()),
                                 parameterFactory.createTrafficModeType(asConfig.getTrafficModeType().getType()),
-                                10,
+                                1,
                                 parameterFactory.createNetworkAppearance(asConfig.getNetworkAppearance())
                         );
                 log.info("Created AS: {}, sigtran stack: {}", asConfig.getName(), sigtranStack.getStackName());

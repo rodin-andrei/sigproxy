@@ -8,6 +8,7 @@ import com.unifun.sigproxy.service.sccp.SccpService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.restcomm.protocols.ss7.sccp.impl.SccpStackImpl;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -17,10 +18,14 @@ public class SccpServiceImpl implements SccpService {
     private final M3uaServiceImpl m3uaService;
     private SccpStackImpl sccpStack;
 
+    @Value("${jss.persist.dir}")
+    private String jssPersistDir;
+
     @Override
     public void initialize(SigtranStack sigtranStack) throws NoConfigurationException, InitializingException {
         this.sccpStack = new SccpStackImpl(sigtranStack.getStackName(), null);
         sccpStack.setMtp3UserPart(1, m3uaService.getManagement(sigtranStack.getStackName()));
+        sccpStack.setPersistDir(jssPersistDir);
         sccpStack.start();
         sccpStack.removeAllResourses();
 
