@@ -69,7 +69,6 @@ public class TestService {
         serverAssociation.setRemoteAddress("127.0.0.1");
         serverAssociation.setRemotePort(12000);
         serverAssociation.setSctpServer(sctpServer);
-        serverAssociation.setSigtranStack(sigtranStack);
         remoteSctpLinkRepository.save(serverAssociation);
 
         HashSet<AsConfig> applicationServers = new HashSet<>();

@@ -30,11 +30,11 @@ public class M3uaServiceImpl implements M3uaService {
 
     @Override
     public void initialize(SigtranStack sigtranStack) throws InitializingException {
+        log.info("Initializing M3UA management...");
+        if (m3uaManagements.containsKey(sigtranStack.getStackName())) {
+            throw new InitializingException("SctpManagement: " + sigtranStack.getStackName() + " already exist");
+        }
         try {
-            log.info("Initializing M3UA management...");
-            if (m3uaManagements.containsKey(sigtranStack.getStackName())) {
-                throw new InitializingException("SctpManagement: " + sigtranStack.getStackName() + " already exist");
-            }
             var m3uaManagement = new M3UAManagementImpl(sigtranStack.getStackName(), sigtranStack.getStackName(), null);
             m3uaManagements.put(m3uaManagement.getName(), m3uaManagement);
             m3uaManagement.setPersistDir(this.jssPersistDir);

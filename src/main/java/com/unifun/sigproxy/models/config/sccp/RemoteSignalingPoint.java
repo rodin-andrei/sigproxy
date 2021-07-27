@@ -1,11 +1,24 @@
 package com.unifun.sigproxy.models.config.sccp;
 
+import com.unifun.sigproxy.models.config.SigtranStack;
 import lombok.Data;
 
+import javax.persistence.*;
+
 @Data
+@Entity
 public class RemoteSignalingPoint {
-    private int rspId;
-    private int dpc;//remote service point code
-    private int rspcFlag = 0; //remote service point code flag
-    private int mask = 0;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private int dpc;
+
+    private int rspcFlag;
+
+    private int mask;
+
+    @ManyToOne
+    @JoinColumn(name = "stack_id", nullable = false)
+    private SigtranStack sigtranStack;
 }

@@ -7,15 +7,12 @@ import javax.persistence.*;
 
 @Data
 @Entity
-public class ServiceAccessPointConfig {
+public class ConcernedSignalingPointCode {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer ID;
-    private Integer mtp3Id;
-    private Integer opc;
-    private Integer ni;
-    private Integer networkId;
-    private Integer localGlobalTitleDigits;
+    private Long id;
+
+    private int signalingPointCode;
 
     @ManyToOne
     @JoinColumn(name = "stack_id", nullable = false)
