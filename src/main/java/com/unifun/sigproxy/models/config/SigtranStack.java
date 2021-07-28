@@ -73,7 +73,7 @@ public class SigtranStack {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "sigtranStack")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Set<SccpLongMessageRule> sccpLongMessageRules;
+    private Set<SccpLongMessageRuleConfig> sccpLongMessageRuleConfigs;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "sigtranStack")
     @ToString.Exclude

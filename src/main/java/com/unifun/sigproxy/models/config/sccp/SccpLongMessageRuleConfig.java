@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 @Data
 @Entity
-public class SccpLongMessageRule {
+public class SccpLongMessageRuleConfig {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
