@@ -1,18 +1,32 @@
 package com.unifun.sigproxy.service.sctp.impl;
 
+import com.unifun.sigproxy.models.config.SigtranStack;
+import com.unifun.sigproxy.models.config.sctp.ClientAssociation;
+import com.unifun.sigproxy.models.config.sctp.SctpServer;
+import com.unifun.sigproxy.models.config.sctp.ServerAssociation;
+import com.unifun.sigproxy.repository.SigtranStackRepository;
+import com.unifun.sigproxy.repository.sctp.RemoteSctpLinkRepository;
+import com.unifun.sigproxy.repository.sctp.SctpLinkRepository;
+import com.unifun.sigproxy.repository.sctp.SctpServerRepository;
 import com.unifun.sigproxy.service.sctp.SctpConfigService;
+import com.unifun.sigproxy.service.sctp.SctpService;
+import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class SctpConfigServiceImpl implements SctpConfigService {
-//    private final SigtranStackRepository sigtranStackRepository;
-//    private final RemoteSctpLinkRepository remoteSctpLinkRepository;
-//    private final SctpLinkRepository sctpLinkRepository;
-//    private final SctpServerRepository sctpServerRepository;
+    private final SigtranStackRepository sigtranStackRepository;
+    private final RemoteSctpLinkRepository remoteSctpLinkRepository;
+    private final SctpLinkRepository sctpLinkRepository;
+    private final SctpServerRepository sctpServerRepository;
 //
 //    @Override
 //    public void addLink(ClientAssociation newLink, String sigtranStack) {
@@ -75,4 +89,56 @@ public class SctpConfigServiceImpl implements SctpConfigService {
 //                .filter(link -> link.getName() != null && link.getName().equals(serverName))
 //                .findFirst();
 //    }
+
+    public Set<ClientAssociation> getClientLinksByStackId(Long stackId) {
+        Optional<SigtranStack> sigtranStack = sigtranStackRepository.findById(stackId);
+        return sigtranStack.map(SigtranStack::getAssociations).orElse(null);
+    }
+
+    public String setClinetLink(ClientAssociation link) {
+        try {
+            sctpLinkRepository.save(link);
+            return "ok";
+        } catch (Exception e) {
+            log.error("Error insert new link in BD: ", e);
+            return "error";
+        }
+    }
+
+    public SigtranStack getSigtranStack(String sigtranStack) {
+        return sigtranStackRepository.findByStackName(sigtranStack);
+    }
+
+    @Override
+    public void deleteSctpLinkById(Long linkId) {
+        sctpLinkRepository.deleteById(linkId);
+    }
+
+    public Set<ServerAssociation> getServerLinksBySctpServerId(Long serverId) {
+        Optional<SctpServer> sctpServer = sctpServerRepository.findById(serverId);
+        return sctpServer.map(SctpServer::getServerAssociations).orElse(new HashSet<>());
+    }
+
+    public SctpServer getSctpServerById(Long serverId) throws NotFoundException {
+        Optional<SctpServer> sctpServer = sctpServerRepository.findById(serverId);
+        if (sctpServer.isPresent()) return sctpServer.get();
+        else throw new NotFoundException("Not found server");
+    }
+
+    public String setServerLink(ServerAssociation serverAssociation) {
+        remoteSctpLinkRepository.save(serverAssociation);
+        return "OK";
+    }
+
+    public SigtranStack getSigtranStackById(long stackId) throws NotFoundException {
+        Optional<SigtranStack> sigtranStack = sigtranStackRepository.findById(stackId);
+        if(sigtranStack.isPresent()) return sigtranStack.get();
+        else throw new NotFoundException("Not found sigtran stack");
+    }
+
+    public ClientAssociation getClientLinksById(Long clientLinkId) throws NotFoundException {
+        Optional<ClientAssociation> clientAssociation = sctpLinkRepository.findById(clientLinkId);
+        if(clientAssociation.isPresent()) return clientAssociation.get();
+        else throw new NotFoundException("Not found sigtran stack");
+    }
 }
