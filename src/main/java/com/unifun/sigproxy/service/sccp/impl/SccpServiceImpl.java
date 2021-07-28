@@ -39,8 +39,6 @@ public class SccpServiceImpl implements SccpService {
             sccpStack.start();
             sccpStack.removeAllResourses();
             log.info("Created sccp management: {}", sigtranStack.getStackName());
-
-
         } catch (Exception e) {
             throw new InitializingException("Can't initialize SCCP Layer. ", e);
         }

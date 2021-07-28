@@ -7,23 +7,16 @@ import javax.persistence.*;
 
 @Data
 @Entity
-public class Mtp3Destination {
+public class SccpRemoteSignalingPointConfig {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int sapId;
+    private int dpc;
 
-    private int firstSignalingPointCode;
+    private int rspcFlag;
 
-    private int lastSignalingPointCode;
-
-    private int firstSls;
-
-    private int lastSls;
-
-    private int slsMask;
-
+    private int mask;
 
     @ManyToOne
     @JoinColumn(name = "stack_id", nullable = false)

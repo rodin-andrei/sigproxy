@@ -7,17 +7,14 @@ import javax.persistence.*;
 
 @Data
 @Entity
-public class RemoteSignalingPoint {
+public class SccpRemoteSubsystemConfig {
+    boolean markProhibitedWhenSpcResuming;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private int dpc;
-
-    private int rspcFlag;
-
-    private int mask;
-
+    private int remoteSignalingPointCode;
+    private int remoteSubsystemNumber;
+    private int remoteSubsystemFlag;
     @ManyToOne
     @JoinColumn(name = "stack_id", nullable = false)
     private SigtranStack sigtranStack;

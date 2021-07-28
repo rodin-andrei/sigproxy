@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.restcomm.protocols.ss7.m3ua.ExchangeType;
 import org.restcomm.protocols.ss7.m3ua.Functionality;
 import org.restcomm.protocols.ss7.m3ua.IPSPType;
-import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +45,7 @@ public class TestService {
     private final SigtranService service;
 
     @EventListener
-    private void test(ContextRefreshedEvent ctxStartEvt) {
+    private void test(ContextStartedEvent ctxStartEvt) {
         initClient();
         initServer();
 

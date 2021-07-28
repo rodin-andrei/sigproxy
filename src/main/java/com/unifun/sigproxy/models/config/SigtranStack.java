@@ -53,7 +53,7 @@ public class SigtranStack {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "sigtranStack")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Set<RemoteSignalingPoint> remoteSignalingPoints;
+    private Set<SccpRemoteSignalingPointConfig> sccpRemoteSignalingPointConfigs;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "sigtranStack")
     @ToString.Exclude
@@ -63,27 +63,27 @@ public class SigtranStack {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "sigtranStack")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Set<RemoteSubsystem> remoteSubsystems;
+    private Set<SccpRemoteSubsystemConfig> sccpRemoteSubsystemConfigs;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "sigtranStack")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Set<ServiceAccessPointConfig> serviceAccessPointConfigs;
+    private Set<SccpServiceAccessPointConfig> sccpServiceAccessPointConfigs;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "sigtranStack")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Set<LongMessageRule> longMessageRules;
+    private Set<SccpLongMessageRule> sccpLongMessageRules;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "sigtranStack")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Set<Mtp3Destination> mtp3Destinations;
+    private Set<SccpMtp3DestinationConfig> sccpMtp3DestinationConfigs;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "sigtranStack")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Set<ConcernedSignalingPointCode> concernedSignalingPointCodes;
+    private Set<SccpConcernedSignalingPointCodeConfig> sccpConcernedSignalingPointCodeConfigs;
 
 
     @OneToOne(mappedBy = "sigtranStack")
@@ -93,5 +93,5 @@ public class SigtranStack {
     private M3uaStackSettings m3uaStackSettings;
 
     @OneToOne(mappedBy = "sigtranStack")
-    private SccpSettings sccpSettings;
+    private SccpSettingsConfig sccpSettingsConfig;
 }

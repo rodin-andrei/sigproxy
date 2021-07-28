@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Data
 @Entity
-public class ServiceAccessPointConfig {
+public class SccpServiceAccessPointConfig {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer ID;

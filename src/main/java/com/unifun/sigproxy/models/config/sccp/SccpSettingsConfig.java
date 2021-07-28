@@ -9,7 +9,7 @@ import javax.persistence.*;
 
 @Data
 @Entity
-public class SccpSettings {
+public class SccpSettingsConfig {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
