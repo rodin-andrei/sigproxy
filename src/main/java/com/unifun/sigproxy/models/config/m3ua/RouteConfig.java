@@ -1,6 +1,7 @@
 package com.unifun.sigproxy.models.config.m3ua;
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 
@@ -18,6 +19,7 @@ public class RouteConfig {
     private int ssn;
 
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "as_id", nullable = false)
     private AsConfig as;
 

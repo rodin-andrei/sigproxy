@@ -2,6 +2,7 @@ package com.unifun.sigproxy.models.config.m3ua;
 
 import com.unifun.sigproxy.models.config.SigtranStack;
 import lombok.Data;
+import lombok.ToString;
 import org.restcomm.protocols.ss7.mtp.RoutingLabelFormat;
 
 import javax.persistence.*;
@@ -31,6 +32,7 @@ public class M3uaStackSettings {
     private boolean useLsbForLinksetSelection;
 
     @OneToOne
+    @ToString.Exclude
     @JoinColumn(name = "stack_id", nullable = false)
     private SigtranStack sigtranStack;
 }

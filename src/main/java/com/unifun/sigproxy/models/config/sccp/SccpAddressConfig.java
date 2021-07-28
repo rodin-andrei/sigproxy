@@ -1,6 +1,7 @@
 package com.unifun.sigproxy.models.config.sccp;
 
 import com.unifun.sigproxy.models.config.SigtranStack;
+import lombok.ToString;
 import org.restcomm.protocols.ss7.indicator.NatureOfAddress;
 import org.restcomm.protocols.ss7.indicator.NumberingPlan;
 
@@ -31,6 +32,7 @@ public class SccpAddressConfig {
 
 
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "stack_id", nullable = false)
     private SigtranStack sigtranStack;
 }

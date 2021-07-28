@@ -34,6 +34,7 @@ public class AspConfig {
     private Set<AsConfig> applicationServers;
 
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "stack_id", nullable = false)
     private SigtranStack sigtranStack;
 }

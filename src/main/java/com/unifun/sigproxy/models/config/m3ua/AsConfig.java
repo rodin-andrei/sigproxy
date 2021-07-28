@@ -51,6 +51,7 @@ public class AsConfig {
     private Set<RouteConfig> routes;
 
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "stack_id", nullable = false)
     private SigtranStack sigtranStack;
 

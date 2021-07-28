@@ -2,6 +2,7 @@ package com.unifun.sigproxy.models.config.sccp;
 
 import com.unifun.sigproxy.models.config.SigtranStack;
 import lombok.Data;
+import lombok.ToString;
 import org.restcomm.protocols.ss7.sccp.LoadSharingAlgorithm;
 import org.restcomm.protocols.ss7.sccp.OriginationType;
 import org.restcomm.protocols.ss7.sccp.RuleType;
@@ -45,6 +46,7 @@ public class SccpRuleConfig {
     private SccpAddressRuleConfig callingSccpAddressRuleConfig;
 
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "stack_id", nullable = false)
     private SigtranStack sigtranStack;
 }
