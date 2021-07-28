@@ -12,7 +12,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-public class AspConfig {
+public class M3uaAspConfig {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,13 +25,13 @@ public class AspConfig {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "ASP_AS",
+            name = "M3UA_ASP_AS",
             joinColumns = {@JoinColumn(name = "asp_id")},
             inverseJoinColumns = {@JoinColumn(name = "as_id")}
     )
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Set<AsConfig> applicationServers;
+    private Set<M3uaAsConfig> applicationServers;
 
     @ManyToOne
     @ToString.Exclude

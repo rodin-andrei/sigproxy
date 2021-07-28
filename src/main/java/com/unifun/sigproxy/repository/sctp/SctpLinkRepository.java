@@ -1,14 +1,11 @@
 package com.unifun.sigproxy.repository.sctp;
 
-import com.unifun.sigproxy.models.config.SigtranStack;
-import com.unifun.sigproxy.models.config.sctp.ClientAssociation;
+import com.unifun.sigproxy.models.config.sctp.SctpClientAssociationConfig;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
 
 /**
  * @author arodin
  */
-public interface SctpLinkRepository extends JpaRepository<ClientAssociation, Long> {
-    ClientAssociation findByLinkName(String linkName);
+public interface SctpLinkRepository extends JpaRepository<SctpClientAssociationConfig, Long> {
+    SctpClientAssociationConfig findByLinkName(String linkName);
 }

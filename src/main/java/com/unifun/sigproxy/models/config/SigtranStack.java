@@ -1,12 +1,12 @@
 package com.unifun.sigproxy.models.config;
 
-import com.unifun.sigproxy.models.config.m3ua.AsConfig;
-import com.unifun.sigproxy.models.config.m3ua.AspConfig;
-import com.unifun.sigproxy.models.config.m3ua.M3uaStackSettings;
+import com.unifun.sigproxy.models.config.m3ua.M3uaAsConfig;
+import com.unifun.sigproxy.models.config.m3ua.M3uaAspConfig;
+import com.unifun.sigproxy.models.config.m3ua.M3uaStackSettingsConfig;
 import com.unifun.sigproxy.models.config.sccp.*;
-import com.unifun.sigproxy.models.config.sctp.ClientAssociation;
+import com.unifun.sigproxy.models.config.sctp.SctpClientAssociationConfig;
 import com.unifun.sigproxy.models.config.sctp.SctpServer;
-import com.unifun.sigproxy.models.config.sctp.SctpStackSettings;
+import com.unifun.sigproxy.models.config.sctp.SctpStackSettingsConfig;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -33,17 +33,17 @@ public class SigtranStack {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "sigtranStack")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Set<ClientAssociation> associations;
+    private Set<SctpClientAssociationConfig> associations;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "sigtranStack")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Set<AsConfig> applicationServers;
+    private Set<M3uaAsConfig> applicationServers;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "sigtranStack")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Set<AspConfig> applicationServerPoints;
+    private Set<M3uaAspConfig> applicationServerPoints;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "sigtranStack")
     @ToString.Exclude
@@ -87,10 +87,10 @@ public class SigtranStack {
 
 
     @OneToOne(mappedBy = "sigtranStack")
-    private SctpStackSettings sctpStackSettings;
+    private SctpStackSettingsConfig sctpStackSettingsConfig;
 
     @OneToOne(mappedBy = "sigtranStack")
-    private M3uaStackSettings m3uaStackSettings;
+    private M3uaStackSettingsConfig m3UaStackSettingsConfig;
 
     @OneToOne(mappedBy = "sigtranStack")
     private SccpSettingsConfig sccpSettingsConfig;

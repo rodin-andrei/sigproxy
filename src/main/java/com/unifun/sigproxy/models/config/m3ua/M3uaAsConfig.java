@@ -15,7 +15,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-public class AsConfig {
+public class M3uaAsConfig {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -43,12 +43,12 @@ public class AsConfig {
     @ManyToMany(mappedBy = "applicationServers")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Set<AspConfig> applicationServerPoints;
+    private Set<M3uaAspConfig> applicationServerPoints;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "as")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Set<RouteConfig> routes;
+    private Set<M3uaRouteConfig> routes;
 
     @ManyToOne
     @ToString.Exclude

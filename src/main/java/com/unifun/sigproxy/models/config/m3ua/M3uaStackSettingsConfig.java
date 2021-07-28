@@ -9,7 +9,7 @@ import javax.persistence.*;
 
 @Entity
 @Data
-public class M3uaStackSettings {
+public class M3uaStackSettingsConfig {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

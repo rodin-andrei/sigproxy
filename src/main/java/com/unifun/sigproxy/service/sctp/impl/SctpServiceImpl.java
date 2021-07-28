@@ -3,7 +3,7 @@ package com.unifun.sigproxy.service.sctp.impl;
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.exception.NoConfigurationException;
 import com.unifun.sigproxy.models.config.SigtranStack;
-import com.unifun.sigproxy.models.config.sctp.ClientAssociation;
+import com.unifun.sigproxy.models.config.sctp.SctpClientAssociationConfig;
 import com.unifun.sigproxy.models.config.sctp.SctpServer;
 import com.unifun.sigproxy.service.sctp.SctpService;
 import lombok.Getter;
@@ -81,7 +81,7 @@ public class SctpServiceImpl implements SctpService {
     }
 
     @Override
-    public void addLink(ClientAssociation link, String sigtranStack) {
+    public void addLink(SctpClientAssociationConfig link, String sigtranStack) {
         //TODO add check already exist assoc
         try {
             Association association = sctpManagements.get(sigtranStack)
@@ -101,7 +101,7 @@ public class SctpServiceImpl implements SctpService {
     }
 
     @Override
-    public void addLinks(Set<ClientAssociation> newLinks, String sigtranStack) {
+    public void addLinks(Set<SctpClientAssociationConfig> newLinks, String sigtranStack) {
         newLinks.forEach(clientAssociation -> addLink(clientAssociation, sigtranStack));
     }
 
@@ -128,7 +128,7 @@ public class SctpServiceImpl implements SctpService {
     }
 
     @Override
-    public void removeSctpLink(ClientAssociation link, String sigtranStack) {
+    public void removeSctpLink(SctpClientAssociationConfig link, String sigtranStack) {
         try {
             sctpManagements.get(sigtranStack).stopAssociation(link.getLinkName());
         } catch (Exception e) {
@@ -172,7 +172,7 @@ public class SctpServiceImpl implements SctpService {
                     );
             log.info("Added server: {} to {} sigtran stack", serverConfig.getName(), sigtranStack);
 
-            serverConfig.getServerAssociations().forEach(serverAssociation -> {
+            serverConfig.getSctpServerAssociationConfigs().forEach(serverAssociation -> {
                 try {
                     sctpManagements.get(sigtranStack)
                             .addServerAssociation(

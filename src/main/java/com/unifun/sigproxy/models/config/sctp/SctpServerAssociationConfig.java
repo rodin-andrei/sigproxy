@@ -1,13 +1,12 @@
 package com.unifun.sigproxy.models.config.sctp;
 
-import com.unifun.sigproxy.models.config.SigtranStack;
 import lombok.Data;
 
 import javax.persistence.*;
 
 @Data
 @Entity
-public class ClientAssociation {
+public class SctpServerAssociationConfig {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,13 +17,7 @@ public class ClientAssociation {
 
     private int remotePort;
 
-    private String localAddress;
-
-    private int localPort;
-
-    private String[] multihomingAddresses;
-
     @ManyToOne
-    @JoinColumn(name = "stack_id", nullable = false)
-    private SigtranStack sigtranStack;
+    @JoinColumn(name = "server_id", nullable = false)
+    private SctpServer sctpServer;
 }

@@ -1,7 +1,6 @@
 package com.unifun.sigproxy.controller.dto;
 
-import com.unifun.sigproxy.models.config.SigtranStack;
-import com.unifun.sigproxy.models.config.sctp.ServerAssociation;
+import com.unifun.sigproxy.models.config.sctp.SctpServerAssociationConfig;
 import lombok.Data;
 
 import java.util.Set;
@@ -13,6 +12,6 @@ public class SctpServerDto {
     private String localAddress;
     private int localPort;
     private String[] multihomingAddresses;
-    private Set<ServerAssociation> serverAssociations;
+    private Set<SctpServerAssociationConfig> sctpServerAssociationConfigs;
     private String status;
 }

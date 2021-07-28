@@ -1,13 +1,13 @@
 package com.unifun.sigproxy.aaaaa;
 
 import com.unifun.sigproxy.models.config.SigtranStack;
-import com.unifun.sigproxy.models.config.m3ua.AsConfig;
-import com.unifun.sigproxy.models.config.m3ua.AspConfig;
-import com.unifun.sigproxy.models.config.m3ua.RouteConfig;
+import com.unifun.sigproxy.models.config.m3ua.M3uaAsConfig;
+import com.unifun.sigproxy.models.config.m3ua.M3uaAspConfig;
+import com.unifun.sigproxy.models.config.m3ua.M3uaRouteConfig;
 import com.unifun.sigproxy.models.config.m3ua.TrafficModeType;
-import com.unifun.sigproxy.models.config.sctp.ClientAssociation;
+import com.unifun.sigproxy.models.config.sctp.SctpClientAssociationConfig;
 import com.unifun.sigproxy.models.config.sctp.SctpServer;
-import com.unifun.sigproxy.models.config.sctp.ServerAssociation;
+import com.unifun.sigproxy.models.config.sctp.SctpServerAssociationConfig;
 import com.unifun.sigproxy.repository.SigtranStackRepository;
 import com.unifun.sigproxy.repository.m3ua.AsRepository;
 import com.unifun.sigproxy.repository.m3ua.AspRepository;
@@ -64,46 +64,46 @@ public class TestService {
         sctpServer.setSigtranStack(sigtranStack);
         sctpServerRepository.save(sctpServer);
 
-        ServerAssociation serverAssociation = new ServerAssociation();
-        serverAssociation.setLinkName("unifun2");
-        serverAssociation.setRemoteAddress("127.0.0.1");
-        serverAssociation.setRemotePort(12000);
-        serverAssociation.setSctpServer(sctpServer);
-        remoteSctpLinkRepository.save(serverAssociation);
+        SctpServerAssociationConfig sctpServerAssociationConfig = new SctpServerAssociationConfig();
+        sctpServerAssociationConfig.setLinkName("unifun2");
+        sctpServerAssociationConfig.setRemoteAddress("127.0.0.1");
+        sctpServerAssociationConfig.setRemotePort(12000);
+        sctpServerAssociationConfig.setSctpServer(sctpServer);
+        remoteSctpLinkRepository.save(sctpServerAssociationConfig);
 
-        HashSet<AsConfig> applicationServers = new HashSet<>();
-        HashSet<AspConfig> applicationServerPoints = new HashSet<>();
+        HashSet<M3uaAsConfig> applicationServers = new HashSet<>();
+        HashSet<M3uaAspConfig> applicationServerPoints = new HashSet<>();
 
-        AspConfig aspConfig = new AspConfig();
-        aspConfig.setName("unifun2_asp");
-        aspConfig.setSctpAssocName(serverAssociation.getLinkName());
-        aspConfig.setHeartbeat(true);
-        aspConfig.setApplicationServers(applicationServers);
+        M3uaAspConfig m3uaAspConfig = new M3uaAspConfig();
+        m3uaAspConfig.setName("unifun2_asp");
+        m3uaAspConfig.setSctpAssocName(sctpServerAssociationConfig.getLinkName());
+        m3uaAspConfig.setHeartbeat(true);
+        m3uaAspConfig.setApplicationServers(applicationServers);
 
-        AsConfig asConfig = new AsConfig();
-        asConfig.setName("as2");
-        asConfig.setFunctionality(Functionality.IPSP);
-        asConfig.setExchangeType(ExchangeType.SE);
-        asConfig.setIpspType(IPSPType.SERVER);
-        asConfig.setTrafficModeType(TrafficModeType.Override);
-        asConfig.setNetworkIndicator(12);
-        asConfig.setNetworkAppearance(10);
-        asConfig.setRoutingContexts(new long[]{6});
-        asConfig.setApplicationServerPoints(applicationServerPoints);
-        asConfig.setSigtranStack(sigtranStack);
-        asConfig = asRepository.save(asConfig);
+        M3uaAsConfig m3uaAsConfig = new M3uaAsConfig();
+        m3uaAsConfig.setName("as2");
+        m3uaAsConfig.setFunctionality(Functionality.IPSP);
+        m3uaAsConfig.setExchangeType(ExchangeType.SE);
+        m3uaAsConfig.setIpspType(IPSPType.SERVER);
+        m3uaAsConfig.setTrafficModeType(TrafficModeType.Override);
+        m3uaAsConfig.setNetworkIndicator(12);
+        m3uaAsConfig.setNetworkAppearance(10);
+        m3uaAsConfig.setRoutingContexts(new long[]{6});
+        m3uaAsConfig.setApplicationServerPoints(applicationServerPoints);
+        m3uaAsConfig.setSigtranStack(sigtranStack);
+        m3uaAsConfig = asRepository.save(m3uaAsConfig);
 
-        aspConfig.getApplicationServers().add(asConfig);
-        aspConfig.setSigtranStack(sigtranStack);
-        aspConfig = aspRepository.save(aspConfig);
+        m3uaAspConfig.getApplicationServers().add(m3uaAsConfig);
+        m3uaAspConfig.setSigtranStack(sigtranStack);
+        m3uaAspConfig = aspRepository.save(m3uaAspConfig);
 
-        RouteConfig routeConfig = new RouteConfig();
-        routeConfig.setAs(asConfig);
-        routeConfig.setDpc(100);
-        routeConfig.setOpc(200);
-        routeConfig.setTrafficModeType(TrafficModeType.Override);
-        routeConfig.setSsn(6);
-        routeRepository.save(routeConfig);
+        M3uaRouteConfig m3uaRouteConfig = new M3uaRouteConfig();
+        m3uaRouteConfig.setAs(m3uaAsConfig);
+        m3uaRouteConfig.setDpc(100);
+        m3uaRouteConfig.setOpc(200);
+        m3uaRouteConfig.setTrafficModeType(TrafficModeType.Override);
+        m3uaRouteConfig.setSsn(6);
+        routeRepository.save(m3uaRouteConfig);
     }
 
     private void initClient() {
@@ -111,7 +111,7 @@ public class TestService {
         sigtranStack.setStackName("stack");
         sigtranStack = sigtranStackRepository.save(sigtranStack);
 
-        ClientAssociation s = new ClientAssociation();
+        SctpClientAssociationConfig s = new SctpClientAssociationConfig();
         s.setLinkName("unifun1");
         s.setLocalAddress("127.0.0.1");
         s.setLocalPort(12000);
@@ -121,39 +121,39 @@ public class TestService {
         sctpLinkRepository.save(s);
 
 
-        HashSet<AsConfig> applicationServers = new HashSet<>();
-        HashSet<AspConfig> applicationServerPoints = new HashSet<>();
+        HashSet<M3uaAsConfig> applicationServers = new HashSet<>();
+        HashSet<M3uaAspConfig> applicationServerPoints = new HashSet<>();
 
-        AspConfig aspConfig = new AspConfig();
-        aspConfig.setName("unifun1_asp");
-        aspConfig.setSctpAssocName(s.getLinkName());
-        aspConfig.setHeartbeat(true);
-        aspConfig.setApplicationServers(applicationServers);
+        M3uaAspConfig m3uaAspConfig = new M3uaAspConfig();
+        m3uaAspConfig.setName("unifun1_asp");
+        m3uaAspConfig.setSctpAssocName(s.getLinkName());
+        m3uaAspConfig.setHeartbeat(true);
+        m3uaAspConfig.setApplicationServers(applicationServers);
 
 
-        AsConfig asConfig = new AsConfig();
-        asConfig.setName("as1");
-        asConfig.setFunctionality(Functionality.IPSP);
-        asConfig.setExchangeType(ExchangeType.SE);
-        asConfig.setIpspType(IPSPType.CLIENT);
-        asConfig.setTrafficModeType(TrafficModeType.Override);
-        asConfig.setNetworkIndicator(12);
-        asConfig.setNetworkAppearance(10);
-        asConfig.setRoutingContexts(new long[]{6});
-        asConfig.setApplicationServerPoints(applicationServerPoints);
-        asConfig.setSigtranStack(sigtranStack);
-        asConfig = asRepository.save(asConfig);
+        M3uaAsConfig m3uaAsConfig = new M3uaAsConfig();
+        m3uaAsConfig.setName("as1");
+        m3uaAsConfig.setFunctionality(Functionality.IPSP);
+        m3uaAsConfig.setExchangeType(ExchangeType.SE);
+        m3uaAsConfig.setIpspType(IPSPType.CLIENT);
+        m3uaAsConfig.setTrafficModeType(TrafficModeType.Override);
+        m3uaAsConfig.setNetworkIndicator(12);
+        m3uaAsConfig.setNetworkAppearance(10);
+        m3uaAsConfig.setRoutingContexts(new long[]{6});
+        m3uaAsConfig.setApplicationServerPoints(applicationServerPoints);
+        m3uaAsConfig.setSigtranStack(sigtranStack);
+        m3uaAsConfig = asRepository.save(m3uaAsConfig);
 
-        aspConfig.getApplicationServers().add(asConfig);
-        aspConfig.setSigtranStack(sigtranStack);
-        aspConfig = aspRepository.save(aspConfig);
+        m3uaAspConfig.getApplicationServers().add(m3uaAsConfig);
+        m3uaAspConfig.setSigtranStack(sigtranStack);
+        m3uaAspConfig = aspRepository.save(m3uaAspConfig);
 
-        RouteConfig routeConfig = new RouteConfig();
-        routeConfig.setAs(asConfig);
-        routeConfig.setDpc(200);
-        routeConfig.setOpc(100);
-        routeConfig.setTrafficModeType(TrafficModeType.Override);
-        routeConfig.setSsn(6);
-        routeRepository.save(routeConfig);
+        M3uaRouteConfig m3uaRouteConfig = new M3uaRouteConfig();
+        m3uaRouteConfig.setAs(m3uaAsConfig);
+        m3uaRouteConfig.setDpc(200);
+        m3uaRouteConfig.setOpc(100);
+        m3uaRouteConfig.setTrafficModeType(TrafficModeType.Override);
+        m3uaRouteConfig.setSsn(6);
+        routeRepository.save(m3uaRouteConfig);
     }
 }

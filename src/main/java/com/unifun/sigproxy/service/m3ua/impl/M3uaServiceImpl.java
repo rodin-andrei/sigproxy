@@ -2,7 +2,7 @@ package com.unifun.sigproxy.service.m3ua.impl;
 
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.models.config.SigtranStack;
-import com.unifun.sigproxy.models.config.m3ua.AspConfig;
+import com.unifun.sigproxy.models.config.m3ua.M3uaAspConfig;
 import com.unifun.sigproxy.service.m3ua.M3uaService;
 import com.unifun.sigproxy.service.sctp.SctpService;
 import lombok.RequiredArgsConstructor;
@@ -126,16 +126,16 @@ public class M3uaServiceImpl implements M3uaService {
     }
 
     @Override
-    public void stopAsp(AspConfig aspConfig, String stackName) {
+    public void stopAsp(M3uaAspConfig m3uaAspConfig, String stackName) {
         try {
-            m3uaManagements.get(stackName).stopAsp(aspConfig.getName());
+            m3uaManagements.get(stackName).stopAsp(m3uaAspConfig.getName());
         } catch (Exception e) {
-            log.error("Can't stop ASP: {}, cause: {}", aspConfig.getName(), e.getMessage(), e);
+            log.error("Can't stop ASP: {}, cause: {}", m3uaAspConfig.getName(), e.getMessage(), e);
         }
     }
 
     @Override
-    public void removeAsp(AspConfig aspConfig, String stackName) {
+    public void removeAsp(M3uaAspConfig m3uaAspConfig, String stackName) {
         //TODO add implementation
     }
 

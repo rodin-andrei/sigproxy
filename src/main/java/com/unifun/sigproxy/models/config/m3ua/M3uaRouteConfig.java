@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Data
 @Entity
-public class RouteConfig {
+public class M3uaRouteConfig {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,7 +21,7 @@ public class RouteConfig {
     @ManyToOne
     @ToString.Exclude
     @JoinColumn(name = "as_id", nullable = false)
-    private AsConfig as;
+    private M3uaAsConfig as;
 
     @Enumerated(EnumType.STRING)
     private TrafficModeType trafficModeType;

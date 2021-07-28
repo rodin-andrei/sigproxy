@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Entity
 @Data
-public class SctpStackSettings {
+public class SctpStackSettingsConfig {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

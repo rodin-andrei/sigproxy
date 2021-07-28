@@ -3,8 +3,8 @@ package com.unifun.sigproxy.controller.config;
 import com.unifun.sigproxy.controller.dto.ClientAssociationDto;
 import com.unifun.sigproxy.controller.dto.ServerAssociationDto;
 import com.unifun.sigproxy.models.config.SigtranStack;
-import com.unifun.sigproxy.models.config.sctp.ClientAssociation;
-import com.unifun.sigproxy.models.config.sctp.ServerAssociation;
+import com.unifun.sigproxy.models.config.sctp.SctpClientAssociationConfig;
+import com.unifun.sigproxy.models.config.sctp.SctpServerAssociationConfig;
 import com.unifun.sigproxy.service.sctp.SctpConfigService;
 import com.unifun.sigproxy.service.sctp.SctpService;
 import javassist.NotFoundException;
@@ -60,12 +60,12 @@ public class SctpController {
                                             @RequestParam int remotePort,
                                             @RequestParam String localAddress,
                                             @RequestParam int localPort) {
-        ClientAssociation clientAssociation = new ClientAssociation();
-        clientAssociation.setLinkName(linkName);
-        clientAssociation.setLocalAddress(localAddress);
-        clientAssociation.setLocalPort(localPort);
-        clientAssociation.setRemoteAddress(remoteAddress);
-        clientAssociation.setRemotePort(remotePort);
+        SctpClientAssociationConfig sctpClientAssociationConfig = new SctpClientAssociationConfig();
+        sctpClientAssociationConfig.setLinkName(linkName);
+        sctpClientAssociationConfig.setLocalAddress(localAddress);
+        sctpClientAssociationConfig.setLocalPort(localPort);
+        sctpClientAssociationConfig.setRemoteAddress(remoteAddress);
+        sctpClientAssociationConfig.setRemotePort(remotePort);
         SigtranStack sigtranStack;
         try {
             sigtranStack = sctpConfigService.getSigtranStackById(stackId);
@@ -73,9 +73,9 @@ public class SctpController {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Server Not Found", e);
         }
-        clientAssociation.setSigtranStack(sigtranStack);
-        sctpConfigService.setClinetLink(clientAssociation);
-        sctpService.addLink(clientAssociation, sigtranStack.getStackName());
+        sctpClientAssociationConfig.setSigtranStack(sigtranStack);
+        sctpConfigService.setClinetLink(sctpClientAssociationConfig);
+        sctpService.addLink(sctpClientAssociationConfig, sigtranStack.getStackName());
 
         return "testpost";
     }
@@ -89,37 +89,37 @@ public class SctpController {
 
     @PostMapping(value = "/startLink", produces = "application/json")
     public void startLink(@RequestParam Long clientLinkId) {
-        ClientAssociation clientAssociation;
+        SctpClientAssociationConfig sctpClientAssociationConfig;
         try {
-            clientAssociation = sctpConfigService.getClientLinksById(clientLinkId);
+            sctpClientAssociationConfig = sctpConfigService.getClientLinksById(clientLinkId);
         } catch (NotFoundException e){
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Link Not Found", e);
         }
-        sctpService.startLink(clientAssociation.getLinkName(), clientAssociation.getSigtranStack().getStackName());
+        sctpService.startLink(sctpClientAssociationConfig.getLinkName(), sctpClientAssociationConfig.getSigtranStack().getStackName());
     }
 
 
     @PostMapping(value = "/stopLink", produces = "application/json")
     public void stopLink(@RequestParam  Long clientLinkId) {
-        ClientAssociation clientAssociation;
+        SctpClientAssociationConfig sctpClientAssociationConfig;
         try {
-            clientAssociation = sctpConfigService.getClientLinksById(clientLinkId);
+            sctpClientAssociationConfig = sctpConfigService.getClientLinksById(clientLinkId);
         } catch (NotFoundException e){
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Link Not Found", e);
         }
-        sctpService.stopLink(clientAssociation.getLinkName(), clientAssociation.getSigtranStack().getStackName());
+        sctpService.stopLink(sctpClientAssociationConfig.getLinkName(), sctpClientAssociationConfig.getSigtranStack().getStackName());
     }
 
     @PostMapping(value = "/serverLinks", produces = "application/json")
     @ResponseBody
     public List<ServerAssociationDto> addNewServerLink(@RequestParam Long serverId) {
 
-        Set<ServerAssociation> serverAssociations = sctpConfigService.getServerLinksBySctpServerId(serverId);
-        if (serverAssociations.isEmpty()) throw new ResponseStatusException(
+        Set<SctpServerAssociationConfig> sctpServerAssociationConfigs = sctpConfigService.getServerLinksBySctpServerId(serverId);
+        if (sctpServerAssociationConfigs.isEmpty()) throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Server Not Found");
-        return serverAssociations.stream()
+        return sctpServerAssociationConfigs.stream()
                 .map(serverAssociation -> {
                     ServerAssociationDto serverAssociationDto = new ServerAssociationDto();
                     serverAssociationDto.setId(serverAssociation.getId());
@@ -137,17 +137,17 @@ public class SctpController {
                                             @RequestParam String linkName,
                                             @RequestParam String remoteAddress,
                                             @RequestParam int remotePort) {
-        ServerAssociation serverAssociation = new ServerAssociation();
-        serverAssociation.setLinkName(linkName);
-        serverAssociation.setRemotePort(remotePort);
-        serverAssociation.setRemoteAddress(remoteAddress);
+        SctpServerAssociationConfig sctpServerAssociationConfig = new SctpServerAssociationConfig();
+        sctpServerAssociationConfig.setLinkName(linkName);
+        sctpServerAssociationConfig.setRemotePort(remotePort);
+        sctpServerAssociationConfig.setRemoteAddress(remoteAddress);
         try {
-            serverAssociation.setSctpServer(sctpConfigService.getSctpServerById(serverId));
+            sctpServerAssociationConfig.setSctpServer(sctpConfigService.getSctpServerById(serverId));
         } catch (NotFoundException e) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Server Not Found", e);
         }
-        sctpConfigService.setServerLink(serverAssociation);
+        sctpConfigService.setServerLink(sctpServerAssociationConfig);
 //        sctpService.addServerAssociation(serverAssociation,serverAssociation.getSctpServer().getSigtranStack().getStackName());
         return "OK";
     }

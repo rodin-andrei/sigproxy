@@ -26,7 +26,7 @@ public class SctpServer {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "sctpServer")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Set<ServerAssociation> serverAssociations;
+    private Set<SctpServerAssociationConfig> sctpServerAssociationConfigs;
 
     @ManyToOne
     @JoinColumn(name = "stack_id", nullable = false)

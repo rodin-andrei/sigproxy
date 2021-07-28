@@ -1,29 +1,29 @@
 package com.unifun.sigproxy.service.sctp;
 
 import com.unifun.sigproxy.models.config.SigtranStack;
-import com.unifun.sigproxy.models.config.sctp.ClientAssociation;
+import com.unifun.sigproxy.models.config.sctp.SctpClientAssociationConfig;
 import com.unifun.sigproxy.models.config.sctp.SctpServer;
-import com.unifun.sigproxy.models.config.sctp.ServerAssociation;
+import com.unifun.sigproxy.models.config.sctp.SctpServerAssociationConfig;
 import javassist.NotFoundException;
 
 import java.util.Set;
 
 public interface SctpConfigService {
-    Set<ClientAssociation> getClientLinksByStackId(Long stackId);
+    Set<SctpClientAssociationConfig> getClientLinksByStackId(Long stackId);
 
-    String setClinetLink(ClientAssociation clientAssociation);
+    String setClinetLink(SctpClientAssociationConfig sctpClientAssociationConfig);
 
     SigtranStack getSigtranStack(String sigtranStack);
 
     void deleteSctpLinkById(Long linkId);
 
-    Set<ServerAssociation> getServerLinksBySctpServerId(Long serverId);
+    Set<SctpServerAssociationConfig> getServerLinksBySctpServerId(Long serverId);
 
     SctpServer getSctpServerById(Long serverId) throws NotFoundException;
 
-    String setServerLink(ServerAssociation serverAssociation);
+    String setServerLink(SctpServerAssociationConfig sctpServerAssociationConfig);
 
     SigtranStack getSigtranStackById(long stackId) throws NotFoundException;
 
-    ClientAssociation getClientLinksById(Long clientLinkId) throws NotFoundException;
+    SctpClientAssociationConfig getClientLinksById(Long clientLinkId) throws NotFoundException;
 }
