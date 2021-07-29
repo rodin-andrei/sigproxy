@@ -12,7 +12,7 @@ import javax.persistence.*;
 public class SccpLongMessageRuleConfig {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     private int firstSignalingPointCode;
 

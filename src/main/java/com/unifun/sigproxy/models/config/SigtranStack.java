@@ -78,11 +78,6 @@ public class SigtranStack {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "sigtranStack")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Set<SccpMtp3DestinationConfig> sccpMtp3DestinationConfigs;
-
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "sigtranStack")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Set<SccpConcernedSignalingPointCodeConfig> sccpConcernedSignalingPointCodeConfigs;
 
 

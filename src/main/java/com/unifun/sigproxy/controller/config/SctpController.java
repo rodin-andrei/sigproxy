@@ -9,6 +9,7 @@ import com.unifun.sigproxy.service.sctp.SctpConfigService;
 import com.unifun.sigproxy.service.sctp.SctpService;
 import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.mobicents.protocols.api.Association;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,23 +33,27 @@ public class SctpController {
     @PostMapping(value = "/clientLinks", produces = "application/json")
     @ResponseBody
     public List<ClientAssociationDto> getLinksInfo(@RequestParam Long stackId) {
-        return sctpConfigService.getClientLinksByStackId(stackId).stream().map(clientAssociation -> {
-            ClientAssociationDto clientAssociationDto = new ClientAssociationDto();
-            clientAssociationDto.setId(clientAssociation.getId());
-            clientAssociationDto.setLinkName(clientAssociation.getLinkName());
-            clientAssociationDto.setLocalAddress(clientAssociation.getLocalAddress());
-            clientAssociationDto.setLocalPort(clientAssociation.getLocalPort());
-            clientAssociationDto.setMultihomingAddresses(clientAssociation.getMultihomingAddresses());
-            clientAssociationDto.setRemoteAddress(clientAssociation.getRemoteAddress());
-            clientAssociationDto.setRemotePort(clientAssociation.getRemotePort());
-            try {
-                clientAssociationDto.setStatus(sctpService.getTransportManagement(clientAssociation.getSigtranStack().getStackName())
-                        .getAssociation(clientAssociation.getLinkName()).isConnected());
-            } catch (Exception exception) {
-                exception.printStackTrace();
-            }
-            return clientAssociationDto;
-        }).collect(Collectors.toList());
+        return sctpConfigService.getClientLinksByStackId(stackId).stream()
+                .map(clientAssociation -> {
+                    ClientAssociationDto clientAssociationDto = new ClientAssociationDto();
+                    clientAssociationDto.setId(clientAssociation.getId());
+                    clientAssociationDto.setLinkName(clientAssociation.getLinkName());
+                    clientAssociationDto.setLocalAddress(clientAssociation.getLocalAddress());
+                    clientAssociationDto.setLocalPort(clientAssociation.getLocalPort());
+                    clientAssociationDto.setMultihomingAddresses(clientAssociation.getMultihomingAddresses());
+                    clientAssociationDto.setRemoteAddress(clientAssociation.getRemoteAddress());
+                    clientAssociationDto.setRemotePort(clientAssociation.getRemotePort());
+                    try {
+                        Association association = sctpService
+                                .getTransportManagement(clientAssociation.getSigtranStack().getStackName())
+                                .getAssociation(clientAssociation.getLinkName());
+                        clientAssociationDto.setStatus(association.isConnected());
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                    }
+                    return clientAssociationDto;
+                })
+                .collect(Collectors.toList());
 
     }
 
@@ -92,7 +97,7 @@ public class SctpController {
         SctpClientAssociationConfig sctpClientAssociationConfig;
         try {
             sctpClientAssociationConfig = sctpConfigService.getClientLinksById(clientLinkId);
-        } catch (NotFoundException e){
+        } catch (NotFoundException e) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Link Not Found", e);
         }
@@ -101,11 +106,11 @@ public class SctpController {
 
 
     @PostMapping(value = "/stopLink", produces = "application/json")
-    public void stopLink(@RequestParam  Long clientLinkId) {
+    public void stopLink(@RequestParam Long clientLinkId) {
         SctpClientAssociationConfig sctpClientAssociationConfig;
         try {
             sctpClientAssociationConfig = sctpConfigService.getClientLinksById(clientLinkId);
-        } catch (NotFoundException e){
+        } catch (NotFoundException e) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Link Not Found", e);
         }

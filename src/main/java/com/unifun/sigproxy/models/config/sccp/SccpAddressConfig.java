@@ -1,25 +1,26 @@
 package com.unifun.sigproxy.models.config.sccp;
 
 import com.unifun.sigproxy.models.config.SigtranStack;
+import lombok.Data;
 import lombok.ToString;
 import org.restcomm.protocols.ss7.indicator.NatureOfAddress;
 import org.restcomm.protocols.ss7.indicator.NumberingPlan;
 
 import javax.persistence.*;
 
+@Data
 @Entity
 public class SccpAddressConfig {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    private Integer addressIndicator;
+    private Byte addressIndicator;
 
     private Integer pointCode;
 
     private Integer ssn;
 
-    @Deprecated
     private Integer translationType;
 
     @Enumerated(EnumType.STRING)
@@ -29,7 +30,6 @@ public class SccpAddressConfig {
     private NatureOfAddress natureOfAddress;
 
     private String digits;
-
 
     @ManyToOne
     @ToString.Exclude

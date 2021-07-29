@@ -1,21 +1,30 @@
 package com.unifun.sigproxy.service.sccp.impl;
 
+
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.models.config.SigtranStack;
-import com.unifun.sigproxy.models.config.sccp.SccpServiceAccessPointConfig;
+import com.unifun.sigproxy.models.config.sccp.*;
 import com.unifun.sigproxy.repository.sccp.SccpServiceAccessPointConfigRepository;
 import com.unifun.sigproxy.service.m3ua.impl.M3uaServiceImpl;
 import com.unifun.sigproxy.service.sccp.SccpService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.restcomm.protocols.ss7.sccp.Router;
-import org.restcomm.protocols.ss7.sccp.SccpProvider;
-import org.restcomm.protocols.ss7.sccp.SccpResource;
-import org.restcomm.protocols.ss7.sccp.impl.SccpRoutingControl;
+import org.restcomm.protocols.ss7.indicator.AddressIndicator;
+import org.restcomm.protocols.ss7.indicator.NatureOfAddress;
+import org.restcomm.protocols.ss7.indicator.NumberingPlan;
+import org.restcomm.protocols.ss7.sccp.*;
 import org.restcomm.protocols.ss7.sccp.impl.SccpStackImpl;
+import org.restcomm.protocols.ss7.sccp.impl.parameter.HopCounterImpl;
+import org.restcomm.protocols.ss7.sccp.impl.parameter.ImportanceImpl;
+import org.restcomm.protocols.ss7.sccp.impl.parameter.SccpAddressImpl;
+import org.restcomm.protocols.ss7.sccp.message.SccpDataMessage;
+import org.restcomm.protocols.ss7.sccp.message.SccpNoticeMessage;
+import org.restcomm.protocols.ss7.sccp.parameter.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +36,7 @@ public class SccpServiceImpl implements SccpService {
     private final Map<String, SccpStackImpl> sccpStacks = new HashMap<>();
 
     private final SccpServiceAccessPointConfigRepository sccpServiceAccessPointConfigRepository;
-
+    private final Map<Integer, SccpAddress> addressMap = new HashMap<>();
     @Value("${jss.persist.dir}")
     private String jssPersistDir;
 
@@ -38,13 +47,93 @@ public class SccpServiceImpl implements SccpService {
             throw new InitializingException("SCCP: " + sigtranStack.getStackName() + " already exist");
         }
         try {
-            SccpStackImpl sccpStack = new SccpStackImpl(sigtranStack.getStackName(), null);
+            SccpStackImpl sccpStack = new SccpStackImpl(sigtranStack.getStackName());
             sccpStacks.put(sigtranStack.getStackName(), sccpStack);
 
             sccpStack.setMtp3UserPart(1, m3uaService.getManagement(sigtranStack.getStackName()));
             sccpStack.setPersistDir(jssPersistDir);
             sccpStack.start();
             sccpStack.removeAllResourses();
+
+            SccpListener sccpListener = new SccpListener() {
+                @Override
+                public void onMessage(SccpDataMessage sccpDataMessage) {
+                    log.info("onMessage" + new String(sccpDataMessage.getData()));
+                }
+
+                @Override
+                public void onNotice(SccpNoticeMessage sccpNoticeMessage) {
+                    log.info("onMessage1");
+                }
+
+                @Override
+                public void onCoordResponse(int i, int i1) {
+                    log.info("onMessage2");
+                }
+
+                @Override
+                public void onState(int i, int i1, boolean b, int i2) {
+                    log.info("onMessage3");
+                }
+
+                @Override
+                public void onPcState(int i, SignallingPointStatus signallingPointStatus, Integer integer, RemoteSccpStatus remoteSccpStatus) {
+                    log.info("onMessage4");
+                }
+
+                @Override
+                public void onNetworkIdState(int i, NetworkIdState networkIdState) {
+                    log.info("onMessage5");
+                }
+
+                @Override
+                public void onConnectIndication(SccpConnection sccpConnection, SccpAddress sccpAddress, SccpAddress sccpAddress1, ProtocolClass protocolClass, Credit credit, byte[] bytes, Importance importance) throws Exception {
+                    log.info("onMessage6");
+                }
+
+                @Override
+                public void onConnectConfirm(SccpConnection sccpConnection, byte[] bytes) {
+                    log.info("onMessage7");
+                }
+
+                @Override
+                public void onDisconnectIndication(SccpConnection sccpConnection, ReleaseCause releaseCause, byte[] bytes) {
+                    log.info("onMessage8");
+                }
+
+                @Override
+                public void onDisconnectIndication(SccpConnection sccpConnection, RefusalCause refusalCause, byte[] bytes) {
+                    log.info("onMessage9");
+                }
+
+                @Override
+                public void onDisconnectIndication(SccpConnection sccpConnection, ErrorCause errorCause) {
+                    log.info("onMessage10");
+                }
+
+                @Override
+                public void onResetIndication(SccpConnection sccpConnection, ResetCause resetCause) {
+                    log.info("onMessage11");
+                }
+
+                @Override
+                public void onResetConfirm(SccpConnection sccpConnection) {
+                    log.info("onMessage12");
+                }
+
+                @Override
+                public void onData(SccpConnection sccpConnection, byte[] bytes) {
+                    log.info("onMessage13");
+                }
+
+                @Override
+                public void onDisconnectConfirm(SccpConnection sccpConnection) {
+                    log.info("onMessage14");
+                }
+            };
+            sccpStack.getSccpProvider().registerSccpListener(8, sccpListener);
+            sccpStack.getSccpProvider().registerSccpListener(147, sccpListener);
+
             log.info("Created sccp management: {}", sigtranStack.getStackName());
         } catch (Exception e) {
             throw new InitializingException("Can't initialize SCCP Layer. ", e);
@@ -53,21 +142,217 @@ public class SccpServiceImpl implements SccpService {
 
         sigtranStack.getSccpServiceAccessPointConfigs().forEach(sccpServiceAccessPointConfig -> {
             this.addMtp3ServiceAccessPoint(sccpServiceAccessPointConfig, sigtranStack.getStackName());
+
+            sccpServiceAccessPointConfig.getSccpMtp3DestinationConfigs()
+                    .forEach(mtp3DestinationConfig -> addMtp3Destination(sigtranStack.getStackName(), mtp3DestinationConfig, sccpServiceAccessPointConfig.getId()));
         });
 
+        sigtranStack.getSccpRemoteSignalingPointConfigs()
+                .forEach(sccpRemoteSignalingPointConfig -> addRemoteSpc(sigtranStack.getStackName(), sccpRemoteSignalingPointConfig));
 
-        SccpProvider sccpProvider = sccpStack.getSccpProvider();
+        sigtranStack.getSccpRemoteSubsystemConfigs()
+                .forEach(sccpRemoteSubsystemConfig -> addRemoteSsn(sccpStack.getName(), sccpRemoteSubsystemConfig));
+
+        sigtranStack.getSccpAddressConfigs()
+                .forEach(sccpAddressConfig -> addAddress(sigtranStack.getStackName(), sccpAddressConfig));
+
+        sigtranStack.getSccpRuleConfigs()
+                .forEach(sccpRuleConfig -> addRule(sigtranStack.getStackName(), sccpRuleConfig));
+
+        sigtranStack.getSccpConcernedSignalingPointCodeConfigs()
+                .forEach(sccpConcernedSignalingPointCodeConfig -> addCSPC(sigtranStack.getStackName(), sccpConcernedSignalingPointCodeConfig));
+
+        sigtranStack.getSccpLongMessageRuleConfigs()
+                .forEach(sccpLongMessageRuleConfig -> addLmr(sigtranStack.getStackName(), sccpLongMessageRuleConfig));
+
+    }
+
+    private void addLmr(String stackName, SccpLongMessageRuleConfig sccpLongMessageRuleConfig) {
+        try {
+            this.sccpStacks.get(stackName).getRouter().addLongMessageRule(sccpLongMessageRuleConfig.getId(),
+                    sccpLongMessageRuleConfig.getFirstSignalingPointCode(),
+                    sccpLongMessageRuleConfig.getLastSignalingPointCode(),
+                    sccpLongMessageRuleConfig.getLongMessageRuleType());
+            log.info("Added {} to stack: {}", sccpLongMessageRuleConfig, stackName);
+        } catch (Exception e) {
+            log.warn("Error added: {} to stack: {}, cause: {}", sccpLongMessageRuleConfig, stackName, e.getMessage(), e);
+        }
+    }
+
+    private void addCSPC(String stackName, SccpConcernedSignalingPointCodeConfig sccpConcernedSignalingPointCodeConfig) {
+        try {
+            sccpStacks.get(stackName).getSccpResource().addConcernedSpc(sccpConcernedSignalingPointCodeConfig.getId(),
+                    sccpConcernedSignalingPointCodeConfig.getSignalingPointCode());
+            log.info("Added {} to stack: {}", sccpConcernedSignalingPointCodeConfig, stackName);
+        } catch (Exception e) {
+            log.warn("Error added: {} to stack: {}, cause: {}", sccpConcernedSignalingPointCodeConfig, stackName, e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void test(String stackName, int addressA, int addressB) {
+        SccpStackImpl sccpStack = this.sccpStacks.get(stackName);
+
+        SccpDataMessage dataMessageClass0 = sccpStack.getSccpProvider().getMessageFactory().createDataMessageClass0(
+                addressMap.get(addressB),
+                addressMap.get(addressA),
+                "Hello".getBytes(StandardCharsets.UTF_8),
+                8,
+                true,
+                new HopCounterImpl(10),
+                new ImportanceImpl((byte) 1)
+        );
 
 
-        Router router = sccpStack.getRouter();
-        SccpResource sccpResource = sccpStack.getSccpResource();
-        SccpRoutingControl sccpRoutingControl = sccpStack.getSccpRoutingControl();
+        try {
+            sccpStack.getSccpProvider().send(dataMessageClass0);
+            log.info("Sended");
+        } catch (IOException e) {
+            log.error("Error send sccp message", e);
+        }
 
+
+    }
+
+    private void addRule(String stackName, SccpRuleConfig sccpRuleConfig) {
+        SccpStackImpl sccpStack = this.sccpStacks.get(stackName);
+        try {
+            sccpStack.getRouter().addRule(sccpRuleConfig.getId(),
+                    sccpRuleConfig.getRuleType(),
+                    sccpRuleConfig.getLoadSharingAlgorithm(),
+                    sccpRuleConfig.getOriginationType(),
+                    createAddressByRuleAddress(sccpStack, sccpRuleConfig.getSccpAddressRuleConfig()),
+                    sccpRuleConfig.getMask(),
+                    sccpRuleConfig.getPrimaryAddressId(),
+                    sccpRuleConfig.getSecondaryAddressId(),
+                    sccpRuleConfig.getNewCallingPartyAddressAddressId(),
+                    sccpRuleConfig.getNetworkId(),
+                    createAddressByRuleAddress(sccpStack, sccpRuleConfig.getCallingSccpAddressRuleConfig())
+            );
+            log.info("Added {} to stack: {}", sccpRuleConfig, stackName);
+
+        } catch (Exception e) {
+
+            log.warn("Error added: {} to stack: {}, cause: {}", sccpRuleConfig, stackName, e.getMessage(), e);
+        }
+    }
+
+    private SccpAddress createAddressByRuleAddress(SccpStackImpl sccpStack, SccpAddressRuleConfig sccpAddressRuleConfig) {
+        if (sccpAddressRuleConfig == null) return null;
+        AddressIndicator aiObj = new AddressIndicator(sccpAddressRuleConfig.getAddressIndicator(), SccpProtocolVersion.ITU);
+
+        NumberingPlan np = sccpAddressRuleConfig.getNumberingPlan();
+        NatureOfAddress nai = sccpAddressRuleConfig.getNatureOfAddress();
+
+        GlobalTitle gt = null;
+
+        switch (aiObj.getGlobalTitleIndicator()) {
+            case GLOBAL_TITLE_INCLUDES_NATURE_OF_ADDRESS_INDICATOR_ONLY:
+                gt = sccpStack.getSccpProvider().getParameterFactory().createGlobalTitle(sccpAddressRuleConfig.getDigits(), nai);
+                break;
+            case GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_ONLY:
+                gt = sccpStack.getSccpProvider().getParameterFactory().createGlobalTitle(sccpAddressRuleConfig.getDigits(), sccpAddressRuleConfig.getTranslationType());
+                break;
+            case GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_NUMBERING_PLAN_AND_ENCODING_SCHEME:
+                gt = sccpStack.getSccpProvider().getParameterFactory().createGlobalTitle(sccpAddressRuleConfig.getDigits(), sccpAddressRuleConfig.getTranslationType(), np, null);
+                break;
+            case GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_NUMBERING_PLAN_ENCODING_SCHEME_AND_NATURE_OF_ADDRESS:
+                gt = sccpStack.getSccpProvider().getParameterFactory().createGlobalTitle(sccpAddressRuleConfig.getDigits(), sccpAddressRuleConfig.getTranslationType(), np, null, nai);
+                break;
+
+            case NO_GLOBAL_TITLE_INCLUDED:
+                gt = sccpStack.getSccpProvider().getParameterFactory().createGlobalTitle(sccpAddressRuleConfig.getDigits());
+                break;
+        }
+
+        SccpAddress sccpAddress = new SccpAddressImpl(aiObj.getRoutingIndicator(), gt, sccpAddressRuleConfig.getPointCode(), sccpAddressRuleConfig.getSsn());
+        return sccpAddress;
+    }
+
+    private void addAddress(String stackName, SccpAddressConfig sccpAddressConfig) {
+        SccpStackImpl sccpStack = sccpStacks.get(stackName);
+
+        AddressIndicator aiObj = new AddressIndicator(sccpAddressConfig.getAddressIndicator(), SccpProtocolVersion.ITU);
+        NumberingPlan np = sccpAddressConfig.getNumberingPlan();
+        NatureOfAddress nai = sccpAddressConfig.getNatureOfAddress();
+
+        GlobalTitle gt = null;
+
+        switch (aiObj.getGlobalTitleIndicator()) {
+            case GLOBAL_TITLE_INCLUDES_NATURE_OF_ADDRESS_INDICATOR_ONLY:
+                gt = sccpStack.getSccpProvider().getParameterFactory().createGlobalTitle(sccpAddressConfig.getDigits(), nai);
+                break;
+            case GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_ONLY:
+                gt = sccpStack.getSccpProvider().getParameterFactory().createGlobalTitle(sccpAddressConfig.getDigits(), sccpAddressConfig.getTranslationType());
+                break;
+            case GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_NUMBERING_PLAN_AND_ENCODING_SCHEME:
+                gt = sccpStack.getSccpProvider().getParameterFactory().createGlobalTitle(sccpAddressConfig.getDigits(), sccpAddressConfig.getTranslationType(), np, null);
+                break;
+            case GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_NUMBERING_PLAN_ENCODING_SCHEME_AND_NATURE_OF_ADDRESS:
+                gt = sccpStack.getSccpProvider().getParameterFactory().createGlobalTitle(sccpAddressConfig.getDigits(), sccpAddressConfig.getTranslationType(), np, null, nai);
+                break;
+
+            case NO_GLOBAL_TITLE_INCLUDED:
+                gt = sccpStack.getSccpProvider().getParameterFactory().createGlobalTitle(sccpAddressConfig.getDigits());
+                break;
+        }
+
+        SccpAddress sccpAddress = new SccpAddressImpl(aiObj.getRoutingIndicator(), gt, sccpAddressConfig.getPointCode(), sccpAddressConfig.getSsn());
+        try {
+            sccpStack.getRouter().addRoutingAddress(sccpAddressConfig.getId(), sccpAddress);
+            addressMap.put(sccpAddressConfig.getId(), sccpAddress);
+            log.info("Added {} to stack: {}", sccpAddressConfig, stackName);
+        } catch (Exception e) {
+            log.warn("Error added: {} to stack: {}, cause: {}", sccpAddressConfig, stackName, e.getMessage(), e);
+        }
+    }
+
+    private void addRemoteSsn(String stackName, SccpRemoteSubsystemConfig sccpRemoteSubsystemConfig) {
+        try {
+            sccpStacks.get(stackName).getSccpResource().addRemoteSsn(sccpRemoteSubsystemConfig.getId(),
+                    sccpRemoteSubsystemConfig.getRemoteSignalingPointCode(),
+                    sccpRemoteSubsystemConfig.getRemoteSubsystemNumber(),
+                    sccpRemoteSubsystemConfig.getRemoteSubsystemFlag(),
+                    sccpRemoteSubsystemConfig.isMarkProhibitedWhenSpcResuming());
+            log.info("Added {} to stack: {}", sccpRemoteSubsystemConfig, stackName);
+        } catch (Exception e) {
+            log.warn("Error added: {} to stack: {}, cause: {}", sccpRemoteSubsystemConfig, stackName, e.getMessage(), e);
+        }
+    }
+
+    private void addRemoteSpc(String stackName, SccpRemoteSignalingPointConfig sccpRemoteSignalingPointConfig) {
+        try {
+            sccpStacks.get(stackName).getSccpResource().addRemoteSpc(
+                    sccpRemoteSignalingPointConfig.getId(),
+                    sccpRemoteSignalingPointConfig.getRemoteSignalingPointCode(),
+                    sccpRemoteSignalingPointConfig.getRspcFlag(),
+                    sccpRemoteSignalingPointConfig.getMask()
+            );
+            log.info("Added {} to stack {}", sccpRemoteSignalingPointConfig, stackName);
+        } catch (Exception e) {
+            log.warn("Error added {} to stack: {}, cause: {}",
+                    sccpRemoteSignalingPointConfig, stackName, e.getMessage(), e);
+        }
+    }
+
+    private void addMtp3Destination(String stackname, SccpMtp3DestinationConfig mtp3DestinationConfig, Integer sapId) {
+        try {
+            this.sccpStacks.get(stackname).getRouter().addMtp3Destination(sapId,
+                    mtp3DestinationConfig.getId(),
+                    mtp3DestinationConfig.getFirstSignalingPointCode(),
+                    mtp3DestinationConfig.getLastSignalingPointCode(),
+                    mtp3DestinationConfig.getFirstSls(),
+                    mtp3DestinationConfig.getLastSls(),
+                    mtp3DestinationConfig.getSlsMask());
+            log.info("Added {} to stack {}", mtp3DestinationConfig, stackname);
+        } catch (Exception e) {
+            log.warn("Error added {} to stack {}", mtp3DestinationConfig, stackname, e);
+        }
     }
 
     public void addMtp3ServiceAccessPoint(SccpServiceAccessPointConfig sccpServiceAccessPointConfig, String stackName) {
         try {
-            sccpStacks.get(stackName).getRouter().addMtp3ServiceAccessPoint(sccpServiceAccessPointConfig.getId(),
+            this.sccpStacks.get(stackName).getRouter().addMtp3ServiceAccessPoint(sccpServiceAccessPointConfig.getId(),
                     sccpServiceAccessPointConfig.getMtp3Id(),
                     sccpServiceAccessPointConfig.getOpc(),
                     sccpServiceAccessPointConfig.getNi(),

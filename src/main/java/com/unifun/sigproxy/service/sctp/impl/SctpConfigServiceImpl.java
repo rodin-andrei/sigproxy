@@ -130,9 +130,8 @@ public class SctpConfigServiceImpl implements SctpConfigService {
     }
 
     public SigtranStack getSigtranStackById(long stackId) throws NotFoundException {
-        Optional<SigtranStack> sigtranStack = sigtranStackRepository.findById(stackId);
-        if (sigtranStack.isPresent()) return sigtranStack.get();
-        else throw new NotFoundException("Not found sigtran stack");
+        return sigtranStackRepository.findById(stackId)
+                .orElseThrow(() -> new NotFoundException("Not found sigtran stack"));
     }
 
     public SctpClientAssociationConfig getClientLinksById(Long clientLinkId) throws NotFoundException {

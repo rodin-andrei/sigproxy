@@ -29,6 +29,7 @@
     </repositories>
     <properties>
         <mobicents.jss7>8.0.0-179</mobicents.jss7>
+        <mobicents.jss7.sccp>8.0.0-145</mobicents.jss7.sccp><!--This is last version sccp with suport routing on GT -->
         <mobicents.sctp>2.0.10</mobicents.sctp>
         <lombok.ver>1.18.12</lombok.ver>
         <maven.compiler.target>14</maven.compiler.target>
@@ -91,7 +92,7 @@
         <dependency>
             <groupId>org.restcomm.protocols.ss7.sccp</groupId>
             <artifactId>sccp-api</artifactId>
-            <version>${mobicents.jss7}</version>
+            <version>${mobicents.jss7.sccp}</version>
             <exclusions>
                 <exclusion>  <!-- declare the exclusion here -->
                     <groupId>io.netty</groupId>
@@ -102,7 +103,7 @@
         <dependency>
             <groupId>org.restcomm.protocols.ss7.sccp</groupId>
             <artifactId>sccp-impl</artifactId>
-            <version>${mobicents.jss7}</version>
+            <version>${mobicents.jss7.sccp}</version>
             <exclusions>
                 <exclusion>  <!-- declare the exclusion here -->
                     <groupId>io.netty</groupId>

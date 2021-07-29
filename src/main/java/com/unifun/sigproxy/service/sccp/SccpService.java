@@ -8,5 +8,7 @@ import org.restcomm.protocols.ss7.sccp.SccpProvider;
 public interface SccpService {
     void initialize(SigtranStack sigtranStack) throws NoConfigurationException, InitializingException;
 
+    void test(String stackName, int addressA, int addressB);
+
     SccpProvider getSccpProvider(String stackName);
 }

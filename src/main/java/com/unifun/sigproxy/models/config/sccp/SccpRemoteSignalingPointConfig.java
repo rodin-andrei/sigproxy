@@ -3,20 +3,26 @@ package com.unifun.sigproxy.models.config.sccp;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import lombok.Data;
 import lombok.ToString;
+import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
 
 @Data
 @Entity
+@DynamicInsert
 public class SccpRemoteSignalingPointConfig {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    private int dpc;
+    private int remoteSignalingPointCode;
 
+    @Deprecated //From SS7_Stack_User_Guide 7.4.21.1
+    @Column(columnDefinition = "int default 0")
     private int rspcFlag;
 
+    @Deprecated //From SS7_Stack_User_Guide 7.4.21.1
+    @Column(columnDefinition = "int default 0")
     private int mask;
 
     @ManyToOne
