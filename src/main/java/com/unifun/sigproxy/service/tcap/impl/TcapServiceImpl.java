@@ -1,18 +1,28 @@
 package com.unifun.sigproxy.service.tcap.impl;
 
+import com.unifun.sigproxy.aaaaa.TestTCListener;
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.exception.NoConfigurationException;
 import com.unifun.sigproxy.models.config.SigtranStack;
+import com.unifun.sigproxy.models.config.tcap.TcapConfig;
 import com.unifun.sigproxy.service.sccp.SccpService;
 import com.unifun.sigproxy.service.tcap.TcapService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.restcomm.protocols.ss7.sccp.SccpProvider;
 import org.restcomm.protocols.ss7.tcap.TCAPStackImpl;
+import org.restcomm.protocols.ss7.tcap.api.TCAPStack;
+import org.restcomm.protocols.ss7.tcap.api.TCListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -29,18 +39,32 @@ public class TcapServiceImpl implements TcapService {
         if (tcapStacks.containsKey(sigtranStack.getStackName())) {
             throw new InitializingException("TcapManagement: " + sigtranStack.getStackName() + " already exist");
         }
+        TcapConfig tcapConfig = sigtranStack.getTcapConfig();
+        SccpProvider sccpProvider = sccpService.getSccpProvider(sigtranStack.getStackName());
+
         TCAPStackImpl tcapStack = new TCAPStackImpl(sigtranStack.getStackName(),
-                sccpService.getSccpProvider(sigtranStack.getStackName()),
-                1);
+                sccpProvider,
+                tcapConfig.getLocalSsn()
+        );
         this.tcapStacks.put(sigtranStack.getStackName(), tcapStack);
         tcapStack.setPersistDir(jssPersistDir);
+        IntStream stream = Arrays.stream(tcapConfig.getAdditionalSsns());
+        Stream<Integer> boxed = stream.boxed();
+        List<Integer> collect = boxed.collect(Collectors.toList());
         try {
+            tcapStack.setExtraSsns(collect);
             tcapStack.start();
         } catch (Exception e) {
-            throw new InitializingException("Can't initialize sctp management: " + sigtranStack.getStackName(), e);
+            throw new InitializingException("Can't initialize tcap management: " + sigtranStack.getStackName(), e);
         }
 
+        TCListener tcListener = new TestTCListener(tcapStack);
+        tcapStack.getProvider().addTCListener(tcListener);
+    }
 
+    @Override
+    public TCAPStack getTcapStack(String stackName) {
+        return this.tcapStacks.get(stackName);
     }
 
 }

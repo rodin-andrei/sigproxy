@@ -19,5 +19,5 @@ public class SctpServerAssociationConfig {
 
     @ManyToOne
     @JoinColumn(name = "server_id", nullable = false)
-    private SctpServer sctpServer;
+    private SctpServerConfig sctpServerConfig;
 }

@@ -1,6 +1,7 @@
 package com.unifun.sigproxy.service.sccp.impl;
 
 
+import com.unifun.sigproxy.aaaaa.TestSccpListener;
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.sccp.*;
@@ -12,14 +13,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.restcomm.protocols.ss7.indicator.AddressIndicator;
 import org.restcomm.protocols.ss7.indicator.NatureOfAddress;
 import org.restcomm.protocols.ss7.indicator.NumberingPlan;
-import org.restcomm.protocols.ss7.sccp.*;
+import org.restcomm.protocols.ss7.sccp.SccpListener;
+import org.restcomm.protocols.ss7.sccp.SccpProtocolVersion;
+import org.restcomm.protocols.ss7.sccp.SccpProvider;
 import org.restcomm.protocols.ss7.sccp.impl.SccpStackImpl;
 import org.restcomm.protocols.ss7.sccp.impl.parameter.HopCounterImpl;
 import org.restcomm.protocols.ss7.sccp.impl.parameter.ImportanceImpl;
 import org.restcomm.protocols.ss7.sccp.impl.parameter.SccpAddressImpl;
 import org.restcomm.protocols.ss7.sccp.message.SccpDataMessage;
-import org.restcomm.protocols.ss7.sccp.message.SccpNoticeMessage;
-import org.restcomm.protocols.ss7.sccp.parameter.*;
+import org.restcomm.protocols.ss7.sccp.parameter.GlobalTitle;
+import org.restcomm.protocols.ss7.sccp.parameter.SccpAddress;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -32,11 +35,10 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class SccpServiceImpl implements SccpService {
+    public final Map<Integer, SccpAddress> addressMap = new HashMap<>();
     private final M3uaServiceImpl m3uaService;
     private final Map<String, SccpStackImpl> sccpStacks = new HashMap<>();
-
     private final SccpServiceAccessPointConfigRepository sccpServiceAccessPointConfigRepository;
-    private final Map<Integer, SccpAddress> addressMap = new HashMap<>();
     @Value("${jss.persist.dir}")
     private String jssPersistDir;
 
@@ -49,89 +51,12 @@ public class SccpServiceImpl implements SccpService {
         try {
             SccpStackImpl sccpStack = new SccpStackImpl(sigtranStack.getStackName());
             sccpStacks.put(sigtranStack.getStackName(), sccpStack);
-
             sccpStack.setMtp3UserPart(1, m3uaService.getManagement(sigtranStack.getStackName()));
             sccpStack.setPersistDir(jssPersistDir);
             sccpStack.start();
             sccpStack.removeAllResourses();
 
-            SccpListener sccpListener = new SccpListener() {
-
-                @Override
-                public void onMessage(SccpDataMessage sccpDataMessage) {
-                    log.info("onMessage" + new String(sccpDataMessage.getData()) + " " + sccpStack.getName());
-                }
-
-                @Override
-                public void onNotice(SccpNoticeMessage sccpNoticeMessage) {
-                    log.info("onMessage1");
-                }
-
-                @Override
-                public void onCoordResponse(int i, int i1) {
-                    log.info("onMessage2");
-                }
-
-                @Override
-                public void onState(int i, int i1, boolean b, int i2) {
-                    log.info("onMessage3");
-                }
-
-                @Override
-                public void onPcState(int i, SignallingPointStatus signallingPointStatus, Integer integer, RemoteSccpStatus remoteSccpStatus) {
-                    log.info("onMessage4");
-                }
-
-                @Override
-                public void onNetworkIdState(int i, NetworkIdState networkIdState) {
-                    log.info("onMessage5");
-                }
-
-                @Override
-                public void onConnectIndication(SccpConnection sccpConnection, SccpAddress sccpAddress, SccpAddress sccpAddress1, ProtocolClass protocolClass, Credit credit, byte[] bytes, Importance importance) throws Exception {
-                    log.info("onMessage6");
-                }
-
-                @Override
-                public void onConnectConfirm(SccpConnection sccpConnection, byte[] bytes) {
-                    log.info("onMessage7");
-                }
-
-                @Override
-                public void onDisconnectIndication(SccpConnection sccpConnection, ReleaseCause releaseCause, byte[] bytes) {
-                    log.info("onMessage8");
-                }
-
-                @Override
-                public void onDisconnectIndication(SccpConnection sccpConnection, RefusalCause refusalCause, byte[] bytes) {
-                    log.info("onMessage9");
-                }
-
-                @Override
-                public void onDisconnectIndication(SccpConnection sccpConnection, ErrorCause errorCause) {
-                    log.info("onMessage10");
-                }
-
-                @Override
-                public void onResetIndication(SccpConnection sccpConnection, ResetCause resetCause) {
-                    log.info("onMessage11");
-                }
-
-                @Override
-                public void onResetConfirm(SccpConnection sccpConnection) {
-                    log.info("onMessage12");
-                }
-
-                @Override
-                public void onData(SccpConnection sccpConnection, byte[] bytes) {
-                    log.info("onMessage13");
-                }
-
-                @Override
-                public void onDisconnectConfirm(SccpConnection sccpConnection) {
-                    log.info("onMessage14");
-                }
-            };
+            SccpListener sccpListener = new TestSccpListener(sccpStack);
             sccpStack.getSccpProvider().registerSccpListener(8, sccpListener);
             sccpStack.getSccpProvider().registerSccpListener(147, sccpListener);
 

@@ -4,7 +4,7 @@ import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.exception.NoConfigurationException;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.sctp.SctpClientAssociationConfig;
-import com.unifun.sigproxy.models.config.sctp.SctpServer;
+import com.unifun.sigproxy.models.config.sctp.SctpServerConfig;
 import com.unifun.sigproxy.service.sctp.SctpService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +46,7 @@ public class SctpServiceImpl implements SctpService {
         }
 
         var clientAssociations = sigtranStack.getAssociations();
-        var sctpServers = sigtranStack.getSctpServers();
+        var sctpServers = sigtranStack.getSctpServerConfigs();
         if (clientAssociations.isEmpty() && sctpServers.isEmpty()) {
             throw new NoConfigurationException("No links or servers to configure for SCTP managment: " + sigtranStack.getStackName());
         }
@@ -160,7 +160,7 @@ public class SctpServiceImpl implements SctpService {
     }
 
     @Override
-    public void addServer(SctpServer serverConfig, String sigtranStack) {
+    public void addServer(SctpServerConfig serverConfig, String sigtranStack) {
         try {
             sctpManagements.get(sigtranStack)
                     .addServer(
@@ -195,7 +195,7 @@ public class SctpServiceImpl implements SctpService {
     }
 
     @Override
-    public void addServers(Set<SctpServer> newServers, String sigtranStack) {
+    public void addServers(Set<SctpServerConfig> newServers, String sigtranStack) {
         newServers.forEach(sctpServer -> addServer(sctpServer, sigtranStack));
     }
 
@@ -220,7 +220,7 @@ public class SctpServiceImpl implements SctpService {
     }
 
     @Override
-    public void removeServer(SctpServer serverConfig, String sigtranStack) {
+    public void removeServer(SctpServerConfig serverConfig, String sigtranStack) {
         try {
             sctpManagements.get(sigtranStack).stopServer(serverConfig.getName());
         } catch (Exception e) {

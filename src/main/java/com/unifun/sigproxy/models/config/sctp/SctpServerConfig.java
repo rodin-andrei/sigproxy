@@ -10,7 +10,7 @@ import java.util.Set;
 
 @Data
 @Entity
-public class SctpServer {
+public class SctpServerConfig {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,7 +23,7 @@ public class SctpServer {
 
     private String[] multihomingAddresses;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "sctpServer")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "sctpServerConfig")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Set<SctpServerAssociationConfig> sctpServerAssociationConfigs;

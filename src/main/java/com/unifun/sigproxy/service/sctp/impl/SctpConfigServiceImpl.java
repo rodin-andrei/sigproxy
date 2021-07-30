@@ -2,8 +2,8 @@ package com.unifun.sigproxy.service.sctp.impl;
 
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.sctp.SctpClientAssociationConfig;
-import com.unifun.sigproxy.models.config.sctp.SctpServer;
 import com.unifun.sigproxy.models.config.sctp.SctpServerAssociationConfig;
+import com.unifun.sigproxy.models.config.sctp.SctpServerConfig;
 import com.unifun.sigproxy.repository.SigtranStackRepository;
 import com.unifun.sigproxy.repository.sctp.RemoteSctpLinkRepository;
 import com.unifun.sigproxy.repository.sctp.SctpLinkRepository;
@@ -114,12 +114,12 @@ public class SctpConfigServiceImpl implements SctpConfigService {
     }
 
     public Set<SctpServerAssociationConfig> getServerLinksBySctpServerId(Long serverId) {
-        Optional<SctpServer> sctpServer = sctpServerRepository.findById(serverId);
-        return sctpServer.map(SctpServer::getSctpServerAssociationConfigs).orElse(new HashSet<>());
+        Optional<SctpServerConfig> sctpServer = sctpServerRepository.findById(serverId);
+        return sctpServer.map(SctpServerConfig::getSctpServerAssociationConfigs).orElse(new HashSet<>());
     }
 
-    public SctpServer getSctpServerById(Long serverId) throws NotFoundException {
-        Optional<SctpServer> sctpServer = sctpServerRepository.findById(serverId);
+    public SctpServerConfig getSctpServerById(Long serverId) throws NotFoundException {
+        Optional<SctpServerConfig> sctpServer = sctpServerRepository.findById(serverId);
         if (sctpServer.isPresent()) return sctpServer.get();
         else throw new NotFoundException("Not found server");
     }

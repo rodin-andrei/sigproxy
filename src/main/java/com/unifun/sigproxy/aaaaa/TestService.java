@@ -7,8 +7,9 @@ import com.unifun.sigproxy.models.config.m3ua.M3uaRouteConfig;
 import com.unifun.sigproxy.models.config.m3ua.TrafficModeType;
 import com.unifun.sigproxy.models.config.sccp.*;
 import com.unifun.sigproxy.models.config.sctp.SctpClientAssociationConfig;
-import com.unifun.sigproxy.models.config.sctp.SctpServer;
 import com.unifun.sigproxy.models.config.sctp.SctpServerAssociationConfig;
+import com.unifun.sigproxy.models.config.sctp.SctpServerConfig;
+import com.unifun.sigproxy.models.config.tcap.TcapConfig;
 import com.unifun.sigproxy.repository.SigtranStackRepository;
 import com.unifun.sigproxy.repository.m3ua.AsRepository;
 import com.unifun.sigproxy.repository.m3ua.AspRepository;
@@ -17,6 +18,7 @@ import com.unifun.sigproxy.repository.sccp.*;
 import com.unifun.sigproxy.repository.sctp.RemoteSctpLinkRepository;
 import com.unifun.sigproxy.repository.sctp.SctpLinkRepository;
 import com.unifun.sigproxy.repository.sctp.SctpServerRepository;
+import com.unifun.sigproxy.repository.tcap.TcapConfigRepository;
 import com.unifun.sigproxy.service.SigtranService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
@@ -55,6 +57,7 @@ public class TestService {
     private final SccpAddressConfigRepository sccpAddressConfigRepository;
     private final SccpRuleConfigRepository sccpRuleConfigRepository;
     private final SccpAddressRuleConfigRepository sccpAddressRuleConfigRepository;
+    private final TcapConfigRepository tcapConfigRepository;
 
 
     private final SigtranService service;
@@ -72,18 +75,18 @@ public class TestService {
         sigtranStack.setStackName("stack2");
         sigtranStack = sigtranStackRepository.save(sigtranStack);
 
-        SctpServer sctpServer = new SctpServer();
-        sctpServer.setLocalAddress("127.0.0.1");
-        sctpServer.setLocalPort(13000);
-        sctpServer.setName("server1");
-        sctpServer.setSigtranStack(sigtranStack);
-        sctpServerRepository.save(sctpServer);
+        SctpServerConfig sctpServerConfig = new SctpServerConfig();
+        sctpServerConfig.setLocalAddress("127.0.0.1");
+        sctpServerConfig.setLocalPort(13000);
+        sctpServerConfig.setName("server1");
+        sctpServerConfig.setSigtranStack(sigtranStack);
+        sctpServerRepository.save(sctpServerConfig);
 
         SctpServerAssociationConfig sctpServerAssociationConfig = new SctpServerAssociationConfig();
         sctpServerAssociationConfig.setLinkName("unifun2");
         sctpServerAssociationConfig.setRemoteAddress("127.0.0.1");
         sctpServerAssociationConfig.setRemotePort(12000);
-        sctpServerAssociationConfig.setSctpServer(sctpServer);
+        sctpServerAssociationConfig.setSctpServerConfig(sctpServerConfig);
         remoteSctpLinkRepository.save(sctpServerAssociationConfig);
 
         HashSet<M3uaAsConfig> applicationServers = new HashSet<>();
@@ -215,6 +218,11 @@ public class TestService {
         sccpRuleConfig2 = sccpRuleConfigRepository.save(sccpRuleConfig2);
 
 
+        TcapConfig tcapConfig = new TcapConfig();
+        tcapConfig.setLocalSsn(147);
+        tcapConfig.setSigtranStack(sigtranStack);
+        tcapConfig.setAdditionalSsns(new int[]{8});
+        tcapConfigRepository.save(tcapConfig);
     }
 
     private void initClient() {
@@ -365,5 +373,11 @@ public class TestService {
         sccpRuleConfig2.setSigtranStack(sigtranStack);
         sccpRuleConfig2 = sccpRuleConfigRepository.save(sccpRuleConfig2);
 
+
+        TcapConfig tcapConfig = new TcapConfig();
+        tcapConfig.setLocalSsn(8);
+        tcapConfig.setSigtranStack(sigtranStack);
+        tcapConfig.setAdditionalSsns(new int[]{147});
+        tcapConfigRepository.save(tcapConfig);
     }
 }

@@ -2,8 +2,8 @@ package com.unifun.sigproxy.service.sctp;
 
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.sctp.SctpClientAssociationConfig;
-import com.unifun.sigproxy.models.config.sctp.SctpServer;
 import com.unifun.sigproxy.models.config.sctp.SctpServerAssociationConfig;
+import com.unifun.sigproxy.models.config.sctp.SctpServerConfig;
 import javassist.NotFoundException;
 
 import java.util.Set;
@@ -19,7 +19,7 @@ public interface SctpConfigService {
 
     Set<SctpServerAssociationConfig> getServerLinksBySctpServerId(Long serverId);
 
-    SctpServer getSctpServerById(Long serverId) throws NotFoundException;
+    SctpServerConfig getSctpServerById(Long serverId) throws NotFoundException;
 
     String setServerLink(SctpServerAssociationConfig sctpServerAssociationConfig);
 

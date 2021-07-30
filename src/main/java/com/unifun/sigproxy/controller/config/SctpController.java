@@ -147,7 +147,7 @@ public class SctpController {
         sctpServerAssociationConfig.setRemotePort(remotePort);
         sctpServerAssociationConfig.setRemoteAddress(remoteAddress);
         try {
-            sctpServerAssociationConfig.setSctpServer(sctpConfigService.getSctpServerById(serverId));
+            sctpServerAssociationConfig.setSctpServerConfig(sctpConfigService.getSctpServerById(serverId));
         } catch (NotFoundException e) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Server Not Found", e);

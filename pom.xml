@@ -28,7 +28,7 @@
         </repository>
     </repositories>
     <properties>
-        <mobicents.jss7>8.0.0-179</mobicents.jss7>
+        <mobicents.jss7>8.0.0-145</mobicents.jss7>
         <mobicents.jss7.sccp>8.0.0-145</mobicents.jss7.sccp><!--This is last version sccp with suport routing on GT -->
         <mobicents.sctp>2.0.10</mobicents.sctp>
         <lombok.ver>1.18.12</lombok.ver>

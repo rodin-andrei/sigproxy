@@ -5,8 +5,9 @@ import com.unifun.sigproxy.models.config.m3ua.M3uaAspConfig;
 import com.unifun.sigproxy.models.config.m3ua.M3uaStackSettingsConfig;
 import com.unifun.sigproxy.models.config.sccp.*;
 import com.unifun.sigproxy.models.config.sctp.SctpClientAssociationConfig;
-import com.unifun.sigproxy.models.config.sctp.SctpServer;
+import com.unifun.sigproxy.models.config.sctp.SctpServerConfig;
 import com.unifun.sigproxy.models.config.sctp.SctpStackSettingsConfig;
+import com.unifun.sigproxy.models.config.tcap.TcapConfig;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -28,7 +29,7 @@ public class SigtranStack {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "sigtranStack")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Set<SctpServer> sctpServers;
+    private Set<SctpServerConfig> sctpServerConfigs;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "sigtranStack")
     @ToString.Exclude
@@ -89,4 +90,7 @@ public class SigtranStack {
 
     @OneToOne(mappedBy = "sigtranStack")
     private SccpSettingsConfig sccpSettingsConfig;
+
+    @OneToOne(mappedBy = "sigtranStack")
+    private TcapConfig tcapConfig;
 }

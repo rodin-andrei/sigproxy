@@ -5,8 +5,10 @@ import com.unifun.sigproxy.exception.NoConfigurationException;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.repository.SigtranStackRepository;
 import com.unifun.sigproxy.service.m3ua.M3uaService;
+import com.unifun.sigproxy.service.map.MapService;
 import com.unifun.sigproxy.service.sccp.SccpService;
 import com.unifun.sigproxy.service.sctp.SctpService;
+import com.unifun.sigproxy.service.tcap.TcapService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,8 @@ public class SigtranServiceImpl implements SigtranService {
     private final M3uaService m3uaService;
     private final SctpService sctpService;
     private final SccpService sccpService;
+    private final TcapService tcapService;
+    private final MapService mapService;
 
     @Override
     public void init() {
@@ -29,11 +33,23 @@ public class SigtranServiceImpl implements SigtranService {
                         initSctp(sigtranStack);
                         initM3ua(sigtranStack);
                         initSccp(sigtranStack);
+                        initTcap(sigtranStack);
+                        initMap(sigtranStack);
                     } catch (NoConfigurationException | InitializingException e) {
                         log.error("Can't initialize Sigtran Stack:{}, cause: {} ",
                                 sigtranStack.getStackName(), e.getMessage(), e);
                     }
                 });
+    }
+
+    private void initMap(SigtranStack sigtranStack) throws NoConfigurationException, InitializingException {
+        log.info("Initializing Map Layer, sigtranStack: {}", sigtranStack.getStackName());
+        mapService.initialize(sigtranStack);
+    }
+
+    private void initTcap(SigtranStack sigtranStack) throws NoConfigurationException, InitializingException {
+        log.info("Initializing Tcap Layer, sigtranStack: {}", sigtranStack.getStackName());
+        tcapService.initialize(sigtranStack);
     }
 
     private void initSccp(final SigtranStack sigtranStack) throws NoConfigurationException, InitializingException {
