@@ -10,6 +10,7 @@ import com.unifun.sigproxy.repository.sctp.RemoteSctpLinkRepository;
 import com.unifun.sigproxy.repository.sctp.SctpLinkRepository;
 import com.unifun.sigproxy.repository.sctp.SctpServerRepository;
 import com.unifun.sigproxy.service.sctp.SctpConfigService;
+import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,19 +27,19 @@ public class SctpConfigServiceImpl implements SctpConfigService {
     private final SctpLinkRepository sctpLinkRepository;
     private final SctpServerRepository sctpServerRepository;
 
-    public Set<SctpClientAssociationConfig> getClientLinksByStackId(Long stackId) {
+    public Set<SctpClientAssociationConfig> getClientLinksByStackId(Long stackId) throws NotFoundException {
         Optional<SigtranStack> sigtranStack = sigtranStackRepository.findById(stackId);
-        return sigtranStack.map(SigtranStack::getAssociations).orElseThrow(() -> new MyResourceNotFoundException("Not found stack with id " + stackId));
+        return sigtranStack.map(SigtranStack::getAssociations).orElseThrow(() -> new NotFoundException("Not found stack with id " + stackId));
     }
 
     public void setClinetLink(SctpClientAssociationConfig link) {
-            sctpLinkRepository.save(link);
+        sctpLinkRepository.save(link);
     }
 
     @Override
-    public SigtranStack getSigtranStackById(Long stackId) {
+    public SigtranStack getSigtranStackById(Long stackId) throws NotFoundException {
         return sigtranStackRepository.findById(stackId)
-                .orElseThrow(() -> new MyResourceNotFoundException("Not found sigtran stack by id " + stackId));
+                .orElseThrow(() -> new NotFoundException("Not found sigtran stack by id " + stackId));
     }
 
     @Override
@@ -46,23 +47,24 @@ public class SctpConfigServiceImpl implements SctpConfigService {
         sctpLinkRepository.deleteById(linkId);
     }
 
-    public Set<SctpServerAssociationConfig> getServerLinksBySctpServerId(Long serverId) {
+    public Set<SctpServerAssociationConfig> getServerLinksBySctpServerId(Long serverId) throws NotFoundException {
         Optional<SctpServer> sctpServer = sctpServerRepository.findById(serverId);
-        return sctpServer.map(SctpServer::getSctpServerAssociationConfigs).orElseThrow(()->new MyResourceNotFoundException(""));
+        return sctpServer.map(SctpServer::getSctpServerAssociationConfigs)
+                .orElseThrow(() -> new NotFoundException("Not found Server by server id " + serverId));
     }
 
-    public SctpServer getSctpServerById(Long serverId) {
+    public SctpServer getSctpServerById(Long serverId) throws NotFoundException {
         return sctpServerRepository.findById(serverId)
-                .orElseThrow(() -> new MyResourceNotFoundException("Not found server by id " + serverId));
+                .orElseThrow(() -> new NotFoundException("Not found server by id " + serverId));
     }
 
     public void setServerLink(SctpServerAssociationConfig sctpServerAssociationConfig) {
         remoteSctpLinkRepository.save(sctpServerAssociationConfig);
     }
 
-    public SctpClientAssociationConfig getClientLinkById(Long clientLinkId) {
+    public SctpClientAssociationConfig getClientLinkById(Long clientLinkId) throws NotFoundException {
         return sctpLinkRepository.findById(clientLinkId)
-                .orElseThrow(() -> new MyResourceNotFoundException("Not found Client Link by id " + clientLinkId));
+                .orElseThrow(() -> new NotFoundException("Not found Client Link by id " + clientLinkId));
 
     }
 

@@ -9,21 +9,21 @@ import javassist.NotFoundException;
 import java.util.Set;
 
 public interface SctpConfigService {
-    Set<SctpClientAssociationConfig> getClientLinksByStackId(Long stackId);
+    Set<SctpClientAssociationConfig> getClientLinksByStackId(Long stackId) throws NotFoundException;
 
-    SctpClientAssociationConfig getClientLinkById(Long clientLinkId);
+    SctpClientAssociationConfig getClientLinkById(Long clientLinkId) throws NotFoundException;
 
     void setClinetLink(SctpClientAssociationConfig sctpClientAssociationConfig);
 
     void removeClientLinkById(Long linkId);
 
-    Set<SctpServerAssociationConfig> getServerLinksBySctpServerId(Long serverId);
+    Set<SctpServerAssociationConfig> getServerLinksBySctpServerId(Long serverId) throws NotFoundException;
 
-    SctpServer getSctpServerById(Long serverId) ;
+    SctpServer getSctpServerById(Long serverId) throws NotFoundException;
 
     void setServerLink(SctpServerAssociationConfig sctpServerAssociationConfig);
 
-    SigtranStack getSigtranStackById(Long stackId) ;
+    SigtranStack getSigtranStackById(Long stackId) throws NotFoundException;
 
     void removeServerLinkById(Long serverLinkId);
 }
