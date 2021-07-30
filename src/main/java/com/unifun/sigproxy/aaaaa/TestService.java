@@ -19,7 +19,7 @@ import com.unifun.sigproxy.repository.sctp.SctpLinkRepository;
 import com.unifun.sigproxy.repository.sctp.SctpServerRepository;
 import com.unifun.sigproxy.service.SigtranService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j;
 import org.restcomm.protocols.ss7.indicator.NatureOfAddress;
 import org.restcomm.protocols.ss7.indicator.NumberingPlan;
 import org.restcomm.protocols.ss7.m3ua.ExchangeType;
@@ -37,7 +37,7 @@ import java.util.HashSet;
 /**
  * @author arodin
  */
-@Slf4j
+@Log4j
 @Service
 @RequiredArgsConstructor
 public class TestService {
@@ -69,7 +69,7 @@ public class TestService {
 
     private void initServer() {
         SigtranStack sigtranStack = new SigtranStack();
-        sigtranStack.setStackName("stack1");
+        sigtranStack.setStackName("stack2");
         sigtranStack = sigtranStackRepository.save(sigtranStack);
 
         SctpServer sctpServer = new SctpServer();
@@ -117,7 +117,7 @@ public class TestService {
         m3uaRouteConfig.setDpc(100);
         m3uaRouteConfig.setOpc(200);
         m3uaRouteConfig.setTrafficModeType(TrafficModeType.Override);
-        m3uaRouteConfig.setSsn(6);
+        m3uaRouteConfig.setSi(3);
         routeRepository.save(m3uaRouteConfig);
 
         SccpServiceAccessPointConfig sccpServiceAccessPointConfig = new SccpServiceAccessPointConfig();
@@ -219,7 +219,7 @@ public class TestService {
 
     private void initClient() {
         SigtranStack sigtranStack = new SigtranStack();
-        sigtranStack.setStackName("stack");
+        sigtranStack.setStackName("stack1");
         sigtranStack = sigtranStackRepository.save(sigtranStack);
 
         SctpClientAssociationConfig s = new SctpClientAssociationConfig();
@@ -230,7 +230,6 @@ public class TestService {
         s.setRemotePort(13000);
         s.setSigtranStack(sigtranStack);
         sctpLinkRepository.save(s);
-
 
         HashSet<M3uaAsConfig> applicationServers = new HashSet<>();
         HashSet<M3uaAspConfig> applicationServerPoints = new HashSet<>();
@@ -264,7 +263,7 @@ public class TestService {
         m3uaRouteConfig.setDpc(200);
         m3uaRouteConfig.setOpc(100);
         m3uaRouteConfig.setTrafficModeType(TrafficModeType.Override);
-        m3uaRouteConfig.setSsn(6);
+        m3uaRouteConfig.setSi(3);
         routeRepository.save(m3uaRouteConfig);
 
 

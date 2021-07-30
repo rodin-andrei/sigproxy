@@ -56,9 +56,10 @@ public class SccpServiceImpl implements SccpService {
             sccpStack.removeAllResourses();
 
             SccpListener sccpListener = new SccpListener() {
+
                 @Override
                 public void onMessage(SccpDataMessage sccpDataMessage) {
-                    log.info("onMessage" + new String(sccpDataMessage.getData()));
+                    log.info("onMessage" + new String(sccpDataMessage.getData()) + " " + sccpStack.getName());
                 }
 
                 @Override
@@ -198,7 +199,7 @@ public class SccpServiceImpl implements SccpService {
                 addressMap.get(addressA),
                 "Hello".getBytes(StandardCharsets.UTF_8),
                 8,
-                true,
+                false,
                 new HopCounterImpl(10),
                 new ImportanceImpl((byte) 1)
         );
