@@ -70,14 +70,14 @@ public class M3uaServiceImpl implements M3uaService {
                     m3uaManagements.get(sigtranStack.getStackName())
                             .addRoute(routeConfig.getDpc(),
                                     routeConfig.getOpc(),
-                                    routeConfig.getSsn(),
+                                    routeConfig.getSi(),
                                     asConfig.getName(),
                                     routeConfig.getTrafficModeType().getType());
                     log.info("Added route to AS:{}, DPC: {}, OPC: {}, SSN: {}, Traffic-mode: {}",
                             asConfig.getName(),
                             routeConfig.getDpc(),
                             routeConfig.getOpc(),
-                            routeConfig.getSsn(),
+                            routeConfig.getSi(),
                             routeConfig.getTrafficModeType());
                 } catch (Exception e) {
                     log.error("Error add Route to AS:" + asConfig.getName(), e);

@@ -11,22 +11,35 @@ import org.restcomm.protocols.ss7.tcap.TCAPStackImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class TcapServiceImpl implements TcapService {
     private final SccpService sccpService;
-    private TCAPStackImpl tcapStack;
+    private final Map<String, TCAPStackImpl> tcapStacks = new HashMap<>();
 
     @Value("${jss.persist.dir}")
     private String jssPersistDir;
 
     @Override
     public void initialize(SigtranStack sigtranStack) throws NoConfigurationException, InitializingException {
-        this.tcapStack = new TCAPStackImpl(sigtranStack.getStackName(),
+        if (tcapStacks.containsKey(sigtranStack.getStackName())) {
+            throw new InitializingException("TcapManagement: " + sigtranStack.getStackName() + " already exist");
+        }
+        TCAPStackImpl tcapStack = new TCAPStackImpl(sigtranStack.getStackName(),
                 sccpService.getSccpProvider(sigtranStack.getStackName()),
                 1);
+        this.tcapStacks.put(sigtranStack.getStackName(), tcapStack);
         tcapStack.setPersistDir(jssPersistDir);
+        try {
+            tcapStack.start();
+        } catch (Exception e) {
+            throw new InitializingException("Can't initialize sctp management: " + sigtranStack.getStackName(), e);
+        }
+
 
     }
 
