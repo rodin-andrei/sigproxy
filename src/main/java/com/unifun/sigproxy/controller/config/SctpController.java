@@ -5,8 +5,8 @@ import com.unifun.sigproxy.controller.dto.SctpServerAssociationConfigDto;
 import com.unifun.sigproxy.exception.MyResourceNotFoundException;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.sctp.SctpClientAssociationConfig;
-import com.unifun.sigproxy.models.config.sctp.SctpServer;
 import com.unifun.sigproxy.models.config.sctp.SctpServerAssociationConfig;
+import com.unifun.sigproxy.models.config.sctp.SctpServerConfig;
 import com.unifun.sigproxy.service.sctp.SctpConfigService;
 import com.unifun.sigproxy.service.sctp.SctpService;
 import javassist.NotFoundException;
@@ -174,7 +174,7 @@ public class SctpController {
     @PostMapping(value = "/startServer", produces = "application/json")
     public void startServer(@RequestParam Long serverId) {
 
-        SctpServer sctpServer;
+        SctpServerConfig sctpServer;
         try {
 
             sctpServer = sctpConfigService.getSctpServerById(serverId);
@@ -187,7 +187,7 @@ public class SctpController {
     @PostMapping(value = "/stopServer", produces = "application/json")
     public void stopServer(@RequestParam Long serverId) {
 
-        SctpServer sctpServer;
+        SctpServerConfig sctpServer;
         try{
             sctpServer = sctpConfigService.getSctpServerById(serverId);
         } catch (NotFoundException e){
