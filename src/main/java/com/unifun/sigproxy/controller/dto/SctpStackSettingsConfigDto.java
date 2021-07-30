@@ -3,10 +3,9 @@ package com.unifun.sigproxy.controller.dto;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import lombok.Data;
 
-import javax.persistence.*;
-
 @Data
-public class SctpStackSettingsDto {
+public class SctpStackSettingsConfigDto {
+
     private Long id;
     private double congControl_BackToNormalDelayThreshold_1;
     private double congControl_BackToNormalDelayThreshold_2;

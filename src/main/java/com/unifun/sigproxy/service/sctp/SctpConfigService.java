@@ -11,19 +11,19 @@ import java.util.Set;
 public interface SctpConfigService {
     Set<SctpClientAssociationConfig> getClientLinksByStackId(Long stackId);
 
-    String setClinetLink(SctpClientAssociationConfig sctpClientAssociationConfig);
+    SctpClientAssociationConfig getClientLinkById(Long clientLinkId);
 
-    SigtranStack getSigtranStack(String sigtranStack);
+    void setClinetLink(SctpClientAssociationConfig sctpClientAssociationConfig);
 
-    void deleteSctpLinkById(Long linkId);
+    void removeClientLinkById(Long linkId);
 
     Set<SctpServerAssociationConfig> getServerLinksBySctpServerId(Long serverId);
 
-    SctpServer getSctpServerById(Long serverId) throws NotFoundException;
+    SctpServer getSctpServerById(Long serverId) ;
 
-    String setServerLink(SctpServerAssociationConfig sctpServerAssociationConfig);
+    void setServerLink(SctpServerAssociationConfig sctpServerAssociationConfig);
 
-    SigtranStack getSigtranStackById(long stackId) throws NotFoundException;
+    SigtranStack getSigtranStackById(Long stackId) ;
 
-    SctpClientAssociationConfig getClientLinksById(Long clientLinkId) throws NotFoundException;
+    void removeServerLinkById(Long serverLinkId);
 }

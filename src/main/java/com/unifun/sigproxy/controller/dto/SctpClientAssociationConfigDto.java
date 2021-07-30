@@ -3,7 +3,8 @@ package com.unifun.sigproxy.controller.dto;
 import lombok.Data;
 
 @Data
-public class ClientAssociationDto {
+public class SctpClientAssociationConfigDto {
+
     private Long id;
     private String linkName;
     private String remoteAddress;
