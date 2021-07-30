@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -26,117 +25,49 @@ public class SctpConfigServiceImpl implements SctpConfigService {
     private final RemoteSctpLinkRepository remoteSctpLinkRepository;
     private final SctpLinkRepository sctpLinkRepository;
     private final SctpServerRepository sctpServerRepository;
-//
-//    @Override
-//    public void addLink(ClientAssociation newLink, String sigtranStack) {
-//        List<ClientAssociation> existLinks = sctpLinkRepository.findAll();
-//
-//        boolean present = existLinks.stream()
-//                .anyMatch(link -> link.getLinkName().equals(newLink.getLinkName()));
-//        if (present) {
-//            throw new IllegalArgumentException("Link with name \"" + newLink.getLinkName() + "\" already exist");
-//        }
-//        sctpLinkRepository.save(newLink);
-//        log.info("Added new link: {}", newLink.getLinkName());
-//    }
-//
-//    @Override
-//    public void addLinks(Set<ClientAssociation> newLinks) {
-//        newLinks.forEach(this::addLink);
-//    }
-//
-//    @Override
-//    public List<ClientAssociation> getLinkConfigs() {
-//        return sctpLinkRepository.findAll();
-//    }
-//
-//    @Override
-//    public Optional<ClientAssociation> getLinkConfig(String linkName) {
-//        //TODO replace to findByName
-//        return sctpLinkRepository.findAll().stream()
-//                .filter(link -> link.getLinkName() != null && link.getLinkName().equals(linkName))
-//                .findFirst();
-//    }
-//
-//    @Override
-//    public void addServerConfig(SctpServer newServer) {
-//
-//        List<SctpServer> servers = sctpServerRepository.findAll();
-//        boolean present = servers.stream()
-//                .anyMatch(link -> link.getName().equals(newServer.getName()));
-//        if (present) {
-//            throw new IllegalArgumentException("Server with name \"" + newServer.getName() + "\n already exist");
-//        }
-//
-//        sctpServerRepository.save(newServer);
-//        log.info("Added new server: {}", newServer.getName());
-//    }
-//
-//    @Override
-//    public void addServerConfigs(Set<SctpServer> newServers) {
-//        newServers.forEach(this::addServerConfig);
-//    }
-//
-//    @Override
-//    public List<SctpServer> getServerConfigs() {
-//        return sctpServerRepository.findAll();
-//    }
-//
-//    @Override
-//    public Optional<SctpServer> getServerConfig(String serverName) {
-//        return sctpServerRepository.findAll().stream()
-//                .filter(link -> link.getName() != null && link.getName().equals(serverName))
-//                .findFirst();
-//    }
 
-    public Set<SctpClientAssociationConfig> getClientLinksByStackId(Long stackId) {
+    public Set<SctpClientAssociationConfig> getClientLinksByStackId(Long stackId) throws NotFoundException {
         Optional<SigtranStack> sigtranStack = sigtranStackRepository.findById(stackId);
-        return sigtranStack.map(SigtranStack::getAssociations).orElse(null);
+        return sigtranStack.map(SigtranStack::getAssociations).orElseThrow(() -> new NotFoundException("Not found stack with id " + stackId));
     }
 
-    public String setClinetLink(SctpClientAssociationConfig link) {
-        try {
-            sctpLinkRepository.save(link);
-            return "ok";
-        } catch (Exception e) {
-            log.error("Error insert new link in BD: ", e);
-            return "error";
-        }
-    }
-
-    public SigtranStack getSigtranStack(String sigtranStack) {
-        return sigtranStackRepository.findByStackName(sigtranStack);
+    public void setClinetLink(SctpClientAssociationConfig link) {
+        sctpLinkRepository.save(link);
     }
 
     @Override
-    public void deleteSctpLinkById(Long linkId) {
+    public SigtranStack getSigtranStackById(Long stackId) throws NotFoundException {
+        return sigtranStackRepository.findById(stackId)
+                .orElseThrow(() -> new NotFoundException("Not found sigtran stack by id " + stackId));
+    }
+
+    @Override
+    public void removeClientLinkById(Long linkId) {
         sctpLinkRepository.deleteById(linkId);
     }
 
-    public Set<SctpServerAssociationConfig> getServerLinksBySctpServerId(Long serverId) {
+    public Set<SctpServerAssociationConfig> getServerLinksBySctpServerId(Long serverId) throws NotFoundException {
         Optional<SctpServerConfig> sctpServer = sctpServerRepository.findById(serverId);
-        return sctpServer.map(SctpServerConfig::getSctpServerAssociationConfigs).orElse(new HashSet<>());
+        return sctpServer.map(SctpServerConfig::getSctpServerAssociationConfigs)
+                .orElseThrow(() -> new NotFoundException("Not found Server by server id " + serverId));
     }
 
     public SctpServerConfig getSctpServerById(Long serverId) throws NotFoundException {
-        Optional<SctpServerConfig> sctpServer = sctpServerRepository.findById(serverId);
-        if (sctpServer.isPresent()) return sctpServer.get();
-        else throw new NotFoundException("Not found server");
+        return sctpServerRepository.findById(serverId)
+                .orElseThrow(() -> new NotFoundException("Not found server by id " + serverId));
     }
 
-    public String setServerLink(SctpServerAssociationConfig sctpServerAssociationConfig) {
+    public void setServerLink(SctpServerAssociationConfig sctpServerAssociationConfig) {
         remoteSctpLinkRepository.save(sctpServerAssociationConfig);
-        return "OK";
     }
 
-    public SigtranStack getSigtranStackById(long stackId) throws NotFoundException {
-        return sigtranStackRepository.findById(stackId)
-                .orElseThrow(() -> new NotFoundException("Not found sigtran stack"));
+    public SctpClientAssociationConfig getClientLinkById(Long clientLinkId) throws NotFoundException {
+        return sctpLinkRepository.findById(clientLinkId)
+                .orElseThrow(() -> new NotFoundException("Not found Client Link by id " + clientLinkId));
+
     }
 
-    public SctpClientAssociationConfig getClientLinksById(Long clientLinkId) throws NotFoundException {
-        Optional<SctpClientAssociationConfig> clientAssociation = sctpLinkRepository.findById(clientLinkId);
-        if (clientAssociation.isPresent()) return clientAssociation.get();
-        else throw new NotFoundException("Not found sigtran stack");
+    public void removeServerLinkById(Long serverLinkId) {
+        remoteSctpLinkRepository.deleteById(serverLinkId);
     }
 }
