@@ -18,9 +18,8 @@ public class M3uaRouteConfig {
 
     private int dpc;
 
-    @Deprecated
+
     @Column(columnDefinition = "int default -1")
-//For support SCCP (3) and ISUP(5)  RFC4666  3.4.5   MTP3-User Identity field: 16 bits (unsigned integer)
     private int si;
 
     /**
