@@ -1,0 +1,16 @@
+<configuration scan="true" scanPeriod="2 seconds">
+    <appender name="COLOR" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%date] %highlight([%level]) %cyan([%-40logger{1}:%-4line]) %msg%n</pattern>
+            <!--             ^^^^^^^^^^ -->
+        </encoder>
+    </appender>
+    <appender name="NOCOLOR" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%date] [%level] [%-40logger{10} %file:%line] %msg%n</pattern>
+        </encoder>
+    </appender>
+    <root level="info">
+        <appender-ref ref="COLOR"/>
+    </root>
+</configuration>

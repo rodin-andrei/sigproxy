@@ -21,7 +21,7 @@ import com.unifun.sigproxy.repository.sctp.SctpServerRepository;
 import com.unifun.sigproxy.repository.tcap.TcapConfigRepository;
 import com.unifun.sigproxy.service.SigtranService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.restcomm.protocols.ss7.indicator.NatureOfAddress;
 import org.restcomm.protocols.ss7.indicator.NumberingPlan;
 import org.restcomm.protocols.ss7.m3ua.ExchangeType;
@@ -30,6 +30,7 @@ import org.restcomm.protocols.ss7.m3ua.IPSPType;
 import org.restcomm.protocols.ss7.sccp.LoadSharingAlgorithm;
 import org.restcomm.protocols.ss7.sccp.OriginationType;
 import org.restcomm.protocols.ss7.sccp.RuleType;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,7 @@ import java.util.HashSet;
 /**
  * @author arodin
  */
-@Log4j
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TestService {
@@ -62,11 +63,17 @@ public class TestService {
 
     private final SigtranService service;
 
+    @Value("${initTestClient}")
+    private boolean initTestClient;
+    @Value("${initTestServer}")
+    private boolean initTestServer;
+
     @EventListener
     private void test(ContextStartedEvent ctxStartEvt) {
-        initClient();
-        initServer();
-
+        if (initTestClient)
+            initClient();
+        if (initTestServer)
+            initServer();
         service.init();
     }
 
