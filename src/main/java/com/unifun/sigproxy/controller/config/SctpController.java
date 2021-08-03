@@ -2,10 +2,12 @@ package com.unifun.sigproxy.controller.config;
 
 import com.unifun.sigproxy.controller.dto.SctpClientAssociationConfigDto;
 import com.unifun.sigproxy.controller.dto.SctpServerAssociationConfigDto;
-import com.unifun.sigproxy.exception.MyResourceNotFoundException;
+import com.unifun.sigproxy.controller.dto.SctpServerConfigDto;
+import com.unifun.sigproxy.exception.SS7NotContentException;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.sctp.SctpClientAssociationConfig;
 import com.unifun.sigproxy.models.config.sctp.SctpServerAssociationConfig;
+import com.unifun.sigproxy.service.SigtranConfigService;
 import com.unifun.sigproxy.models.config.sctp.SctpServerConfig;
 import com.unifun.sigproxy.service.sctp.SctpConfigService;
 import com.unifun.sigproxy.service.sctp.SctpService;
@@ -13,10 +15,7 @@ import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -24,37 +23,26 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("sctp/conf")
+@RequestMapping("conf/sctp")
 @RequiredArgsConstructor
 public class SctpController {
 
+    private final SigtranConfigService sigtranConfigService;
     private final SctpConfigService sctpConfigService;
     private final SctpService sctpService;
 
-    @PostMapping(value = "/clientLinks", produces = "application/json")
+    @GetMapping(value = "/clientLinks", produces = "application/json")
     @ResponseBody
-    public List<SctpClientAssociationConfigDto> getLinksInfo(@RequestParam Long stackId) {
-        try {
-            return sctpConfigService.getClientLinksByStackId(stackId).stream().map(clientAssociation -> {
-                SctpClientAssociationConfigDto sctpClientAssociationConfigDto = new SctpClientAssociationConfigDto();
-                sctpClientAssociationConfigDto.setId(clientAssociation.getId());
-                sctpClientAssociationConfigDto.setLinkName(clientAssociation.getLinkName());
-                sctpClientAssociationConfigDto.setLocalAddress(clientAssociation.getLocalAddress());
-                sctpClientAssociationConfigDto.setLocalPort(clientAssociation.getLocalPort());
-                sctpClientAssociationConfigDto.setMultihomingAddresses(clientAssociation.getMultihomingAddresses());
-                sctpClientAssociationConfigDto.setRemoteAddress(clientAssociation.getRemoteAddress());
-                sctpClientAssociationConfigDto.setRemotePort(clientAssociation.getRemotePort());
-                try {
-                    sctpClientAssociationConfigDto.setStatus(sctpService.getTransportManagement(clientAssociation.getSigtranStack().getStackName())
-                            .getAssociation(clientAssociation.getLinkName()).isConnected());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return sctpClientAssociationConfigDto;
-            }).collect(Collectors.toList());
-        } catch (NotFoundException e) {
-            throw new MyResourceNotFoundException(e);
-        }
+    public List<SctpClientAssociationConfigDto> getLinksInfo(@RequestParam Long stackId) throws NotFoundException {
+
+        List<SctpClientAssociationConfigDto> sctpClientAssociationConfig = sigtranConfigService.getClientLinksByStackId(stackId).stream()
+                .map(this::getSctpClientAssociationConfigDto)
+                .collect(Collectors.toList());
+
+        if (sctpClientAssociationConfig.isEmpty())
+            throw new SS7NotContentException("Not found Client Links with stack id " + stackId);
+        return sctpClientAssociationConfig;
+
     }
 
     @PostMapping(value = "/newClientLink", produces = "application/json")
@@ -74,9 +62,9 @@ public class SctpController {
         sctpClientAssociationConfig.setRemotePort(remotePort);
         SigtranStack sigtranStack;
         try {
-            sigtranStack = sctpConfigService.getSigtranStackById(stackId);
+            sigtranStack = sigtranConfigService.getSigtranStackById(stackId);
         } catch (NotFoundException e) {
-            throw new MyResourceNotFoundException(e);
+            throw new SS7NotContentException(e);
         }
         sctpClientAssociationConfig.setSigtranStack(sigtranStack);
         sctpConfigService.setClinetLink(sctpClientAssociationConfig);
@@ -90,7 +78,7 @@ public class SctpController {
         try {
             sctpClientAssociationConfig = sctpConfigService.getClientLinkById(clientLinkId);
         } catch (NotFoundException e) {
-            throw new MyResourceNotFoundException(e);
+            throw new SS7NotContentException(e);
         }
         sctpService.removeSctpLink(sctpClientAssociationConfig, sctpClientAssociationConfig.getSigtranStack().getStackName());
         sctpConfigService.removeClientLinkById(clientLinkId);
@@ -103,7 +91,7 @@ public class SctpController {
         try {
             sctpClientAssociationConfig = sctpConfigService.getClientLinkById(clientLinkId);
         } catch (NotFoundException e) {
-            throw new MyResourceNotFoundException(e);
+            throw new SS7NotContentException(e);
         }
         sctpService.startLink(sctpClientAssociationConfig.getLinkName(), sctpClientAssociationConfig.getSigtranStack().getStackName());
     }
@@ -116,33 +104,15 @@ public class SctpController {
         try {
             sctpClientAssociationConfig = sctpConfigService.getClientLinkById(clientLinkId);
         } catch (NotFoundException e) {
-            throw new MyResourceNotFoundException(e);
+            throw new SS7NotContentException(e);
         }
         sctpService.stopLink(sctpClientAssociationConfig.getLinkName(), sctpClientAssociationConfig.getSigtranStack().getStackName());
     }
 
-    @PostMapping(value = "/serverLinks", produces = "application/json")
+    @GetMapping(value = "/serverLinks", produces = "application/json")
     @ResponseBody
-    public List<SctpServerAssociationConfigDto> addNewServerLink(@RequestParam Long serverId) {
-
-        Set<SctpServerAssociationConfig> sctpServerAssociationConfigs;
-        try {
-            sctpServerAssociationConfigs = sctpConfigService.getServerLinksBySctpServerId(serverId);
-        } catch (NotFoundException e) {
-            throw new MyResourceNotFoundException(e);
-        }
-        if (sctpServerAssociationConfigs.isEmpty()) throw new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "Server Not Found");
-        return sctpServerAssociationConfigs.stream()
-                .map(serverAssociation -> {
-                    SctpServerAssociationConfigDto sctpServerAssociationConfigDto = new SctpServerAssociationConfigDto();
-                    sctpServerAssociationConfigDto.setId(serverAssociation.getId());
-                    sctpServerAssociationConfigDto.setLinkName(serverAssociation.getLinkName());
-                    sctpServerAssociationConfigDto.setRemoteAddress(serverAssociation.getRemoteAddress());
-                    sctpServerAssociationConfigDto.setRemotePort(serverAssociation.getRemotePort());
-                    return sctpServerAssociationConfigDto;
-                })
-                .collect(Collectors.toList());
+    public List<SctpServerAssociationConfigDto> srverLinks(@RequestParam Long serverId) {
+        return getSctpServerAssociationConfigDto(serverId);
     }
 
     @PostMapping(value = "/newServerLink", produces = "application/json")
@@ -159,7 +129,7 @@ public class SctpController {
         try {
             sctpServerAssociationConfig.setSctpServerConfig(sctpConfigService.getSctpServerById(serverId));
         } catch (NotFoundException e) {
-            throw new MyResourceNotFoundException(e);
+            throw new SS7NotContentException(e);
         }
         sctpConfigService.setServerLink(sctpServerAssociationConfig);
 //        sctpService.addServerAssociation(serverAssociation,serverAssociation.getSctpServer().getSigtranStack().getStackName());
@@ -179,7 +149,7 @@ public class SctpController {
 
             sctpServer = sctpConfigService.getSctpServerById(serverId);
         } catch (NotFoundException e) {
-            throw new MyResourceNotFoundException(e);
+            throw new SS7NotContentException(e);
         }
         sctpService.startServer(sctpServer.getName(), sctpServer.getSigtranStack().getStackName());
     }
@@ -187,11 +157,12 @@ public class SctpController {
     @PostMapping(value = "/stopServer", produces = "application/json")
     public void stopServer(@RequestParam Long serverId) {
 
+
         SctpServerConfig sctpServer;
-        try{
+        try {
             sctpServer = sctpConfigService.getSctpServerById(serverId);
-        } catch (NotFoundException e){
-            throw new MyResourceNotFoundException(e);
+        } catch (NotFoundException e) {
+            throw new SS7NotContentException(e);
         }
         sctpService.stopServer(sctpServer.getName(), sctpServer.getSigtranStack().getStackName());
     }
@@ -199,12 +170,109 @@ public class SctpController {
     @PostMapping(value = "/stopSigtranStack", produces = "application/json")
     public void stopSigtranStack(@RequestParam Long sigtranStackId) {
         SigtranStack sigtranStack;
-        try{
-          sigtranStack = sctpConfigService.getSigtranStackById(sigtranStackId);
-        } catch (NotFoundException e){
-            throw new MyResourceNotFoundException(e);
+        try {
+            sigtranStack = sigtranConfigService.getSigtranStackById(sigtranStackId);
+        } catch (NotFoundException e) {
+            throw new SS7NotContentException(e);
         }
 
         sctpService.stopStack(sigtranStack.getStackName());
+    }
+
+    @PostMapping(value = "/newSctpServer", produces = "application/json")
+    public void addSctpServer(@RequestParam Long stackId,
+                              @RequestParam String serverName,
+                              @RequestParam String localAddres,
+                              @RequestParam int localPort
+//                              @RequestParam String[] multihomingAddresses,
+//                              @RequestBody Set<SctpServerAssociationConfigDto> sctpServerAssociationConfigDto
+    ) {
+
+        SctpServerConfig sctpServerConfig = new SctpServerConfig();
+        sctpServerConfig.setLocalAddress(localAddres);
+        sctpServerConfig.setLocalPort(localPort);
+//        sctpServer.setMultihomingAddresses(multihomingAddresses);
+        sctpServerConfig.setName(serverName);
+        try {
+            sctpServerConfig.setSigtranStack(sigtranConfigService.getSigtranStackById(stackId));
+        } catch (NotFoundException e) {
+            throw new SS7NotContentException(e);
+        }
+
+        sctpConfigService.setSctpServer(sctpServerConfig);
+
+
+    }
+
+    @GetMapping(value = "servers", produces = "application/json")
+    @ResponseBody
+    public List<SctpServerConfigDto> getServerList(@RequestParam Long stackId) {
+
+        try {
+            return sigtranConfigService.getSctpServersByStackId(stackId).stream()
+                    .map(this::getSctpServerConfigDto)
+                    .collect(Collectors.toList());
+        } catch (NotFoundException e) {
+            throw new SS7NotContentException("Not found sigtran stack with id " + stackId);
+        }
+    }
+
+    private SctpClientAssociationConfigDto getSctpClientAssociationConfigDto(SctpClientAssociationConfig clientAssociation) {
+        SctpClientAssociationConfigDto sctpClientAssociationConfigDto = new SctpClientAssociationConfigDto();
+        sctpClientAssociationConfigDto.setId(clientAssociation.getId());
+        sctpClientAssociationConfigDto.setLinkName(clientAssociation.getLinkName());
+        sctpClientAssociationConfigDto.setLocalAddress(clientAssociation.getLocalAddress());
+        sctpClientAssociationConfigDto.setLocalPort(clientAssociation.getLocalPort());
+        sctpClientAssociationConfigDto.setMultihomingAddresses(clientAssociation.getMultihomingAddresses());
+        sctpClientAssociationConfigDto.setRemoteAddress(clientAssociation.getRemoteAddress());
+        sctpClientAssociationConfigDto.setRemotePort(clientAssociation.getRemotePort());
+        try {
+            sctpClientAssociationConfigDto.setStatus(sctpService.getTransportManagement(clientAssociation.getSigtranStack().getStackName())
+                    .getAssociation(clientAssociation.getLinkName()).isConnected());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return sctpClientAssociationConfigDto;
+    }
+
+    private SctpServerConfigDto getSctpServerConfigDto(SctpServerConfig sctpServerConfig) {
+        SctpServerConfigDto sctpServerConfigDto = new SctpServerConfigDto();
+        sctpServerConfigDto.setLocalAddress(sctpServerConfig.getLocalAddress());
+        sctpServerConfigDto.setLocalPort(sctpServerConfig.getLocalPort());
+        sctpServerConfigDto.setMultihomingAddresses(sctpServerConfig.getMultihomingAddresses());
+        sctpServerConfigDto.setName(sctpServerConfig.getName());
+        sctpServerConfigDto.setSctpServerAssociationConfigs(getSctpServerAssociationConfigDto(sctpServerConfig.getId()));
+        sctpServerConfigDto.setId(sctpServerConfig.getId());
+
+        return sctpServerConfigDto;
+    }
+
+    private List<SctpServerAssociationConfigDto> getSctpServerAssociationConfigDto(long serverId) {
+
+        Set<SctpServerAssociationConfig> sctpServerAssociationConfigs;
+        try {
+            sctpServerAssociationConfigs = sctpConfigService.getServerLinksBySctpServerId(serverId);
+        } catch (NotFoundException e) {
+            throw new SS7NotContentException(e);
+        }
+        if (sctpServerAssociationConfigs.isEmpty()) throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "Server Not Found");
+        return sctpServerAssociationConfigs.stream()
+                .map(serverAssociation -> {
+                    SctpServerAssociationConfigDto sctpServerAssociationConfigDto = new SctpServerAssociationConfigDto();
+                    sctpServerAssociationConfigDto.setId(serverAssociation.getId());
+                    sctpServerAssociationConfigDto.setLinkName(serverAssociation.getLinkName());
+                    sctpServerAssociationConfigDto.setRemoteAddress(serverAssociation.getRemoteAddress());
+                    sctpServerAssociationConfigDto.setRemotePort(serverAssociation.getRemotePort());
+                    try {
+                        sctpServerAssociationConfigDto.setStatus(sctpService.getTransportManagement(serverAssociation.getSctpServerConfig().getSigtranStack().getStackName())
+                                .getAssociation(serverAssociation.getLinkName()).isConnected());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    return sctpServerAssociationConfigDto;
+                })
+                .collect(Collectors.toList());
     }
 }

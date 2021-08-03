@@ -9,5 +9,6 @@ public class SctpServerAssociationConfigDto {
     private String linkName;
     private String remoteAddress;
     private int remotePort;
+    private boolean status;
 
 }

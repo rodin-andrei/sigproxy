@@ -4,17 +4,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(value = HttpStatus.NO_CONTENT)
-public class MyResourceNotFoundException extends RuntimeException{
-    public MyResourceNotFoundException() {
+public class SS7NotContentException extends RuntimeException{
+    public SS7NotContentException() {
         super();
     }
-    public MyResourceNotFoundException(String message, Throwable cause) {
+    public SS7NotContentException(String message, Throwable cause) {
         super(message, cause);
     }
-    public MyResourceNotFoundException(String message) {
+    public SS7NotContentException(String message) {
         super(message);
     }
-    public MyResourceNotFoundException(Throwable cause) {
+    public SS7NotContentException(Throwable cause) {
         super(cause);
     }
 }

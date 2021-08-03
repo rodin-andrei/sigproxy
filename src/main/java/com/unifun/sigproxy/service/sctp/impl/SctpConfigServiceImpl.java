@@ -1,6 +1,6 @@
 package com.unifun.sigproxy.service.sctp.impl;
 
-import com.unifun.sigproxy.models.config.SigtranStack;
+
 import com.unifun.sigproxy.models.config.sctp.SctpClientAssociationConfig;
 import com.unifun.sigproxy.models.config.sctp.SctpServerAssociationConfig;
 import com.unifun.sigproxy.models.config.sctp.SctpServerConfig;
@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -26,19 +27,8 @@ public class SctpConfigServiceImpl implements SctpConfigService {
     private final SctpLinkRepository sctpLinkRepository;
     private final SctpServerRepository sctpServerRepository;
 
-    public Set<SctpClientAssociationConfig> getClientLinksByStackId(Long stackId) throws NotFoundException {
-        Optional<SigtranStack> sigtranStack = sigtranStackRepository.findById(stackId);
-        return sigtranStack.map(SigtranStack::getAssociations).orElseThrow(() -> new NotFoundException("Not found stack with id " + stackId));
-    }
-
     public void setClinetLink(SctpClientAssociationConfig link) {
         sctpLinkRepository.save(link);
-    }
-
-    @Override
-    public SigtranStack getSigtranStackById(Long stackId) throws NotFoundException {
-        return sigtranStackRepository.findById(stackId)
-                .orElseThrow(() -> new NotFoundException("Not found sigtran stack by id " + stackId));
     }
 
     @Override
@@ -69,5 +59,14 @@ public class SctpConfigServiceImpl implements SctpConfigService {
 
     public void removeServerLinkById(Long serverLinkId) {
         remoteSctpLinkRepository.deleteById(serverLinkId);
+    }
+
+    public void setSctpServer(SctpServerConfig sctpServer){
+        sctpServerRepository.save(sctpServer);
+    }
+
+    @Override
+    public List<SctpServerConfig> getSctpServers(long stackId) {
+       return sctpServerRepository.findAll();
     }
 }
