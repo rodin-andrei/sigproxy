@@ -1,6 +1,10 @@
 package com.unifun.sigproxy.service.sctp.impl;
 
 
+import com.unifun.sigproxy.controller.dto.SctpClientAssociationConfigDto;
+import com.unifun.sigproxy.exception.SS7NotContentException;
+import com.unifun.sigproxy.exception.SS7NotFoundException;
+import com.unifun.sigproxy.exception.SS7RemoveSctpAssociationException;
 import com.unifun.sigproxy.models.config.sctp.SctpClientAssociationConfig;
 import com.unifun.sigproxy.models.config.sctp.SctpServerAssociationConfig;
 import com.unifun.sigproxy.models.config.sctp.SctpServerConfig;
@@ -12,6 +16,7 @@ import com.unifun.sigproxy.service.sctp.SctpConfigService;
 import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,46 +32,70 @@ public class SctpConfigServiceImpl implements SctpConfigService {
     private final SctpLinkRepository sctpLinkRepository;
     private final SctpServerRepository sctpServerRepository;
 
-    public void setClinetLink(SctpClientAssociationConfig link) {
+    @Override
+    public void addClinetLink(SctpClientAssociationConfig link) {
         sctpLinkRepository.save(link);
     }
 
     @Override
     public void removeClientLinkById(Long linkId) {
-        sctpLinkRepository.deleteById(linkId);
+        try {
+            sctpLinkRepository.deleteById(linkId);
+        } catch (Exception e) {
+            throw new SS7NotFoundException("Not found sctp link with id " + linkId + " for delete");
+        }
     }
 
-    public Set<SctpServerAssociationConfig> getServerLinksBySctpServerId(Long serverId) throws NotFoundException {
+    @Override
+    public Set<SctpServerAssociationConfig> getServerLinksBySctpServerId(Long serverId) {
+
         Optional<SctpServerConfig> sctpServer = sctpServerRepository.findById(serverId);
-        return sctpServer.map(SctpServerConfig::getSctpServerAssociationConfigs)
-                .orElseThrow(() -> new NotFoundException("Not found Server by server id " + serverId));
+        if (sctpServer.map(SctpServerConfig::getSctpServerAssociationConfigs).isPresent()) {
+            if (sctpServer.map(SctpServerConfig::getSctpServerAssociationConfigs).get().isEmpty()) {
+                throw new SS7NotContentException("Sigtran Server with id " + serverId + " doesn't contain sctp server links");
+            } else return sctpServer.map(SctpServerConfig::getSctpServerAssociationConfigs).get();
+        } else throw new SS7NotFoundException("Not found Server with id " + serverId);
     }
 
+    @Override
     public SctpServerConfig getSctpServerById(Long serverId) throws NotFoundException {
+
         return sctpServerRepository.findById(serverId)
-                .orElseThrow(() -> new NotFoundException("Not found server by id " + serverId));
+                .orElseThrow(() -> new NotFoundException("Not found server with id " + serverId));
     }
 
+    @Override
     public void setServerLink(SctpServerAssociationConfig sctpServerAssociationConfig) {
         remoteSctpLinkRepository.save(sctpServerAssociationConfig);
     }
 
+    @Override
     public SctpClientAssociationConfig getClientLinkById(Long clientLinkId) throws NotFoundException {
         return sctpLinkRepository.findById(clientLinkId)
                 .orElseThrow(() -> new NotFoundException("Not found Client Link by id " + clientLinkId));
-
     }
 
-    public void removeServerLinkById(Long serverLinkId) {
-        remoteSctpLinkRepository.deleteById(serverLinkId);
+    @Override
+    public SctpServerAssociationConfig removeServerLinkById(Long serverLinkId) {
+
+        Optional<SctpServerAssociationConfig> sctpClientAssociationConfig = remoteSctpLinkRepository.findById(serverLinkId);
+        if (sctpClientAssociationConfig.isEmpty())
+            throw new SS7NotFoundException("Not found Server Link with id " + serverLinkId);
+        try {
+            remoteSctpLinkRepository.deleteById(serverLinkId);
+        } catch (Exception e){
+            throw new SS7RemoveSctpAssociationException("Failed remove Server Link with id " + serverLinkId);
+        }
+        return sctpClientAssociationConfig.get();
     }
 
-    public void setSctpServer(SctpServerConfig sctpServer){
+    @Override
+    public void setSctpServer(SctpServerConfig sctpServer) {
         sctpServerRepository.save(sctpServer);
     }
 
     @Override
     public List<SctpServerConfig> getSctpServers(long stackId) {
-       return sctpServerRepository.findAll();
+        return sctpServerRepository.findAll();
     }
 }

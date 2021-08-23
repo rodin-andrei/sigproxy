@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface SigtranConfigService {
-    Set<SctpClientAssociationConfig> getClientLinksByStackId(Long stackId) throws NotFoundException;
-    SigtranStack getSigtranStackById(Long stackId) throws NotFoundException;
+    Set<SctpClientAssociationConfig> getClientLinksByStackId(Long stackId);
+    SigtranStack getSigtranStackById(Long stackId);
     Set<SctpServerConfig> getSctpServersByStackId(Long stackId) throws NotFoundException;
 }

@@ -81,7 +81,6 @@ public class SigtranStack {
     @EqualsAndHashCode.Exclude
     private Set<SccpConcernedSignalingPointCodeConfig> sccpConcernedSignalingPointCodeConfigs;
 
-
     @OneToOne(mappedBy = "sigtranStack")
     private SctpStackSettingsConfig sctpStackSettingsConfig;
 

@@ -14,18 +14,17 @@ public interface SctpConfigService {
 
     SctpClientAssociationConfig getClientLinkById(Long clientLinkId) throws NotFoundException;
 
-    void setClinetLink(SctpClientAssociationConfig sctpClientAssociationConfig);
+    void addClinetLink(SctpClientAssociationConfig sctpClientAssociationConfig);
 
     void removeClientLinkById(Long linkId);
 
-    Set<SctpServerAssociationConfig> getServerLinksBySctpServerId(Long serverId) throws NotFoundException;
+    Set<SctpServerAssociationConfig> getServerLinksBySctpServerId(Long serverId);
 
     SctpServerConfig getSctpServerById(Long serverId) throws NotFoundException;
 
     void setServerLink(SctpServerAssociationConfig sctpServerAssociationConfig);
 
-
-    void removeServerLinkById(Long serverLinkId);
+    SctpServerAssociationConfig removeServerLinkById(Long serverLinkId);
 
     void setSctpServer(SctpServerConfig sctpServer);
 
