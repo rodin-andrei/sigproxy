@@ -18,7 +18,7 @@ public class M3uaStackSettingsConfig {
 
     private int heartbeatTime;
 
-    private int MaxAsForRoute;
+    private int maxAsForRoute;
 
     private int maxSequenceNumber;
 

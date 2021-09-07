@@ -1,4 +1,4 @@
-package com.unifun.sigproxy.controller.dto;
+package com.unifun.sigproxy.controller.dto.sctp;
 
 import com.unifun.sigproxy.models.config.SigtranStack;
 import lombok.Data;
@@ -24,5 +24,4 @@ public class SctpStackSettingsConfigDto {
     private int optionSoSndbuf;
     private boolean singleThread;
     private int workerThreads;
-    private SigtranStack sigtranStack;
 }

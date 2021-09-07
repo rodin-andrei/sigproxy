@@ -1,7 +1,5 @@
 package com.unifun.sigproxy.service.sctp;
 
-import com.unifun.sigproxy.controller.dto.SctpServerAssociationConfigDto;
-import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.sctp.SctpClientAssociationConfig;
 import com.unifun.sigproxy.models.config.sctp.SctpServerAssociationConfig;
 import com.unifun.sigproxy.models.config.sctp.SctpServerConfig;

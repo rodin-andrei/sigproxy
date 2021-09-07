@@ -1,7 +1,7 @@
 package com.unifun.sigproxy.service.sctp.impl;
 
 
-import com.unifun.sigproxy.controller.dto.SctpClientAssociationConfigDto;
+import com.unifun.sigproxy.exception.SS7AddClientLinkException;
 import com.unifun.sigproxy.exception.SS7NotContentException;
 import com.unifun.sigproxy.exception.SS7NotFoundException;
 import com.unifun.sigproxy.exception.SS7RemoveSctpAssociationException;
@@ -16,7 +16,6 @@ import com.unifun.sigproxy.service.sctp.SctpConfigService;
 import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,7 +33,11 @@ public class SctpConfigServiceImpl implements SctpConfigService {
 
     @Override
     public void addClinetLink(SctpClientAssociationConfig link) {
-        sctpLinkRepository.save(link);
+        try {
+            sctpLinkRepository.save(link);
+        } catch (Exception e) {
+            throw new SS7AddClientLinkException("Adding a link " + link.getLinkName() + " failed.");
+        }
     }
 
     @Override
@@ -83,7 +86,7 @@ public class SctpConfigServiceImpl implements SctpConfigService {
             throw new SS7NotFoundException("Not found Server Link with id " + serverLinkId);
         try {
             remoteSctpLinkRepository.deleteById(serverLinkId);
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new SS7RemoveSctpAssociationException("Failed remove Server Link with id " + serverLinkId);
         }
         return sctpClientAssociationConfig.get();

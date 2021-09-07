@@ -1,4 +1,4 @@
-package com.unifun.sigproxy.controller.dto;
+package com.unifun.sigproxy.controller.dto.sctp;
 
 import lombok.Data;
 

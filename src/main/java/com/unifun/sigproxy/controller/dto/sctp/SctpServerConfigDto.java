@@ -1,11 +1,8 @@
-package com.unifun.sigproxy.controller.dto;
+package com.unifun.sigproxy.controller.dto.sctp;
 
-import com.unifun.sigproxy.models.config.SigtranStack;
-import com.unifun.sigproxy.models.config.sctp.SctpServerAssociationConfig;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Set;
 
 @Data
 public class SctpServerConfigDto {
