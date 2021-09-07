@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Controller
 @RequestMapping("conf/sigtranStack")
 @RequiredArgsConstructor
@@ -22,5 +25,14 @@ public class SigtranStackController {
     @ResponseBody
     public SigtranStackDto getSigtranStack(@RequestParam Long sigtranStackId){
         return creatorDataObject.createSigtranStackDto(sigtranConfigService.getSigtranStackById(sigtranStackId));
+    }
+
+    @GetMapping(value = "/getSigtranStacks", produces = "application/json")
+    @ResponseBody
+    public List<SigtranStackDto> getSigtranStacks(){
+        return sigtranConfigService.getSigtranStacks()
+                .stream()
+                .map(creatorDataObject::createSigtranStackDto)
+                .collect(Collectors.toList());
     }
 }

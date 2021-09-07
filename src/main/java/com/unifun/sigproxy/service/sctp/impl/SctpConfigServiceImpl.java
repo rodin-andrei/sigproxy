@@ -61,10 +61,17 @@ public class SctpConfigServiceImpl implements SctpConfigService {
     }
 
     @Override
-    public SctpServerConfig getSctpServerById(Long serverId) throws NotFoundException {
+    public SctpServerConfig getSctpServerById(Long serverId) {
 
         return sctpServerRepository.findById(serverId)
-                .orElseThrow(() -> new NotFoundException("Not found server with id " + serverId));
+                .orElseThrow(() -> new SS7NotFoundException("Not found Server with id " + serverId));
+    }
+
+    @Override
+    public SctpServerAssociationConfig getServerLinkById(Long serverLinkId) {
+        return remoteSctpLinkRepository.findById(serverLinkId)
+                .orElseThrow(()->new SS7NotFoundException("Not found Server Link with id " + serverLinkId));
+
     }
 
     @Override
@@ -73,9 +80,9 @@ public class SctpConfigServiceImpl implements SctpConfigService {
     }
 
     @Override
-    public SctpClientAssociationConfig getClientLinkById(Long clientLinkId) throws NotFoundException {
+    public SctpClientAssociationConfig getClientLinkById(Long clientLinkId) {
         return sctpLinkRepository.findById(clientLinkId)
-                .orElseThrow(() -> new NotFoundException("Not found Client Link by id " + clientLinkId));
+                .orElseThrow(() -> new SS7NotFoundException("Not found Client Link by id " + clientLinkId));
     }
 
     @Override

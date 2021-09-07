@@ -1,5 +1,6 @@
 package com.unifun.sigproxy.service;
 
+import com.unifun.sigproxy.controller.dto.SigtranStackDto;
 import com.unifun.sigproxy.exception.SS7NotContentException;
 import com.unifun.sigproxy.exception.SS7NotFoundException;
 import com.unifun.sigproxy.models.config.SigtranStack;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -46,5 +48,10 @@ public class SigtranConfigServiceImpl implements SigtranConfigService {
                 throw new SS7NotContentException("Sigtran stack with id " + stackId + " doesn't contain sctp Servers");
             } else return sigtranStack.map(SigtranStack::getSctpServerConfigs).get();
         } else throw new SS7NotFoundException("Not found stack with id " + stackId);
+    }
+
+    @Override
+    public List<SigtranStack> getSigtranStacks() {
+        return sigtranStackRepository.findAll();
     }
 }

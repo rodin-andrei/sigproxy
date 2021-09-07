@@ -4,6 +4,7 @@ import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.exception.NoConfigurationException;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.sctp.SctpClientAssociationConfig;
+import com.unifun.sigproxy.models.config.sctp.SctpServerAssociationConfig;
 import com.unifun.sigproxy.models.config.sctp.SctpServerConfig;
 import org.mobicents.protocols.api.Management;
 
@@ -22,6 +23,8 @@ public interface SctpService {
     void addLinks(Set<SctpClientAssociationConfig> newLinks, String sigtranStack);
 
     void removeSctpLink(SctpClientAssociationConfig link, String sigtranStack);
+
+    void addServerLink(SctpServerAssociationConfig serverLink, String sigtranStack);
 
     void addServer(SctpServerConfig serverConfig, String sigtranStack);
 

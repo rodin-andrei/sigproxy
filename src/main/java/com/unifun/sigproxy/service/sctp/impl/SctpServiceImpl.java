@@ -5,6 +5,7 @@ import com.unifun.sigproxy.exception.NoConfigurationException;
 import com.unifun.sigproxy.exception.SS7AddClientLinkException;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.sctp.SctpClientAssociationConfig;
+import com.unifun.sigproxy.models.config.sctp.SctpServerAssociationConfig;
 import com.unifun.sigproxy.models.config.sctp.SctpServerConfig;
 import com.unifun.sigproxy.service.sctp.SctpService;
 import lombok.Getter;
@@ -107,6 +108,8 @@ public class SctpServiceImpl implements SctpService {
         newLinks.forEach(clientAssociation -> addLink(clientAssociation, sigtranStack));
     }
 
+
+
     @Override
     @Deprecated
     public void startLink(String linkName, String sigtranStack) {
@@ -143,6 +146,7 @@ public class SctpServiceImpl implements SctpService {
         }
     }
 
+
     @Override
     public void removeAllLinks(String sigtranStack) {
         Management sctpManagement = sctpManagements.get(sigtranStack);
@@ -159,6 +163,23 @@ public class SctpServiceImpl implements SctpService {
                         log.warn("Can't remove association: {}. {}", assoc.getName(), e.getMessage(), e);
                     }
                 });
+    }
+
+    @Override
+    public void addServerLink(SctpServerAssociationConfig serverLink, String sigtranStack) {
+        try {
+            sctpManagements.get(sigtranStack)
+                    .addServerAssociation(
+                            serverLink.getRemoteAddress(),
+                            serverLink.getRemotePort(),
+                            serverLink.getSctpServerConfig().getName(),
+                            serverLink.getLinkName(),
+                            IpChannelType.TCP);
+            log.info("Added server association: {} to {} sigtran stack", serverLink.getLinkName(),
+                    sigtranStack);
+        } catch (Exception e) {
+            log.error("Can't create serverAssociation {}.", serverLink.getLinkName(), e);
+        }
     }
 
     @Override

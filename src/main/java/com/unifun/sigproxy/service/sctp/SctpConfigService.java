@@ -10,7 +10,7 @@ import java.util.Set;
 
 public interface SctpConfigService {
 
-    SctpClientAssociationConfig getClientLinkById(Long clientLinkId) throws NotFoundException;
+    SctpClientAssociationConfig getClientLinkById(Long clientLinkId);
 
     void addClinetLink(SctpClientAssociationConfig sctpClientAssociationConfig);
 
@@ -18,7 +18,9 @@ public interface SctpConfigService {
 
     Set<SctpServerAssociationConfig> getServerLinksBySctpServerId(Long serverId);
 
-    SctpServerConfig getSctpServerById(Long serverId) throws NotFoundException;
+    SctpServerConfig getSctpServerById(Long serverId);
+
+    SctpServerAssociationConfig getServerLinkById(Long serverLinkId);
 
     void setServerLink(SctpServerAssociationConfig sctpServerAssociationConfig);
 
