@@ -1,6 +1,6 @@
 package com.unifun.sigproxy.controller.config;
 
-import com.unifun.sigproxy.controller.dto.CreatorDataObject;
+import com.unifun.sigproxy.controller.dto.CreatorDataObjectService;
 import com.unifun.sigproxy.controller.dto.sctp.SctpClientAssociationConfigDto;
 import com.unifun.sigproxy.controller.dto.sctp.SctpServerAssociationConfigDto;
 import com.unifun.sigproxy.controller.dto.sctp.SctpServerConfigDto;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SctpController {
 
-    private final CreatorDataObject creatorDataObject;
+    private final CreatorDataObjectService creatorDataObjectService;
     private final SigtranConfigService sigtranConfigService;
     private final SctpConfigService sctpConfigService;
     private final SctpService sctpService;
@@ -34,7 +34,7 @@ public class SctpController {
     public List<SctpClientAssociationConfigDto> getLinksInfo(@RequestParam Long stackId) {
 
         return sigtranConfigService.getClientLinksByStackId(stackId).stream()
-                .map(this.creatorDataObject::createSctpClientAssociationConfigDto)
+                .map(this.creatorDataObjectService::createSctpClientAssociationConfigDto)
                 .collect(Collectors.toList());
     }
 
@@ -59,7 +59,7 @@ public class SctpController {
         sctpService.addLink(sctpClientAssociationConfig, sigtranStack.getStackName());
         sctpConfigService.addClinetLink(sctpClientAssociationConfig);
 
-        return creatorDataObject.createSctpClientAssociationConfigDto(sctpClientAssociationConfig);
+        return creatorDataObjectService.createSctpClientAssociationConfigDto(sctpClientAssociationConfig);
     }
 
     @PostMapping(value = "/removeClientLink", produces = "application/json")
@@ -69,7 +69,7 @@ public class SctpController {
         SctpClientAssociationConfig sctpClientAssociationConfig = sctpConfigService.getClientLinkById(clientLinkId);
         sctpService.removeSctpLink(sctpClientAssociationConfig, sctpClientAssociationConfig.getSigtranStack().getStackName());
         sctpConfigService.removeClientLinkById(clientLinkId);
-        return creatorDataObject.createSctpClientAssociationConfigDto(sctpClientAssociationConfig);
+        return creatorDataObjectService.createSctpClientAssociationConfigDto(sctpClientAssociationConfig);
     }
 
     @PostMapping(value = "/startClientLink", produces = "application/json")
@@ -78,7 +78,7 @@ public class SctpController {
 
         SctpClientAssociationConfig sctpClientAssociationConfig = sctpConfigService.getClientLinkById(clientLinkId);
         sctpService.startLink(sctpClientAssociationConfig.getLinkName(), sctpClientAssociationConfig.getSigtranStack().getStackName());
-        return creatorDataObject.createSctpClientAssociationConfigDto(sctpClientAssociationConfig);
+        return creatorDataObjectService.createSctpClientAssociationConfigDto(sctpClientAssociationConfig);
     }
 
 
@@ -88,7 +88,7 @@ public class SctpController {
 
         SctpClientAssociationConfig sctpClientAssociationConfig = sctpConfigService.getClientLinkById(clientLinkId);
         sctpService.stopLink(sctpClientAssociationConfig.getLinkName(), sctpClientAssociationConfig.getSigtranStack().getStackName());
-        return creatorDataObject.createSctpClientAssociationConfigDto(sctpClientAssociationConfig);
+        return creatorDataObjectService.createSctpClientAssociationConfigDto(sctpClientAssociationConfig);
     }
 
     @GetMapping(value = "/getServerLinks", produces = "application/json")
@@ -99,7 +99,7 @@ public class SctpController {
 
         return sctpServerAssociationConfigs
                 .stream()
-                .map(this.creatorDataObject::createSctpServerAssociationConfigDto)
+                .map(this.creatorDataObjectService::createSctpServerAssociationConfigDto)
                 .collect(Collectors.toList());
     }
 
@@ -119,7 +119,7 @@ public class SctpController {
 
         sctpConfigService.setServerLink(sctpServerAssociationConfig);
         sctpService.addServerLink(sctpServerAssociationConfig,sctpServerAssociationConfig.getSctpServerConfig().getSigtranStack().getStackName());
-        return creatorDataObject.createSctpServerAssociationConfigDto(sctpServerAssociationConfig);
+        return creatorDataObjectService.createSctpServerAssociationConfigDto(sctpServerAssociationConfig);
     }
 
     @PostMapping(value = "/removeServerLink", produces = "application/json")
@@ -137,7 +137,7 @@ public class SctpController {
 
         SctpServerAssociationConfig sctpServerAssociationConfig = sctpConfigService.getServerLinkById(serverLinkId);
         sctpService.startLink(sctpServerAssociationConfig.getLinkName(), sctpServerAssociationConfig.getSctpServerConfig().getSigtranStack().getStackName());
-        return creatorDataObject.createSctpServerAssociationConfigDto(sctpServerAssociationConfig);
+        return creatorDataObjectService.createSctpServerAssociationConfigDto(sctpServerAssociationConfig);
     }
 
 
@@ -147,7 +147,7 @@ public class SctpController {
 
         SctpServerAssociationConfig sctpServerAssociationConfig = sctpConfigService.getServerLinkById(serverLinkId);
         sctpService.stopLink(sctpServerAssociationConfig.getLinkName(), sctpServerAssociationConfig.getSctpServerConfig().getSigtranStack().getStackName());
-        return creatorDataObject.createSctpServerAssociationConfigDto(sctpServerAssociationConfig);
+        return creatorDataObjectService.createSctpServerAssociationConfigDto(sctpServerAssociationConfig);
     }
 
 
@@ -198,7 +198,7 @@ public class SctpController {
     public List<SctpServerConfigDto> getServerList(@RequestParam Long stackId){
 
         return sigtranConfigService.getSctpServersByStackId(stackId).stream()
-                .map(this.creatorDataObject::createSctpServerConfigDto)
+                .map(this.creatorDataObjectService::createSctpServerConfigDto)
                 .collect(Collectors.toList());
     }
 }

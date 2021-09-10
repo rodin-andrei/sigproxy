@@ -3,6 +3,7 @@ package com.unifun.sigproxy.service.sctp.impl;
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.exception.NoConfigurationException;
 import com.unifun.sigproxy.exception.SS7AddClientLinkException;
+import com.unifun.sigproxy.exception.SS7NotFoundException;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.sctp.SctpClientAssociationConfig;
 import com.unifun.sigproxy.models.config.sctp.SctpServerAssociationConfig;
@@ -107,7 +108,6 @@ public class SctpServiceImpl implements SctpService {
     public void addLinks(Set<SctpClientAssociationConfig> newLinks, String sigtranStack) {
         newLinks.forEach(clientAssociation -> addLink(clientAssociation, sigtranStack));
     }
-
 
 
     @Override
@@ -239,6 +239,17 @@ public class SctpServiceImpl implements SctpService {
             sctpManagements.get(sigtranStack).stopServer(serverName);
         } catch (Exception e) {
             log.warn(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public boolean getLinkStatus(String sigtranStack, String linkName) {
+
+        try {
+            return this.getTransportManagement(sigtranStack)
+                    .getAssociation(linkName).isConnected();
+        } catch (Exception e) {
+           throw new SS7NotFoundException("Not found link wirh name"+ linkName);
         }
     }
 

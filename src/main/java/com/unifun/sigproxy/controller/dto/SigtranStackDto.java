@@ -21,7 +21,7 @@ public class SigtranStackDto {
     private Long id;
     private String stackName;
     private Set<SctpServerConfigDto> sctpServerConfigsDto;
-    private Set<SctpClientAssociationConfigDto> associationsDtoDto;
+    private Set<SctpClientAssociationConfigDto> associationsDto;
     private SctpStackSettingsConfigDto sctpStackSettingsConfigDto;
     private Set<M3uaAsConfigDto> applicationServersDto;
     private M3uaStackSettingsConfigDto m3UaStackSettingsConfigDto;

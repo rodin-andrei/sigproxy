@@ -40,6 +40,8 @@ public interface SctpService {
 
     void stopServer(String serverName, String sigtranStack);
 
+    boolean getLinkStatus(String sigtranStack, String linkName);
+
     void removeServer(SctpServerConfig serverConfig, String sigtranStack);
 
     void removeAllServers(String sigtranStack);

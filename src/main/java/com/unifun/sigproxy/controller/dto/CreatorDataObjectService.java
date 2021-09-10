@@ -24,36 +24,30 @@ import com.unifun.sigproxy.models.config.tcap.TcapConfig;
 import com.unifun.sigproxy.service.sctp.SctpConfigService;
 import com.unifun.sigproxy.service.sctp.SctpService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Component
+@Service
 @RequiredArgsConstructor
-public class CreatorDataObject {
+public class CreatorDataObjectService {
 
     private final SctpConfigService sctpConfigService;
     private final SctpService sctpService;
 
 
     public SctpClientAssociationConfigDto createSctpClientAssociationConfigDto(SctpClientAssociationConfig clientAssociation) {
-        SctpClientAssociationConfigDto sctpClientAssociationConfigDto = new SctpClientAssociationConfigDto();
-        sctpClientAssociationConfigDto.setId(clientAssociation.getId());
-        sctpClientAssociationConfigDto.setLinkName(clientAssociation.getLinkName());
-        sctpClientAssociationConfigDto.setLocalAddress(clientAssociation.getLocalAddress());
-        sctpClientAssociationConfigDto.setLocalPort(clientAssociation.getLocalPort());
-        sctpClientAssociationConfigDto.setMultihomingAddresses(clientAssociation.getMultihomingAddresses());
-        sctpClientAssociationConfigDto.setRemoteAddress(clientAssociation.getRemoteAddress());
-        sctpClientAssociationConfigDto.setRemotePort(clientAssociation.getRemotePort());
-
-        try {
-            sctpClientAssociationConfigDto.setStatus(sctpService.getTransportManagement(clientAssociation.getSigtranStack().getStackName())
-                    .getAssociation(clientAssociation.getLinkName()).isConnected());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return sctpClientAssociationConfigDto;
+        return SctpClientAssociationConfigDto.builder()
+                .id(clientAssociation.getId())
+                .linkName(clientAssociation.getLinkName())
+                .localAddress(clientAssociation.getLocalAddress())
+                .localPort(clientAssociation.getLocalPort())
+                .multihomingAddresses(clientAssociation.getMultihomingAddresses())
+                .remoteAddress(clientAssociation.getRemoteAddress())
+                .remotePort(clientAssociation.getRemotePort())
+                .status(sctpService.getLinkStatus(clientAssociation.getSigtranStack().getStackName(), clientAssociation.getLinkName()))
+                .build();
     }
 
     public SctpServerAssociationConfigDto createSctpServerAssociationConfigDto(SctpServerAssociationConfig sctpServerAssociationConfigs) {
@@ -93,7 +87,7 @@ public class CreatorDataObject {
     }
 
     public SctpStackSettingsConfigDto createSctpStackSettingsConfigDto(SctpStackSettingsConfig sctpStackSettingsConfig) {
-        if(sctpStackSettingsConfig == null) return null;
+        if (sctpStackSettingsConfig == null) return null;
         SctpStackSettingsConfigDto sctpStackSettingsConfigDto = new SctpStackSettingsConfigDto();
 
         return sctpStackSettingsConfigDto;
@@ -163,7 +157,7 @@ public class CreatorDataObject {
 
 
     private SccpAddressRuleConfigDto createSccpAddressRuleConfigDto(SccpAddressRuleConfig sccpAddressRuleConfig) {
-        if(sccpAddressRuleConfig == null) return null;
+        if (sccpAddressRuleConfig == null) return null;
         return SccpAddressRuleConfigDto.builder()
                 .id(sccpAddressRuleConfig.getId())
                 .addressIndicator(sccpAddressRuleConfig.getAddressIndicator())
@@ -177,7 +171,7 @@ public class CreatorDataObject {
     }
 
     private SccpRuleConfigDto createSccpRuleConfigsDto(SccpRuleConfig sccpRuleConfig) {
-        if(sccpRuleConfig == null) return null;
+        if (sccpRuleConfig == null) return null;
         return SccpRuleConfigDto.builder()
                 .id(sccpRuleConfig.getId())
                 .mask(sccpRuleConfig.getMask())
@@ -264,7 +258,7 @@ public class CreatorDataObject {
     }
 
     private SccpSettingsConfigDto createSccpSettingsConfigDto(SccpSettingsConfig sccpSettingsConfig) {
-        if(sccpSettingsConfig == null) return null;
+        if (sccpSettingsConfig == null) return null;
         return SccpSettingsConfigDto.builder()
                 .id(sccpSettingsConfig.getId())
                 .zmarginxudtmessage(sccpSettingsConfig.getZmarginxudtmessage())
@@ -312,7 +306,7 @@ public class CreatorDataObject {
                                 .map(this::createSctpServerConfigDto)
                                 .collect(Collectors.toSet())
                 )
-                .associationsDtoDto(
+                .associationsDto(
                         sigtranStack.getAssociations()
                                 .stream()
                                 .map(this::createSctpClientAssociationConfigDto)

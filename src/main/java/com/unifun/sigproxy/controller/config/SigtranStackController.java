@@ -1,6 +1,6 @@
 package com.unifun.sigproxy.controller.config;
 
-import com.unifun.sigproxy.controller.dto.CreatorDataObject;
+import com.unifun.sigproxy.controller.dto.CreatorDataObjectService;
 import com.unifun.sigproxy.controller.dto.SigtranStackDto;
 import com.unifun.sigproxy.service.SigtranConfigService;
 import lombok.RequiredArgsConstructor;
@@ -18,13 +18,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SigtranStackController {
 
-    private final CreatorDataObject creatorDataObject;
+    private final CreatorDataObjectService creatorDataObjectService;
     private final SigtranConfigService sigtranConfigService;
 
     @GetMapping(value = "/getSigtranStack", produces = "application/json")
     @ResponseBody
     public SigtranStackDto getSigtranStack(@RequestParam Long sigtranStackId){
-        return creatorDataObject.createSigtranStackDto(sigtranConfigService.getSigtranStackById(sigtranStackId));
+        return creatorDataObjectService.createSigtranStackDto(sigtranConfigService.getSigtranStackById(sigtranStackId));
     }
 
     @GetMapping(value = "/getSigtranStacks", produces = "application/json")
@@ -32,7 +32,7 @@ public class SigtranStackController {
     public List<SigtranStackDto> getSigtranStacks(){
         return sigtranConfigService.getSigtranStacks()
                 .stream()
-                .map(creatorDataObject::createSigtranStackDto)
+                .map(creatorDataObjectService::createSigtranStackDto)
                 .collect(Collectors.toList());
     }
 }
