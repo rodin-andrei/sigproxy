@@ -1,8 +1,5 @@
 package com.unifun.sigproxy.service.map.impl;
 
-import com.unifun.sigproxy.aaaaa.TestMAPServiceSupplementaryListener;
-import com.unifun.sigproxy.aaaaa.TestMapDialogListener;
-import com.unifun.sigproxy.aaaaa.TestMapServiceSmsListener;
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.exception.NoConfigurationException;
 import com.unifun.sigproxy.models.config.SigtranStack;
@@ -53,15 +50,6 @@ public class MapServiceImpl implements MapService {
         } catch (Exception e) {
             throw new InitializingException("Can't initialize MAP Layer. ", e);
         }
-
-        MAPProvider mapProvider = mapStack.getMAPProvider();
-        mapProvider.addMAPDialogListener(new TestMapDialogListener(mapStack));
-        mapProvider.getMAPServiceSms().acivate();
-        mapProvider.getMAPServiceSms().addMAPServiceListener(new TestMapServiceSmsListener(mapStack));
-        mapProvider.getMAPServiceSupplementary().acivate();
-        mapProvider.getMAPServiceSupplementary().addMAPServiceListener(new TestMAPServiceSupplementaryListener(mapStack));
-
-
     }
 
     @Override

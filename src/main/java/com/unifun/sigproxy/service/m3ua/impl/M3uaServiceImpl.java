@@ -1,6 +1,6 @@
 package com.unifun.sigproxy.service.m3ua.impl;
 
-import com.unifun.sigproxy.aaaaa.TestM3uaListener;
+
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.m3ua.M3uaAspConfig;
@@ -42,7 +42,6 @@ public class M3uaServiceImpl implements M3uaService {
             m3uaManagement.setTransportManagement(sctpService.getTransportManagement(sigtranStack.getStackName()));
             m3uaManagement.start();
             m3uaManagement.removeAllResourses();
-            m3uaManagement.addMtp3UserPartListener(new TestM3uaListener(m3uaManagement));
             log.info("Created m3ua management: {}", sigtranStack.getStackName());
         } catch (Exception e) {
             throw new InitializingException("Can't initialize M3ua Layer. ", e);

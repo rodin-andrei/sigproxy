@@ -1,6 +1,5 @@
 package com.unifun.sigproxy.service.tcap.impl;
 
-import com.unifun.sigproxy.aaaaa.TestTCListener;
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.exception.NoConfigurationException;
 import com.unifun.sigproxy.models.config.SigtranStack;
@@ -12,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.restcomm.protocols.ss7.sccp.SccpProvider;
 import org.restcomm.protocols.ss7.tcap.TCAPStackImpl;
 import org.restcomm.protocols.ss7.tcap.api.TCAPStack;
-import org.restcomm.protocols.ss7.tcap.api.TCListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -57,9 +55,6 @@ public class TcapServiceImpl implements TcapService {
         } catch (Exception e) {
             throw new InitializingException("Can't initialize tcap management: " + sigtranStack.getStackName(), e);
         }
-
-        TCListener tcListener = new TestTCListener(tcapStack);
-        tcapStack.getProvider().addTCListener(tcListener);
     }
 
     @Override

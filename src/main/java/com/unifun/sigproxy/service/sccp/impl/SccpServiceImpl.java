@@ -1,7 +1,6 @@
 package com.unifun.sigproxy.service.sccp.impl;
 
 
-import com.unifun.sigproxy.aaaaa.TestSccpListener;
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.sccp.*;
@@ -13,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.restcomm.protocols.ss7.indicator.AddressIndicator;
 import org.restcomm.protocols.ss7.indicator.NatureOfAddress;
 import org.restcomm.protocols.ss7.indicator.NumberingPlan;
-import org.restcomm.protocols.ss7.sccp.SccpListener;
 import org.restcomm.protocols.ss7.sccp.SccpProtocolVersion;
 import org.restcomm.protocols.ss7.sccp.SccpProvider;
 import org.restcomm.protocols.ss7.sccp.impl.SccpStackImpl;
@@ -55,11 +53,6 @@ public class SccpServiceImpl implements SccpService {
             sccpStack.setPersistDir(jssPersistDir);
             sccpStack.start();
             sccpStack.removeAllResourses();
-
-            SccpListener sccpListener = new TestSccpListener(sccpStack);
-            sccpStack.getSccpProvider().registerSccpListener(8, sccpListener);
-            sccpStack.getSccpProvider().registerSccpListener(147, sccpListener);
-
             log.info("Created sccp management: {}", sigtranStack.getStackName());
         } catch (Exception e) {
             throw new InitializingException("Can't initialize SCCP Layer. ", e);
