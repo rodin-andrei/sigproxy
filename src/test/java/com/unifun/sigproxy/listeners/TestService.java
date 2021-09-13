@@ -74,7 +74,7 @@ public class TestService {
             initClient();
         if (initTestServer)
             initServer();
-        service.init();
+//        service.init();
     }
 
     private void initServer() {

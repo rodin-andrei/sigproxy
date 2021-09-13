@@ -11,6 +11,8 @@ import com.unifun.sigproxy.service.sctp.SctpService;
 import com.unifun.sigproxy.service.tcap.TcapService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.ContextStartedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -24,8 +26,9 @@ public class SigtranServiceImpl implements SigtranService {
     private final TcapService tcapService;
     private final MapService mapService;
 
-    @Override
-    public void init() {
+
+    @EventListener
+    public void init(ContextStartedEvent event) {
         log.info("Initializing Sigtran stacks.");
         sigtranStackRepository.findAll()
                 .forEach(sigtranStack -> {
