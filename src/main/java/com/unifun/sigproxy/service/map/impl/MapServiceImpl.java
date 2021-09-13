@@ -7,7 +7,12 @@ import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.exception.NoConfigurationException;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.service.map.MapService;
+import com.unifun.sigproxy.service.map.listeners.MAPDialogListenerImpl;
+import com.unifun.sigproxy.service.map.listeners.MAPServiceSmsListenerImpl;
+import com.unifun.sigproxy.service.map.listeners.MAPServiceSupplementaryListenerImpl;
+import com.unifun.sigproxy.service.rabbit.pojo.MapMessage;
 import com.unifun.sigproxy.service.sccp.SccpService;
+import com.unifun.sigproxy.service.sccp.impl.SccpParametersServiceImpl;
 import com.unifun.sigproxy.service.sccp.impl.SccpServiceImpl;
 import com.unifun.sigproxy.service.tcap.TcapService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +26,7 @@ import org.restcomm.protocols.ss7.map.api.service.supplementary.MAPDialogSupplem
 import org.restcomm.protocols.ss7.map.datacoding.CBSDataCodingSchemeImpl;
 import org.restcomm.protocols.ss7.map.primitives.AlertingPatternImpl;
 import org.restcomm.protocols.ss7.map.primitives.USSDStringImpl;
+import org.restcomm.protocols.ss7.sccp.impl.parameter.SccpAddressImpl;
 import org.restcomm.protocols.ss7.sccp.parameter.SccpAddress;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +40,7 @@ import java.util.Map;
 public class MapServiceImpl implements MapService {
     private final TcapService tcapService;
     private final SccpService sccpService;
+    private final SccpParametersServiceImpl sccpParametersService;
 
     private final Map<String, MAPStackImpl> mapStacks = new HashMap<>();
 
@@ -98,4 +105,46 @@ public class MapServiceImpl implements MapService {
         }
 
     }
+
+    //TODO fill default if empty message parameters
+    public MAPDialogSupplementary createDialogProcessUnstructuredSSRequest(String stackName, MapMessage mapMessage) {
+        MAPProvider mapProvider = this.mapStacks.get(stackName).getMAPProvider();
+        MAPParameterFactory mapParameterFactory = mapProvider.getMAPParameterFactory();
+        MAPApplicationContextName networkUnstructuredSsContext = MAPApplicationContextName.networkUnstructuredSsContext;
+        MAPApplicationContextVersion version = MAPApplicationContextVersion.version2;
+        MAPApplicationContext mapContext = MAPApplicationContext.getInstance(networkUnstructuredSsContext, version);
+        SccpAddress callingParty = this.sccpParametersService.createSccpAddress(mapMessage.getCallingParty(), stackName);
+        SccpAddressImpl sccpAddress = new SccpAddressImpl();
+        SccpAddress calledParty = this.sccpParametersService.createSccpAddress(mapMessage.getCalledParty(), stackName);
+
+        ISDNAddressString isdnAddressStringA = mapParameterFactory
+                .createISDNAddressString(AddressNature.international_number,
+                        NumberingPlan.ISDN,
+                        callingParty.getGlobalTitle().getDigits());
+        ISDNAddressString isdnAddressStringB = mapParameterFactory
+                .createISDNAddressString(AddressNature.international_number,
+                        NumberingPlan.ISDN,
+                        calledParty.getGlobalTitle().getDigits());
+
+        try {
+            MAPDialogSupplementary newDialog = mapProvider.getMAPServiceSupplementary().createNewDialog(mapContext,
+                    callingParty,
+                    isdnAddressStringA,
+                    calledParty,
+                    isdnAddressStringB);
+
+            CBSDataCodingSchemeImpl cbsDataCodingScheme = new CBSDataCodingSchemeImpl(15);
+            newDialog.addProcessUnstructuredSSRequest(cbsDataCodingScheme,
+                    new USSDStringImpl(mapMessage.getUssdString(), cbsDataCodingScheme, StandardCharsets.UTF_8),
+                    new AlertingPatternImpl(),
+                    isdnAddressStringB);
+
+            //newDialog.send();
+            return newDialog;
+        } catch (MAPException e) {
+            log.warn(e.getMessage(), e);
+        }
+        return null;
+    }
+
 }
