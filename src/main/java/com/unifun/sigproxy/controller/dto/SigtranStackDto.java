@@ -17,7 +17,6 @@ import java.util.Set;
 @Data
 @Builder
 public class SigtranStackDto {
-
     private Long id;
     private String stackName;
     private Set<SctpServerConfigDto> sctpServerConfigsDto;
@@ -32,6 +31,5 @@ public class SigtranStackDto {
     private Set<SccpServiceAccessPointConfigDto> sccpServiceAccessPointConfigsDto;
     private Set<SccpConcernedSignalingPointCodeConfigDto> sccpConcernedSignalingPointCodeConfigsDto;
     private SccpSettingsConfigDto sccpSettingsConfigDto;
-
     private TcapConfigDto tcapConfigDto;
 }

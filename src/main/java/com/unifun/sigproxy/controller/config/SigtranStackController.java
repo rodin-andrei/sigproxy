@@ -5,15 +5,13 @@ import com.unifun.sigproxy.controller.dto.SigtranStackDto;
 import com.unifun.sigproxy.service.SigtranConfigService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Controller
+
+@RestController
 @RequestMapping("conf/sigtranStack")
 @RequiredArgsConstructor
 public class SigtranStackController {

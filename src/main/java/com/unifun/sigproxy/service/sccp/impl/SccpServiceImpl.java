@@ -39,7 +39,6 @@ public class SccpServiceImpl implements SccpService {
     private final SccpServiceAccessPointConfigRepository sccpServiceAccessPointConfigRepository;
     @Value("${jss.persist.dir}")
     private String jssPersistDir;
-
     @Override
     public void initialize(SigtranStack sigtranStack) throws InitializingException {
         log.info("Initializing SCCP management...");
@@ -54,6 +53,7 @@ public class SccpServiceImpl implements SccpService {
             sccpStack.start();
             sccpStack.removeAllResourses();
             log.info("Created sccp management: {}", sigtranStack.getStackName());
+            this.initSettings(sccpStack,sigtranStack);
         } catch (Exception e) {
             throw new InitializingException("Can't initialize SCCP Layer. ", e);
         }
@@ -286,5 +286,42 @@ public class SccpServiceImpl implements SccpService {
     @Override
     public SccpProvider getSccpProvider(String stackName) {
         return sccpStacks.get(stackName).getSccpProvider();
+    }
+
+    public void initSettings(SccpStackImpl sccpStack, SigtranStack sigtranStack){
+        try {
+            sccpStack.setDeliveryMessageThreadCount(sigtranStack.getM3UaStackSettingsConfig().getDeliveryMessageThreadCount());
+            sccpStack.setCanRelay(sccpStack.isCanRelay());
+            sccpStack.setCongControl_Algo(sccpStack.getCongControl_Algo());
+            sccpStack.setCongControl_blockingOutgoungSccpMessages(sccpStack.isCongControl_blockingOutgoungSccpMessages()); //todo not found
+            sccpStack.setCongControlM(sccpStack.getCongControlM());
+            sccpStack.setCongControlN(sccpStack.getCongControlN());
+            sccpStack.setCongControlTIMER_A(sccpStack.getCongControlTIMER_A());
+            sccpStack.setCongControlTIMER_D(sccpStack.getCongControlTIMER_D());
+            sccpStack.setConnEstTimerDelay(sccpStack.getConnEstTimerDelay());
+            sccpStack.setGuardTimerDelay(sccpStack.getGuardTimerDelay());
+            sccpStack.setIarTimerDelay(sccpStack.getIarTimerDelay());
+            sccpStack.setIasTimerDelay(sccpStack.getIasTimerDelay());
+            sccpStack.setIntTimerDelay(sccpStack.getIntTimerDelay());
+            sccpStack.setMaxDataMessage(sccpStack.getMaxDataMessage());
+            sccpStack.setMtp3UserParts(sccpStack.getMtp3UserParts());
+            sccpStack.setPeriodOfLogging(sccpStack.getPeriodOfLogging());
+            sccpStack.setPreviewMode(sccpStack.isPreviewMode());
+            sccpStack.setReassemblyTimerDelay(sccpStack.getReassemblyTimerDelay());
+            sccpStack.setRelTimerDelay(sccpStack.getRelTimerDelay());
+            sccpStack.setRemoveSpc(sccpStack.isRemoveSpc());
+            sccpStack.setRepeatRelTimerDelay(sccpStack.getRepeatRelTimerDelay());
+            sccpStack.setResetTimerDelay(sccpStack.getResetTimerDelay());
+            sccpStack.setRspProhibitedByDefault( sccpStack.isRspProhibitedByDefault());
+            sccpStack.setSccpProtocolVersion(sccpStack.getSccpProtocolVersion());
+            sccpStack.setSstTimerDuration_IncreaseFactor(sccpStack.getSstTimerDuration_IncreaseFactor());
+            sccpStack.setSstTimerDuration_Max(sccpStack.getSstTimerDuration_Max());
+            sccpStack.setSstTimerDuration_Min(sccpStack.getSstTimerDuration_Min());
+            sccpStack.setTimerExecutorsThreadCount(sccpStack.getTimerExecutorsThreadCount());
+            sccpStack.setZMarginXudtMessage(sccpStack.getZMarginXudtMessage());
+
+        } catch (Exception e){
+            log.warn("Exception in SccpServiceImpl.initSetting: "+e);
+        }
     }
 }
