@@ -42,6 +42,7 @@ public class M3uaServiceImpl implements M3uaService {
             m3uaManagement.setTransportManagement(sctpService.getTransportManagement(sigtranStack.getStackName()));
             m3uaManagement.start();
             m3uaManagement.removeAllResourses();
+            this.initSettings(m3uaManagement,sigtranStack);
             log.info("Created m3ua management: {}", sigtranStack.getStackName());
         } catch (Exception e) {
             throw new InitializingException("Can't initialize M3ua Layer. ", e);
@@ -144,5 +145,23 @@ public class M3uaServiceImpl implements M3uaService {
     public M3UAManagementImpl getManagement(String stackName) {
         return this.m3uaManagements.get(stackName);
     }
+
+
+    private void initSettings(M3UAManagementImpl m3uaManagement, SigtranStack sigtranStack) {
+        try {
+            m3uaManagement.setDeliveryMessageThreadCount(sigtranStack.getM3UaStackSettingsConfig().getDeliveryMessageThreadCount());
+            m3uaManagement.setHeartbeatTime(sigtranStack.getM3UaStackSettingsConfig().getHeartbeatTime());
+            m3uaManagement.setRoutingKeyManagementEnabled(sigtranStack.getM3UaStackSettingsConfig().isRoutingKeyManagementEnabled());
+            m3uaManagement.setMaxAsForRoute(sigtranStack.getM3UaStackSettingsConfig().getMaxAsForRoute());
+            m3uaManagement.setMaxSequenceNumber(sigtranStack.getM3UaStackSettingsConfig().getMaxSequenceNumber());
+            m3uaManagement.setRoutingLabelFormat(sigtranStack.getM3UaStackSettingsConfig().getRoutingLabelFormat());
+            m3uaManagement.setStatisticsEnabled(sigtranStack.getM3UaStackSettingsConfig().isStatisticsEnabled());
+            m3uaManagement.setUseLsbForLinksetSelection(sigtranStack.getM3UaStackSettingsConfig().isUseLsbForLinksetSelection());
+        } catch (Exception e){
+            log.warn("Exception in M3uaServiceImp.iniSetting: "+ e);
+        }
+
+    }
+
 }
 

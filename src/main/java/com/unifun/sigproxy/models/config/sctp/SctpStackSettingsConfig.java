@@ -18,7 +18,7 @@ public class SctpStackSettingsConfig {
     private double congControl_DelayThreshold_1;
     private double congControl_DelayThreshold_2;
     private double congControl_DelayThreshold_3;
-    private int setConnectDelay;
+    private int setConnectDelay; //todo may without set ?
     private boolean optionSctpDisableFragments;
     private int optionSctpFragmentInterleave;
     private int optionSctpInitMaxStreams_MaxInStreams;

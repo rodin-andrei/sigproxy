@@ -44,9 +44,12 @@ public class SctpServiceImpl implements SctpService {
             sctpManagement.setPersistDir(this.jssPersistDir);
             sctpManagement.start();
             sctpManagement.removeAllResourses();
+            this.initSettings(sigtranStack,sctpManagement);
         } catch (Exception e) {
             throw new InitializingException("Can't initialize sctp management: " + sigtranStack.getStackName(), e);
         }
+
+
 
         var clientAssociations = sigtranStack.getAssociations();
         var sctpServers = sigtranStack.getSctpServerConfigs();
@@ -283,5 +286,30 @@ public class SctpServiceImpl implements SctpService {
                         log.warn("Can't remove association: {}. {}", server.getName(), e.getMessage(), e);
                     }
                 });
+    }
+
+    private void initSettings(SigtranStack sigtranStack, NettySctpManagementImpl  nettySctpManagement){
+        try {
+            nettySctpManagement.setCongControl_BackToNormalDelayThreshold_1(sigtranStack.getSctpStackSettingsConfig().getCongControl_BackToNormalDelayThreshold_1());
+            nettySctpManagement.setCongControl_BackToNormalDelayThreshold_2(sigtranStack.getSctpStackSettingsConfig().getCongControl_BackToNormalDelayThreshold_2());
+            nettySctpManagement.setCongControl_BackToNormalDelayThreshold_3(sigtranStack.getSctpStackSettingsConfig().getCongControl_BackToNormalDelayThreshold_3());
+            nettySctpManagement.setOptionSctpNodelay(sigtranStack.getSctpStackSettingsConfig().isOptionSctpNodelay());
+            nettySctpManagement.setCongControl_DelayThreshold_1(sigtranStack.getSctpStackSettingsConfig().getCongControl_DelayThreshold_1());
+            nettySctpManagement.setCongControl_DelayThreshold_2(sigtranStack.getSctpStackSettingsConfig().getCongControl_DelayThreshold_2());
+            nettySctpManagement.setCongControl_DelayThreshold_3(sigtranStack.getSctpStackSettingsConfig().getCongControl_DelayThreshold_3());
+            nettySctpManagement.setOptionSctpDisableFragments(sigtranStack.getSctpStackSettingsConfig().isOptionSctpDisableFragments());
+            nettySctpManagement.setOptionSctpFragmentInterleave(sigtranStack.getSctpStackSettingsConfig().getOptionSctpFragmentInterleave());
+            nettySctpManagement.setOptionSoLinger(sigtranStack.getSctpStackSettingsConfig().getOptionSoLinger());
+            nettySctpManagement.setOptionSoRcvbuf(sigtranStack.getSctpStackSettingsConfig().getOptionSoRcvbuf());
+            nettySctpManagement.setOptionSoSndbuf(sigtranStack.getSctpStackSettingsConfig().getOptionSoSndbuf());
+            nettySctpManagement.setSingleThread(sigtranStack.getSctpStackSettingsConfig().isSingleThread());
+            nettySctpManagement.setWorkerThreads(sigtranStack.getSctpStackSettingsConfig().getWorkerThreads());
+            nettySctpManagement.setConnectDelay(sigtranStack.getSctpStackSettingsConfig().getSetConnectDelay());
+            nettySctpManagement.setOptionSctpInitMaxstreams_MaxInStreams(sigtranStack.getSctpStackSettingsConfig().getOptionSctpInitMaxStreams_MaxInStreams());
+            nettySctpManagement.setOptionSctpInitMaxstreams_MaxOutStreams(sigtranStack.getSctpStackSettingsConfig().getOptionSctpInitMaxStreams_MaxOutStreams());
+//            nettySctpManagement.setServerListener(); /todo search how to init setting.
+        }catch (Exception e){
+            log.warn("Error in SctpServiceImpl.initSettings: "+ e);
+        }
     }
 }
