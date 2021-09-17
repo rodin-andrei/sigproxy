@@ -1,9 +1,10 @@
 package com.unifun.sigproxy.controller.dto.sctp;
 
-import com.unifun.sigproxy.models.config.SigtranStack;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class SctpStackSettingsConfigDto {
 
     private Long id;

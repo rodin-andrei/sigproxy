@@ -1,10 +1,11 @@
 package com.unifun.sigproxy.controller.config;
 
-import com.unifun.sigproxy.controller.dto.CreatorDataObjectService;
 import com.unifun.sigproxy.controller.dto.SigtranStackDto;
+import com.unifun.sigproxy.controller.dto.service.CreatorDataAccessObjectService;
+import com.unifun.sigproxy.controller.dto.service.CreatorDataObjectService;
+import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.service.SigtranConfigService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,17 +13,18 @@ import java.util.stream.Collectors;
 
 
 @RestController
-@RequestMapping("conf/sigtranStack")
+@RequestMapping("conf")
 @RequiredArgsConstructor
 public class SigtranStackController {
 
-    private final CreatorDataObjectService creatorDataObjectService;
+    private final CreatorDataObjectService creatorDto;
+    private final CreatorDataAccessObjectService creatorDao;
     private final SigtranConfigService sigtranConfigService;
 
     @GetMapping(value = "/getSigtranStack", produces = "application/json")
     @ResponseBody
     public SigtranStackDto getSigtranStack(@RequestParam Long sigtranStackId){
-        return creatorDataObjectService.createSigtranStackDto(sigtranConfigService.getSigtranStackById(sigtranStackId));
+        return creatorDto.createSigtranStackDto(sigtranConfigService.getSigtranStackById(sigtranStackId));
     }
 
     @GetMapping(value = "/getSigtranStacks", produces = "application/json")
@@ -30,7 +32,14 @@ public class SigtranStackController {
     public List<SigtranStackDto> getSigtranStacks(){
         return sigtranConfigService.getSigtranStacks()
                 .stream()
-                .map(creatorDataObjectService::createSigtranStackDto)
+                .map(creatorDto::createSigtranStackDto)
                 .collect(Collectors.toList());
+    }
+
+    @PostMapping(value = "/addSigtranStack", produces = "application/json")
+    @ResponseBody
+    public SigtranStackDto addSigtranStack(@RequestBody SigtranStackDto sigtranStackDto){
+        SigtranStack sigtranStack = sigtranConfigService.addSigtranStack(creatorDao.createSigtranStackDao(sigtranStackDto));
+        return creatorDto.createSigtranStackDto(sigtranStack);
     }
 }

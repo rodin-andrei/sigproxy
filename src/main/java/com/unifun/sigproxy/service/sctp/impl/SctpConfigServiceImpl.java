@@ -1,10 +1,8 @@
 package com.unifun.sigproxy.service.sctp.impl;
 
 
-import com.unifun.sigproxy.exception.SS7AddClientLinkException;
-import com.unifun.sigproxy.exception.SS7NotContentException;
-import com.unifun.sigproxy.exception.SS7NotFoundException;
-import com.unifun.sigproxy.exception.SS7RemoveSctpAssociationException;
+import com.unifun.sigproxy.exception.*;
+import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.sctp.SctpClientAssociationConfig;
 import com.unifun.sigproxy.models.config.sctp.SctpServerAssociationConfig;
 import com.unifun.sigproxy.models.config.sctp.SctpServerConfig;
@@ -13,7 +11,6 @@ import com.unifun.sigproxy.repository.sctp.RemoteSctpLinkRepository;
 import com.unifun.sigproxy.repository.sctp.SctpLinkRepository;
 import com.unifun.sigproxy.repository.sctp.SctpServerRepository;
 import com.unifun.sigproxy.service.sctp.SctpConfigService;
-import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,11 +29,22 @@ public class SctpConfigServiceImpl implements SctpConfigService {
     private final SctpServerRepository sctpServerRepository;
 
     @Override
+    public Set<SctpClientAssociationConfig> getClientLinksByStackId(Long stackId) {
+
+        Optional<SigtranStack> sigtranStack = sigtranStackRepository.findById(stackId);
+        if (sigtranStack.map(SigtranStack::getAssociations).isPresent()) {
+            if (sigtranStack.map(SigtranStack::getAssociations).get().isEmpty())
+                throw new SS7NotContentException("Sigtran stack with id " + stackId + " doesn't contain sctp client links");
+            else return sigtranStack.map(SigtranStack::getAssociations).get();
+        } else throw new SS7NotFoundException("Not found stack with id " + stackId);
+    }
+
+    @Override
     public void addClinetLink(SctpClientAssociationConfig link) {
         try {
             sctpLinkRepository.save(link);
         } catch (Exception e) {
-            throw new SS7AddClientLinkException("Adding a link " + link.getLinkName() + " failed.");
+            throw new SS7AddException("Adding a link " + link.getLinkName() + " failed.");
         }
     }
 
@@ -75,8 +83,12 @@ public class SctpConfigServiceImpl implements SctpConfigService {
     }
 
     @Override
-    public void setServerLink(SctpServerAssociationConfig sctpServerAssociationConfig) {
-        remoteSctpLinkRepository.save(sctpServerAssociationConfig);
+    public void addServerLink(SctpServerAssociationConfig sctpServerAssociationConfig) {
+        try {
+            remoteSctpLinkRepository.save(sctpServerAssociationConfig);
+        } catch (Exception e){
+            throw new SS7AddException("Error to add server with name "+ sctpServerAssociationConfig.getLinkName());
+        }
     }
 
     @Override
@@ -100,12 +112,12 @@ public class SctpConfigServiceImpl implements SctpConfigService {
     }
 
     @Override
-    public void setSctpServer(SctpServerConfig sctpServer) {
+    public void addSctpServer(SctpServerConfig sctpServer) {
         sctpServerRepository.save(sctpServer);
     }
 
     @Override
-    public List<SctpServerConfig> getSctpServers(long stackId) {
+    public List<SctpServerConfig> getSctpServersByStackId(Long stackId) {
         return sctpServerRepository.findAll();
     }
 }

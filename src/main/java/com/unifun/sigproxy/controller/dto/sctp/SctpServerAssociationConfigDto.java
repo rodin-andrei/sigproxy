@@ -1,8 +1,10 @@
 package com.unifun.sigproxy.controller.dto.sctp;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class SctpServerAssociationConfigDto {
 
     private Long id;
