@@ -102,30 +102,25 @@ public class TestMAPServiceSupplementaryListener extends TestMAPServiceListener 
     @Override
     public void onProcessUnstructuredSSResponse(ProcessUnstructuredSSResponse processUnstructuredSSResponse) {
         log.info("onProcessUnstructuredSSResponse  " + mapStack.getName());
-
     }
 
     @Override
     public void onUnstructuredSSRequest(UnstructuredSSRequest unstructuredSSRequest) {
         log.info("onUnstructuredSSRequest  " + mapStack.getName());
-
     }
 
     @Override
     public void onUnstructuredSSResponse(UnstructuredSSResponse unstructuredSSResponse) {
         log.info("onUnstructuredSSResponse  " + mapStack.getName());
-
     }
 
     @Override
     public void onUnstructuredSSNotifyRequest(UnstructuredSSNotifyRequest unstructuredSSNotifyRequest) {
         log.info("onUnstructuredSSNotifyRequest  " + mapStack.getName());
-
     }
 
     @Override
     public void onUnstructuredSSNotifyResponse(UnstructuredSSNotifyResponse unstructuredSSNotifyResponse) {
         log.info("onUnstructuredSSNotifyResponse  " + mapStack.getName());
-
     }
 }

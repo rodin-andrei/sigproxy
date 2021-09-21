@@ -14,6 +14,7 @@ import com.unifun.sigproxy.repository.sctp.SctpLinkRepository;
 import com.unifun.sigproxy.repository.sctp.SctpServerRepository;
 import com.unifun.sigproxy.service.sctp.SctpConfigService;
 import javassist.NotFoundException;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
