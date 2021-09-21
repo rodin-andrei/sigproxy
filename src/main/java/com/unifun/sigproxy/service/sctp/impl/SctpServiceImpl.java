@@ -2,7 +2,7 @@ package com.unifun.sigproxy.service.sctp.impl;
 
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.exception.NoConfigurationException;
-import com.unifun.sigproxy.exception.SS7AddClientLinkException;
+import com.unifun.sigproxy.exception.SS7AddException;
 import com.unifun.sigproxy.exception.SS7NotFoundException;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.sctp.SctpClientAssociationConfig;
@@ -103,7 +103,7 @@ public class SctpServiceImpl implements SctpService {
             log.info("Added client association: {} to {} sigtran stack", link.getLinkName(), sigtranStack);
         } catch (Exception e) {
             log.error("Can't create link association " + link.getLinkName() + " . ", e);
-            throw new SS7AddClientLinkException("Can't create link association " + link.getLinkName());
+            throw new SS7AddException("Can't create link association " + link.getLinkName());
         }
     }
 
@@ -252,7 +252,7 @@ public class SctpServiceImpl implements SctpService {
             return this.getTransportManagement(sigtranStack)
                     .getAssociation(linkName).isConnected();
         } catch (Exception e) {
-           throw new SS7NotFoundException("Not found link wirh name"+ linkName);
+           throw new SS7NotFoundException("Not found link with name "+ linkName);
         }
     }
 

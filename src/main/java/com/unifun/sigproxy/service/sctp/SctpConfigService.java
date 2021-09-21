@@ -12,8 +12,6 @@ public interface SctpConfigService {
 
     SctpClientAssociationConfig getClientLinkById(Long clientLinkId);
 
-    void addClinetLink(SctpClientAssociationConfig sctpClientAssociationConfig);
-
     void removeClientLinkById(Long linkId);
 
     Set<SctpServerAssociationConfig> getServerLinksBySctpServerId(Long serverId);
@@ -22,11 +20,15 @@ public interface SctpConfigService {
 
     SctpServerAssociationConfig getServerLinkById(Long serverLinkId);
 
-    void setServerLink(SctpServerAssociationConfig sctpServerAssociationConfig);
-
     SctpServerAssociationConfig removeServerLinkById(Long serverLinkId);
 
-    void setSctpServer(SctpServerConfig sctpServer);
+    List<SctpServerConfig> getSctpServersByStackId(Long stackId);
 
-    List<SctpServerConfig> getSctpServers(long stackId);
+    Set<SctpClientAssociationConfig> getClientLinksByStackId(Long stackId);
+
+    void addSctpServer(SctpServerConfig sctpServer);
+
+    void addServerLink(SctpServerAssociationConfig sctpServerAssociationConfig);
+
+    void addClinetLink(SctpClientAssociationConfig sctpClientAssociationConfig);
 }

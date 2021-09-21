@@ -1,13 +1,8 @@
 package com.unifun.sigproxy.controller.dto.sccp;
 
-import com.unifun.sigproxy.controller.dto.SigtranStackDto;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-import org.hibernate.annotations.DynamicInsert;
 
-import javax.persistence.*;
 import java.util.Set;
 
 @Data

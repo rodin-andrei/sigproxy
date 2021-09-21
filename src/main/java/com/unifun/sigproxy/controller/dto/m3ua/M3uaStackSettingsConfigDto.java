@@ -1,9 +1,11 @@
 package com.unifun.sigproxy.controller.dto.m3ua;
 
+import lombok.Builder;
 import lombok.Data;
 import org.restcomm.protocols.ss7.mtp.RoutingLabelFormat;
 
 @Data
+@Builder
 public class M3uaStackSettingsConfigDto {
 
     private Long id;

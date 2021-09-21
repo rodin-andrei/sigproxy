@@ -36,9 +36,9 @@ public class MyControllerAdvice {
                 .build();
     }
 
-    @ExceptionHandler(SS7AddClientLinkException.class)
+    @ExceptionHandler(SS7AddException.class)
     @ResponseBody
-    public ApiBaseErrorDto handleAddClientLinkException(SS7AddClientLinkException ex, HttpServletRequest request){
+    public ApiBaseErrorDto handleAddClientLinkException(SS7AddException ex, HttpServletRequest request){
         log.info(String.valueOf(ex));
         return ApiBaseErrorDto.builder()
                 .patch(request.getRequestURI())
