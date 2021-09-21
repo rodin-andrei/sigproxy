@@ -14,6 +14,8 @@ public interface SctpService {
 
     void initialize(SigtranStack sigtranStack) throws NoConfigurationException, InitializingException;
 
+    void addSigtranStack(SigtranStack sigtranStack) throws InitializingException;
+
     void stopStack(String sigtranStack);
 
     Management getTransportManagement(String sigtranStack);
@@ -25,6 +27,8 @@ public interface SctpService {
     void removeSctpLink(SctpClientAssociationConfig link, String sigtranStack);
 
     void addServerLink(SctpServerAssociationConfig serverLink, String sigtranStack);
+
+    void addServerNew(SctpServerConfig sctpServerConfig, String sigtranStack);
 
     void addServer(SctpServerConfig serverConfig, String sigtranStack);
 

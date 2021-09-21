@@ -26,9 +26,9 @@ public interface SctpConfigService {
 
     Set<SctpClientAssociationConfig> getClientLinksByStackId(Long stackId);
 
-    void addSctpServer(SctpServerConfig sctpServer);
+    SctpServerConfig addSctpServer(SctpServerConfig sctpServer);
 
-    void addServerLink(SctpServerAssociationConfig sctpServerAssociationConfig);
+    SctpServerAssociationConfig addServerLink(SctpServerAssociationConfig sctpServerAssociationConfig);
 
-    void addClinetLink(SctpClientAssociationConfig sctpClientAssociationConfig);
+    SctpClientAssociationConfig addClinetLink(SctpClientAssociationConfig sctpClientAssociationConfig);
 }

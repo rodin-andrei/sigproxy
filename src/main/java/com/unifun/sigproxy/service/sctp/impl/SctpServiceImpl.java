@@ -44,11 +44,10 @@ public class SctpServiceImpl implements SctpService {
             sctpManagement.setPersistDir(this.jssPersistDir);
             sctpManagement.start();
             sctpManagement.removeAllResourses();
-            this.initSettings(sigtranStack,sctpManagement);
+            this.initSettings(sigtranStack, sctpManagement);
         } catch (Exception e) {
             throw new InitializingException("Can't initialize sctp management: " + sigtranStack.getStackName(), e);
         }
-
 
 
         var clientAssociations = sigtranStack.getAssociations();
@@ -69,6 +68,23 @@ public class SctpServiceImpl implements SctpService {
             sctpManagements.get(sigtranStack.getStackName())
                     .getServers()
                     .forEach(server -> log.trace("ServerName: {}", server.getName()));
+        }
+    }
+
+    public void addSigtranStack(SigtranStack sigtranStack) throws InitializingException {
+        try {
+            log.info("Initializing SCTP management...");
+            if (sctpManagements.containsKey(sigtranStack.getStackName())) {
+                throw new InitializingException("SctpManagement: " + sigtranStack.getStackName() + " already exist");
+            }
+            var sctpManagement = new NettySctpManagementImpl(sigtranStack.getStackName());
+            sctpManagements.put(sigtranStack.getStackName(), sctpManagement);
+            sctpManagement.setPersistDir(this.jssPersistDir);
+            sctpManagement.start();
+            sctpManagement.removeAllResourses();
+            this.initSettings(sigtranStack, sctpManagement);
+        } catch (Exception e) {
+            throw new InitializingException("Can't initialize sctp management: " + sigtranStack.getStackName(), e);
         }
     }
 
@@ -186,6 +202,24 @@ public class SctpServiceImpl implements SctpService {
     }
 
     @Override
+    public void addServerNew(SctpServerConfig serverConfig, String sigtranStack) {
+        try {
+            sctpManagements.get(sigtranStack)
+                    .addServer(
+                            serverConfig.getName(),
+                            serverConfig.getLocalAddress(),
+                            serverConfig.getLocalPort(),
+                            IpChannelType.TCP,
+                            serverConfig.getMultihomingAddresses()
+                    );
+            log.info("Added server: {} to {} sigtran stack", serverConfig.getName(), sigtranStack);
+        } catch (Exception e) {
+            log.error("Can't create server {}. {}", serverConfig.getName(), e.getMessage(), e);
+            throw new SS7AddException("Add server with name " + serverConfig.getName() + " failed");
+        }
+    }
+
+    @Override
     public void addServer(SctpServerConfig serverConfig, String sigtranStack) {
         try {
             sctpManagements.get(sigtranStack)
@@ -252,7 +286,7 @@ public class SctpServiceImpl implements SctpService {
             return this.getTransportManagement(sigtranStack)
                     .getAssociation(linkName).isConnected();
         } catch (Exception e) {
-           throw new SS7NotFoundException("Not found link with name "+ linkName);
+            throw new SS7NotFoundException("Not found link with name " + linkName);
         }
     }
 
@@ -288,7 +322,7 @@ public class SctpServiceImpl implements SctpService {
                 });
     }
 
-    private void initSettings(SigtranStack sigtranStack, NettySctpManagementImpl  nettySctpManagement){
+    private void initSettings(SigtranStack sigtranStack, NettySctpManagementImpl nettySctpManagement) {
         try {
             nettySctpManagement.setCongControl_BackToNormalDelayThreshold_1(sigtranStack.getSctpStackSettingsConfig().getCongControl_BackToNormalDelayThreshold_1());
             nettySctpManagement.setCongControl_BackToNormalDelayThreshold_2(sigtranStack.getSctpStackSettingsConfig().getCongControl_BackToNormalDelayThreshold_2());
@@ -308,8 +342,8 @@ public class SctpServiceImpl implements SctpService {
             nettySctpManagement.setOptionSctpInitMaxstreams_MaxInStreams(sigtranStack.getSctpStackSettingsConfig().getOptionSctpInitMaxStreams_MaxInStreams());
             nettySctpManagement.setOptionSctpInitMaxstreams_MaxOutStreams(sigtranStack.getSctpStackSettingsConfig().getOptionSctpInitMaxStreams_MaxOutStreams());
 //            nettySctpManagement.setServerListener(); /todo search how to init setting.
-        }catch (Exception e){
-            log.warn("Error in SctpServiceImpl.initSettings: "+ e);
+        } catch (Exception e) {
+            log.warn("Error in SctpServiceImpl.initSettings: " + e);
         }
     }
 }

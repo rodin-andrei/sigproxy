@@ -140,14 +140,15 @@ public class SctpController {
                 .collect(Collectors.toList());
     }
 
-    @PostMapping(value = "/addSctpServer", produces = "application/json")
+    @PostMapping(value = "/addServer", produces = "application/json")
     @ResponseBody
-    public SctpServerConfigDto addSctpServer(@RequestBody SctpServerConfigDto sctpServerConfigDto,
+    public SctpServerConfigDto addServer(@RequestBody SctpServerConfigDto sctpServerConfigDto,
                                              @RequestParam Long sigtranStackId) {
 
         SigtranStack sigtranStack = sigtranConfigService.getSigtranStackById(sigtranStackId);
         SctpServerConfig sctpServerConfig = creatorDao.createSctpServerDao(sctpServerConfigDto, sigtranStack);
-        sctpConfigService.addSctpServer(sctpServerConfig);
+        sctpServerConfig = sctpConfigService.addSctpServer(sctpServerConfig);
+        sctpService.addServerNew(sctpServerConfig, sigtranStack.getStackName());
         return creatorDto.createSctpServerConfigDto(sctpServerConfig);
     }
 
@@ -158,7 +159,7 @@ public class SctpController {
 
         SctpServerConfig sctpServerConfig = sctpConfigService.getSctpServerById(serverId);
         SctpServerAssociationConfig sctpServerAssociationConfig = creatorDao.createSctpServerAssociationConfigDao(sctpserverAssConfig, sctpServerConfig);
-        sctpConfigService.addServerLink(sctpServerAssociationConfig);
+        sctpServerAssociationConfig = sctpConfigService.addServerLink(sctpServerAssociationConfig);
         sctpService.addServerLink(sctpServerAssociationConfig, sctpServerAssociationConfig.getSctpServerConfig().getSigtranStack().getStackName());
         return creatorDto.createSctpServerAssociationConfigDto(sctpServerAssociationConfig);
     }
@@ -170,8 +171,8 @@ public class SctpController {
 
         SigtranStack sigtranStack = sigtranConfigService.getSigtranStackById(stackId);
         SctpClientAssociationConfig sctpClientAssociationConfig = creatorDao.createSctpClientAssociationConfigDao(sctpClient, sigtranStack);
-        sctpConfigService.addClinetLink(sctpClientAssociationConfig);
         sctpService.addLink(sctpClientAssociationConfig, sigtranStack.getStackName());
+        sctpConfigService.addClinetLink(sctpClientAssociationConfig);
         return creatorDto.createSctpClientAssociationConfigDto(sctpClientAssociationConfig);
     }
 }

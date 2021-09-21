@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -14,5 +15,5 @@ public class SctpServerConfigDto {
     private String localAddress;
     private int localPort;
     private String[] multihomingAddresses;
-    private List<SctpServerAssociationConfigDto> sctpServerAssociationConfigs;
+    private Set<SctpServerAssociationConfigDto> sctpServerAssociationConfigs;
 }
