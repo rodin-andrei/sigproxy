@@ -11,10 +11,6 @@ import com.unifun.sigproxy.repository.sctp.RemoteSctpLinkRepository;
 import com.unifun.sigproxy.repository.sctp.SctpLinkRepository;
 import com.unifun.sigproxy.repository.sctp.SctpServerRepository;
 import com.unifun.sigproxy.service.sctp.SctpConfigService;
-
-import javassist.NotFoundException;
-import lombok.AllArgsConstructor;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,18 +31,18 @@ public class SctpConfigServiceImpl implements SctpConfigService {
     @Override
     public Set<SctpClientAssociationConfig> getClientLinksByStackId(Long stackId) {
 
-        Optional<SigtranStack> sigtranStack = sigtranStackRepository.findById(stackId);
-        if (sigtranStack.map(SigtranStack::getAssociations).isPresent()) {
-            if (sigtranStack.map(SigtranStack::getAssociations).get().isEmpty())
-                throw new SS7NotContentException("Sigtran stack with id " + stackId + " doesn't contain sctp client links");
-            else return sigtranStack.map(SigtranStack::getAssociations).get();
-        } else throw new SS7NotFoundException("Not found stack with id " + stackId);
+        SigtranStack sigtranStack = sigtranStackRepository.findById(stackId)
+                .orElseThrow(() -> new SS7NotContentException("Not found stack with id " + stackId));
+        return Optional.ofNullable(sigtranStack.getAssociations())
+                .orElseThrow(() -> new SS7NotContentException("Sigtran stack with id " + stackId + " doesn't contain sctp client links"));
+
+
     }
 
     @Override
-    public void addClinetLink(SctpClientAssociationConfig link) {
+    public SctpClientAssociationConfig addClinetLink(SctpClientAssociationConfig link) {
         try {
-            sctpLinkRepository.save(link);
+            return sctpLinkRepository.save(link);
         } catch (Exception e) {
             throw new SS7AddException("Adding a link " + link.getLinkName() + " failed.");
         }
@@ -63,12 +59,11 @@ public class SctpConfigServiceImpl implements SctpConfigService {
 
     @Override
     public Set<SctpServerAssociationConfig> getServerLinksBySctpServerId(Long serverId) {
-        Optional<SctpServerConfig> sctpServer = sctpServerRepository.findById(serverId);
-        if (sctpServer.map(SctpServerConfig::getSctpServerAssociationConfigs).isPresent()) {
-            if (sctpServer.map(SctpServerConfig::getSctpServerAssociationConfigs).get().isEmpty()) {
-                throw new SS7NotContentException("Sigtran Server with id " + serverId + " doesn't contain sctp server links");
-            } else return sctpServer.map(SctpServerConfig::getSctpServerAssociationConfigs).get();
-        } else throw new SS7NotFoundException("Not found Server with id " + serverId);
+
+        SctpServerConfig sctpServer = sctpServerRepository.findById(serverId)
+                .orElseThrow(() -> new SS7NotFoundException("Not found Server with id " + serverId));
+        return Optional.ofNullable(sctpServer.getSctpServerAssociationConfigs())
+                .orElseThrow(() -> new SS7NotContentException("Sigtran Server with id " + serverId + " doesn't contain sctp server links"));
     }
 
     @Override
@@ -81,16 +76,16 @@ public class SctpConfigServiceImpl implements SctpConfigService {
     @Override
     public SctpServerAssociationConfig getServerLinkById(Long serverLinkId) {
         return remoteSctpLinkRepository.findById(serverLinkId)
-                .orElseThrow(()->new SS7NotFoundException("Not found Server Link with id " + serverLinkId));
+                .orElseThrow(() -> new SS7NotFoundException("Not found Server Link with id " + serverLinkId));
 
     }
 
     @Override
-    public void addServerLink(SctpServerAssociationConfig sctpServerAssociationConfig) {
+    public SctpServerAssociationConfig addServerLink(SctpServerAssociationConfig sctpServerAssociationConfig) {
         try {
-            remoteSctpLinkRepository.save(sctpServerAssociationConfig);
-        } catch (Exception e){
-            throw new SS7AddException("Error to add server with name "+ sctpServerAssociationConfig.getLinkName());
+            return remoteSctpLinkRepository.save(sctpServerAssociationConfig);
+        } catch (Exception e) {
+            throw new SS7AddException("Error to add server with name " + sctpServerAssociationConfig.getLinkName());
         }
     }
 
@@ -103,20 +98,23 @@ public class SctpConfigServiceImpl implements SctpConfigService {
     @Override
     public SctpServerAssociationConfig removeServerLinkById(Long serverLinkId) {
 
-        Optional<SctpServerAssociationConfig> sctpClientAssociationConfig = remoteSctpLinkRepository.findById(serverLinkId);
-        if (sctpClientAssociationConfig.isEmpty())
-            throw new SS7NotFoundException("Not found Server Link with id " + serverLinkId);
+        SctpServerAssociationConfig sctpClientAssociationConfig = remoteSctpLinkRepository.findById(serverLinkId)
+                .orElseThrow(() -> new SS7NotFoundException("Not found Server Link with id " + serverLinkId));
         try {
             remoteSctpLinkRepository.deleteById(serverLinkId);
         } catch (Exception e) {
             throw new SS7RemoveSctpAssociationException("Failed remove Server Link with id " + serverLinkId);
         }
-        return sctpClientAssociationConfig.get();
+        return sctpClientAssociationConfig;
     }
 
     @Override
-    public void addSctpServer(SctpServerConfig sctpServer) {
-        sctpServerRepository.save(sctpServer);
+    public SctpServerConfig addSctpServer(SctpServerConfig sctpServer) {
+        try {
+            return sctpServerRepository.save(sctpServer);
+        } catch (Exception e) {
+            throw new SS7AddException("Add Server with name " + sctpServer.getName() + " failed");
+        }
     }
 
     @Override

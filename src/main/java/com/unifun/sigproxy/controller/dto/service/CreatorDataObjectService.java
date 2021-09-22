@@ -26,6 +26,9 @@ import com.unifun.sigproxy.service.sctp.SctpService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,7 +38,7 @@ public class CreatorDataObjectService {
     private final SctpService sctpService;
 
     public SctpClientAssociationConfigDto createSctpClientAssociationConfigDto(SctpClientAssociationConfig clientAssociation) {
-        if (clientAssociation == null) return  null;
+        if (clientAssociation == null) return null;
         return SctpClientAssociationConfigDto.builder()
                 .id(clientAssociation.getId())
                 .linkName(clientAssociation.getLinkName())
@@ -49,7 +52,7 @@ public class CreatorDataObjectService {
     }
 
     public SctpServerAssociationConfigDto createSctpServerAssociationConfigDto(SctpServerAssociationConfig sctpServerAssociationConfigs) {
-        if (sctpServerAssociationConfigs == null) return  null;
+        if (sctpServerAssociationConfigs == null) return null;
         return SctpServerAssociationConfigDto.builder()
                 .id(sctpServerAssociationConfigs.getId())
                 .linkName(sctpServerAssociationConfigs.getLinkName())
@@ -63,7 +66,7 @@ public class CreatorDataObjectService {
 
 
     public SctpServerConfigDto createSctpServerConfigDto(SctpServerConfig sctpServerConfig) {
-        if (sctpServerConfig == null) return  null;
+        if (sctpServerConfig == null) return null;
         return SctpServerConfigDto.builder()
                 .id(sctpServerConfig.getId())
                 .localAddress(sctpServerConfig.getLocalAddress())
@@ -71,10 +74,10 @@ public class CreatorDataObjectService {
                 .multihomingAddresses(sctpServerConfig.getMultihomingAddresses())
                 .name(sctpServerConfig.getName())
                 .sctpServerAssociationConfigs(
-                        sctpServerConfig.getSctpServerAssociationConfigs()
+                        Optional.ofNullable(sctpServerConfig.getSctpServerAssociationConfigs()).orElse(new HashSet<>())
                                 .stream()
                                 .map(this::createSctpServerAssociationConfigDto)
-                                .collect(Collectors.toList())
+                                .collect(Collectors.toSet())
                 )
                 .build();
 
@@ -106,7 +109,7 @@ public class CreatorDataObjectService {
     }
 
     public M3uaAspConfigDto createM3uaAspConfigDto(M3uaAspConfig m3uaAspConfig) {
-        if (m3uaAspConfig == null) return  null;
+        if (m3uaAspConfig == null) return null;
         return M3uaAspConfigDto.builder()
                 .id(m3uaAspConfig.getId())
                 .name(m3uaAspConfig.getName())
@@ -117,7 +120,7 @@ public class CreatorDataObjectService {
 
 
     public M3uaRouteConfigDto createM3uaRouteConfigDto(M3uaRouteConfig m3uaRouteConfig) {
-        if (m3uaRouteConfig == null) return  null;
+        if (m3uaRouteConfig == null) return null;
         return M3uaRouteConfigDto.builder()
                 .id(m3uaRouteConfig.getId())
                 .opc(m3uaRouteConfig.getOpc())
@@ -129,7 +132,7 @@ public class CreatorDataObjectService {
     }
 
     public M3uaAsConfigDto createM3uaAsConfigDto(M3uaAsConfig m3uaAsConfig) {
-        if (m3uaAsConfig == null) return  null;
+        if (m3uaAsConfig == null) return null;
         return M3uaAsConfigDto.builder()
                 .id(m3uaAsConfig.getId())
                 .name(m3uaAsConfig.getName())
@@ -141,12 +144,12 @@ public class CreatorDataObjectService {
                 .networkAppearance(m3uaAsConfig.getNetworkAppearance())
                 .routingContexts(m3uaAsConfig.getRoutingContexts())
                 .applicationServerPointsDto(
-                        m3uaAsConfig.getApplicationServerPoints()
+                        Optional.ofNullable(m3uaAsConfig.getApplicationServerPoints()).orElse(new HashSet<>())
                                 .stream()
                                 .map(this::createM3uaAspConfigDto)
                                 .collect(Collectors.toSet()))
                 .routesDto(
-                        m3uaAsConfig.getRoutes()
+                        Optional.ofNullable(m3uaAsConfig.getRoutes()).orElse(new HashSet<>())
                                 .stream()
                                 .map(this::createM3uaRouteConfigDto)
                                 .collect(Collectors.toSet()))
@@ -203,7 +206,7 @@ public class CreatorDataObjectService {
     }
 
     public SccpRemoteSignalingPointConfigDto createSccpRemoteSignalingPointConfigsDto(SccpRemoteSignalingPointConfig sccpRemoteSignalingPointConfig) {
-        if (sccpRemoteSignalingPointConfig == null) return  null;
+        if (sccpRemoteSignalingPointConfig == null) return null;
         return SccpRemoteSignalingPointConfigDto
                 .builder()
                 .id(sccpRemoteSignalingPointConfig.getId())
@@ -214,7 +217,7 @@ public class CreatorDataObjectService {
     }
 
     public SccpAddressConfigDto createSccpAddressConfigsDto(SccpAddressConfig sccpAddressConfig) {
-        if (sccpAddressConfig == null) return  null;
+        if (sccpAddressConfig == null) return null;
         return SccpAddressConfigDto
                 .builder()
                 .id(sccpAddressConfig.getId())
@@ -229,7 +232,7 @@ public class CreatorDataObjectService {
     }
 
     public SccpRemoteSubsystemConfigDto createSccpRemoteSubsystemConfigDto(SccpRemoteSubsystemConfig sccpRemoteSubsystemConfig) {
-        if (sccpRemoteSubsystemConfig == null) return  null;
+        if (sccpRemoteSubsystemConfig == null) return null;
         return SccpRemoteSubsystemConfigDto.builder()
                 .id(sccpRemoteSubsystemConfig.getId())
                 .remoteSignalingPointCode(sccpRemoteSubsystemConfig.getRemoteSignalingPointCode())
@@ -240,7 +243,7 @@ public class CreatorDataObjectService {
     }
 
     public SccpMtp3DestinationConfigDto createSccpMtp3DestinationConfigDto(SccpMtp3DestinationConfig sccpMtp3DestinationConfig) {
-        if (sccpMtp3DestinationConfig == null) return  null;
+        if (sccpMtp3DestinationConfig == null) return null;
         return SccpMtp3DestinationConfigDto.builder()
                 .id(sccpMtp3DestinationConfig.getId())
                 .firstSignalingPointCode(sccpMtp3DestinationConfig.getFirstSignalingPointCode())
@@ -253,7 +256,7 @@ public class CreatorDataObjectService {
     }
 
     public SccpServiceAccessPointConfigDto createSccpServiceAccessPointConfigDto(SccpServiceAccessPointConfig sccpServiceAccessPointConfig) {
-        if (sccpServiceAccessPointConfig == null) return  null;
+        if (sccpServiceAccessPointConfig == null) return null;
         return SccpServiceAccessPointConfigDto.builder()
                 .id(sccpServiceAccessPointConfig.getId())
                 .mtp3Id(sccpServiceAccessPointConfig.getMtp3Id())
@@ -262,7 +265,7 @@ public class CreatorDataObjectService {
                 .networkId(sccpServiceAccessPointConfig.getNetworkId())
                 .localGlobalTitleDigits(sccpServiceAccessPointConfig.getLocalGlobalTitleDigits())
                 .sccpMtp3DestinationConfigs(
-                        sccpServiceAccessPointConfig.getSccpMtp3DestinationConfigs()
+                        Optional.ofNullable(sccpServiceAccessPointConfig.getSccpMtp3DestinationConfigs()).orElse(new HashSet<>())
                                 .stream()
                                 .map(this::createSccpMtp3DestinationConfigDto)
                                 .collect(Collectors.toSet())
@@ -271,7 +274,7 @@ public class CreatorDataObjectService {
     }
 
     public SccpConcernedSignalingPointCodeConfigDto createSccpConcernedSignalingPointCodeConfigDto(SccpConcernedSignalingPointCodeConfig sccpConcernedSignalingPointCodeConfig) {
-        if (sccpConcernedSignalingPointCodeConfig == null) return  null;
+        if (sccpConcernedSignalingPointCodeConfig == null) return null;
         return SccpConcernedSignalingPointCodeConfigDto.builder()
                 .id(sccpConcernedSignalingPointCodeConfig.getId())
                 .signalingPointCode(sccpConcernedSignalingPointCodeConfig.getSignalingPointCode())
@@ -310,7 +313,7 @@ public class CreatorDataObjectService {
     }
 
     public TcapConfigDto createTcapConfigDto(TcapConfig tcapConfig) {
-        if (tcapConfig == null) return  null;
+        if (tcapConfig == null) return null;
         return TcapConfigDto.builder()
                 .id(tcapConfig.getId())
                 .localSsn(tcapConfig.getLocalSsn())
@@ -323,55 +326,55 @@ public class CreatorDataObjectService {
                 .id(sigtranStack.getId())
                 .stackName(sigtranStack.getStackName())
                 .sctpServerConfigsDto(
-                        sigtranStack.getSctpServerConfigs()
+                        Optional.ofNullable(sigtranStack.getSctpServerConfigs()).orElse(new HashSet<>())
                                 .stream()
                                 .map(this::createSctpServerConfigDto)
                                 .collect(Collectors.toSet())
                 )
                 .associationsDto(
-                        sigtranStack.getAssociations()
+                        Optional.ofNullable(sigtranStack.getAssociations()).orElse(new HashSet<>())
                                 .stream()
                                 .map(this::createSctpClientAssociationConfigDto)
                                 .collect(Collectors.toSet()))
                 .sctpStackSettingsConfigDto(createSctpStackSettingsConfigDto(sigtranStack.getSctpStackSettingsConfig()))
                 .applicationServersDto(
-                        sigtranStack.getApplicationServers()
+                        Optional.ofNullable(sigtranStack.getApplicationServers()).orElse(new HashSet<>())
                                 .stream()
                                 .map(this::createM3uaAsConfigDto)
                                 .collect(Collectors.toSet())
                 )
                 .m3UaStackSettingsConfigDto(createM3uaStackSettingsConfigDto(sigtranStack.getM3UaStackSettingsConfig()))
                 .sccpRuleConfigsDto(
-                        sigtranStack.getSccpRuleConfigs()
+                        Optional.ofNullable(sigtranStack.getSccpRuleConfigs()).orElse(new HashSet<>())
                                 .stream()
                                 .map(this::createSccpRuleConfigsDto)
                                 .collect(Collectors.toSet()))
                 .sccpRemoteSignalingPointConfigsDto(
-                        sigtranStack.getSccpRemoteSignalingPointConfigs()
+                        Optional.ofNullable(sigtranStack.getSccpRemoteSignalingPointConfigs()).orElse(new HashSet<>())
                                 .stream()
                                 .map(this::createSccpRemoteSignalingPointConfigsDto)
                                 .collect(Collectors.toSet())
                 )
                 .sccpAddressConfigsDto(
-                        sigtranStack.getSccpAddressConfigs()
+                        Optional.ofNullable(sigtranStack.getSccpAddressConfigs()).orElse(new HashSet<>())
                                 .stream()
                                 .map(this::createSccpAddressConfigsDto)
                                 .collect(Collectors.toSet())
                 )
                 .sccpRemoteSubsystemConfigsDto(
-                        sigtranStack.getSccpRemoteSubsystemConfigs()
+                        Optional.ofNullable(sigtranStack.getSccpRemoteSubsystemConfigs()).orElse(new HashSet<>())
                                 .stream()
                                 .map(this::createSccpRemoteSubsystemConfigDto)
                                 .collect(Collectors.toSet())
                 )
                 .sccpServiceAccessPointConfigsDto(
-                        sigtranStack.getSccpServiceAccessPointConfigs()
+                        Optional.ofNullable(sigtranStack.getSccpServiceAccessPointConfigs()).orElse(new HashSet<>())
                                 .stream()
                                 .map(this::createSccpServiceAccessPointConfigDto)
                                 .collect(Collectors.toSet())
                 )
                 .sccpConcernedSignalingPointCodeConfigsDto(
-                        sigtranStack.getSccpConcernedSignalingPointCodeConfigs()
+                        Optional.ofNullable(sigtranStack.getSccpConcernedSignalingPointCodeConfigs()).orElse(new HashSet<>())
                                 .stream()
                                 .map(this::createSccpConcernedSignalingPointCodeConfigDto)
                                 .collect(Collectors.toSet())

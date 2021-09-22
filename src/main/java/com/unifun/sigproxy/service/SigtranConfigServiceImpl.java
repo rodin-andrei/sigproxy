@@ -1,9 +1,11 @@
 package com.unifun.sigproxy.service;
 
+import com.unifun.sigproxy.exception.SS7AddException;
 import com.unifun.sigproxy.exception.SS7NotFoundException;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.repository.SigtranStackRepository;
 import com.unifun.sigproxy.service.m3ua.M3uaConfigService;
+import com.unifun.sigproxy.service.sctp.SctpService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,7 +18,6 @@ import java.util.List;
 public class SigtranConfigServiceImpl implements SigtranConfigService {
 
     private final SigtranStackRepository sigtranStackRepository;
-    private final M3uaConfigService m3uaConfigService;
 
     @Override
     public SigtranStack getSigtranStackById(Long stackId) {
@@ -32,7 +33,10 @@ public class SigtranConfigServiceImpl implements SigtranConfigService {
 
     @Override
     public SigtranStack addSigtranStack(SigtranStack sigtranStack) {
-        sigtranStack = sigtranStackRepository.save(sigtranStack);
-        return sigtranStack;
+        try {
+            return sigtranStackRepository.save(sigtranStack);
+        } catch (Exception e){
+            throw new SS7AddException("Add Sigtran stack with name "+sigtranStack+ "failed", e.getCause().getCause());
+        }
     }
 }
