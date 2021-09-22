@@ -63,7 +63,6 @@ public class SctpConfigServiceImpl implements SctpConfigService {
 
     @Override
     public Set<SctpServerAssociationConfig> getServerLinksBySctpServerId(Long serverId) {
-
         Optional<SctpServerConfig> sctpServer = sctpServerRepository.findById(serverId);
         if (sctpServer.map(SctpServerConfig::getSctpServerAssociationConfigs).isPresent()) {
             if (sctpServer.map(SctpServerConfig::getSctpServerAssociationConfigs).get().isEmpty()) {

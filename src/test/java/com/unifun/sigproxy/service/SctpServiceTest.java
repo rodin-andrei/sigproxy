@@ -12,19 +12,22 @@ import com.unifun.sigproxy.service.sctp.SctpConfigService;
 import com.unifun.sigproxy.service.sctp.impl.SctpConfigServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.testng.annotations.Test;
+
 import java.util.Optional;
+
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
-
 
 
 @Slf4j
 public class SctpServiceTest {
+
 
     @Mock
     private SctpServerRepository sctpServerRepository;
@@ -65,10 +68,10 @@ public class SctpServiceTest {
                 "\n{Name} = " + test.getName() +
                 "\n(id} = " + test.getId());
         Assertions.assertThat(test).isNotNull();
-        verify(sctpServerRepository).findById(1L);
+        Assertions.assertThat(sctpServerRepository.findById(1L)).isPresent();
     }
 
-    @Test(expected = SS7NotFoundException.class)
+    @Test(expectedExceptions = SS7NotFoundException.class)
     public void getSctpServerConfig_ById_Should_Return_Null() {
         given(sctpServerRepository.findById(1L)).willReturn(Optional.empty());
         Optional<SctpServerConfig> test = Optional.ofNullable(sctpConfigService.getSctpServerById(1L));
@@ -76,7 +79,7 @@ public class SctpServiceTest {
     }
 
     @Test
-    public void save_SctpClientAssociationConfig_With_Rigth_Param(){
+    public void saveSctpClientAssociationConfig_With_Rigth_Param() {
         SctpClientAssociationConfig s = new SctpClientAssociationConfig();
         s.setLinkName("test");
         s.setLocalAddress("test");
@@ -87,15 +90,12 @@ public class SctpServiceTest {
         s.setMultihomingAddresses(new String[]{"a", "b", "c", "d", "e", "f", "g", "h", "t", "k", "k", "k", "l", "k"});
         s.setSigtranStack(new SigtranStack());
         given(sctpLinkRepository.save(s)).willReturn(s);
-        ArgumentCaptor<SctpClientAssociationConfig> captor = ArgumentCaptor.forClass(SctpClientAssociationConfig.class);
         sctpConfigService.addClinetLink(s);
-        verify(sctpLinkRepository).save(captor.capture());
-        log.info("Succes save with: "+ captor.getValue());
-        Assertions.assertThat(captor.getValue()).isEqualTo(s);
+        Assertions.assertThat(sctpLinkRepository.save(s)).isEqualTo(s);
     }
 
     @Test
-    public void save_SctpClientAssociationConfig_With_Wrong_Param(){
+    public void saveSctpClientAssociationConfig_With_Wrong_Param() {
         SctpClientAssociationConfig s = new SctpClientAssociationConfig();
         s.setLinkName("test");
         s.setLocalAddress("test");
@@ -106,12 +106,28 @@ public class SctpServiceTest {
         s.setMultihomingAddresses(new String[]{"a", "b", "c", "d", "e", "f", "g", "h", "t", "k", "k", "k", "l", "k"});
         s.setSigtranStack(new SigtranStack());
         given(sctpLinkRepository.save(s)).willReturn(s);
+
         ArgumentCaptor<SctpClientAssociationConfig> captor = ArgumentCaptor.forClass(SctpClientAssociationConfig.class);
         sctpConfigService.addClinetLink(anyObject());
-        verify(sctpLinkRepository).save(captor.capture());
-        log.info("Succes save with: "+ captor.getValue());
+        verify(sctpLinkRepository, atLeastOnce()).save(captor.capture());
+        log.info("Succes save with: " + captor.getValue());
         Assertions.assertThat(captor.getValue()).isNotEqualTo(s);
+
     }
 
+
+    @Test
+    public void removeSctpClientAssociationConfig_With_Right_Id() {
+        Long deletedId = 1L;
+        ArgumentCaptor<Long> captor = ArgumentCaptor.forClass(Long.class);
+        sctpLinkRepository.deleteById(deletedId);
+        verify(sctpLinkRepository,atLeastOnce()).deleteById(captor.capture());
+        Assertions.assertThat(captor.getValue()).isEqualTo(deletedId);
+    }
+
+    @Test
+    public void getServerLinksBySctpServerId_Shoul_Return_Set(){
+
+    }
 
 }
