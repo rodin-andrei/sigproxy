@@ -103,7 +103,7 @@ public class SctpConfigServiceImpl implements SctpConfigService {
         try {
             remoteSctpLinkRepository.deleteById(serverLinkId);
         } catch (Exception e) {
-            throw new SS7RemoveSctpAssociationException("Failed remove Server Link with id " + serverLinkId);
+            throw new SS7RemoveException("Failed remove Server Link with id " + serverLinkId);
         }
         return sctpClientAssociationConfig;
     }
