@@ -148,7 +148,7 @@ public class SctpController {
         SigtranStack sigtranStack = sigtranConfigService.getSigtranStackById(sigtranStackId);
         SctpServerConfig sctpServerConfig = creatorDao.createSctpServerDao(sctpServerConfigDto, sigtranStack);
         sctpServerConfig = sctpConfigService.addSctpServer(sctpServerConfig);
-        sctpService.addServerNew(sctpServerConfig, sigtranStack.getStackName());
+        sctpService.addServer(sctpServerConfig, sigtranStack.getStackName());
         return creatorDto.createSctpServerConfigDto(sctpServerConfig);
     }
 
