@@ -28,9 +28,7 @@ public interface SctpService {
 
     void addServerLink(SctpServerAssociationConfig serverLink, String sigtranStack);
 
-    void addServerNew(SctpServerConfig sctpServerConfig, String sigtranStack);
-
-    void addServer(SctpServerConfig serverConfig, String sigtranStack);
+    void addServer(SctpServerConfig sctpServerConfig, String sigtranStack);
 
     void addServers(Set<SctpServerConfig> newServers, String sigtranStack);
 

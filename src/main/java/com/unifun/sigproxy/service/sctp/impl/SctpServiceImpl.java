@@ -202,7 +202,7 @@ public class SctpServiceImpl implements SctpService {
     }
 
     @Override
-    public void addServerNew(SctpServerConfig serverConfig, String sigtranStack) {
+    public void addServer(SctpServerConfig serverConfig, String sigtranStack) {
         try {
             sctpManagements.get(sigtranStack)
                     .addServer(
@@ -220,43 +220,11 @@ public class SctpServiceImpl implements SctpService {
     }
 
     @Override
-    public void addServer(SctpServerConfig serverConfig, String sigtranStack) {
-        try {
-            sctpManagements.get(sigtranStack)
-                    .addServer(
-                            serverConfig.getName(),
-                            serverConfig.getLocalAddress(),
-                            serverConfig.getLocalPort(),
-                            IpChannelType.TCP,
-                            serverConfig.getMultihomingAddresses()
-                    );
-            log.info("Added server: {} to {} sigtran stack", serverConfig.getName(), sigtranStack);
-
-            serverConfig.getSctpServerAssociationConfigs().forEach(serverAssociation -> {
-                try {
-                    sctpManagements.get(sigtranStack)
-                            .addServerAssociation(
-                                    serverAssociation.getRemoteAddress(),
-                                    serverAssociation.getRemotePort(),
-                                    serverConfig.getName(),
-                                    serverAssociation.getLinkName(),
-                                    IpChannelType.TCP);
-                    log.info("Added server association: {} to {} sigtran stack", serverAssociation.getLinkName(),
-                            sigtranStack);
-                } catch (Exception e) {
-                    log.error("Can't create serverAssociation {}.", serverAssociation.getLinkName(), e);
-                }
-            });
-
-            startServer(serverConfig.getName(), sigtranStack);
-        } catch (Exception e) {
-            log.error("Can't create server {}. {}", serverConfig.getName(), e.getMessage(), e);
-        }
-    }
-
-    @Override
     public void addServers(Set<SctpServerConfig> newServers, String sigtranStack) {
-        newServers.forEach(sctpServer -> addServer(sctpServer, sigtranStack));
+        newServers.forEach(sctpServer -> {
+            addServer(sctpServer, sigtranStack);
+            sctpServer.getSctpServerAssociationConfigs().forEach(sctpServerLink -> addServerLink(sctpServerLink, sigtranStack));
+        });
     }
 
     @Override

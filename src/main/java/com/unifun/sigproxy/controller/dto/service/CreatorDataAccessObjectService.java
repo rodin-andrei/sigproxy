@@ -3,14 +3,14 @@ package com.unifun.sigproxy.controller.dto.service;
 import com.unifun.sigproxy.controller.dto.SigtranStackDto;
 import com.unifun.sigproxy.controller.dto.m3ua.M3uaAsConfigDto;
 import com.unifun.sigproxy.controller.dto.m3ua.M3uaAspConfigDto;
+import com.unifun.sigproxy.controller.dto.m3ua.M3uaRouteConfigDto;
+import com.unifun.sigproxy.controller.dto.m3ua.M3uaStackSettingsConfigDto;
 import com.unifun.sigproxy.controller.dto.sctp.SctpClientAssociationConfigDto;
 import com.unifun.sigproxy.controller.dto.sctp.SctpServerAssociationConfigDto;
 import com.unifun.sigproxy.controller.dto.sctp.SctpServerConfigDto;
 import com.unifun.sigproxy.controller.dto.tcap.TcapConfigDto;
 import com.unifun.sigproxy.models.config.SigtranStack;
-import com.unifun.sigproxy.models.config.m3ua.M3uaAsConfig;
-import com.unifun.sigproxy.models.config.m3ua.M3uaAspConfig;
-import com.unifun.sigproxy.models.config.m3ua.TrafficModeType;
+import com.unifun.sigproxy.models.config.m3ua.*;
 import com.unifun.sigproxy.models.config.sctp.SctpClientAssociationConfig;
 import com.unifun.sigproxy.models.config.sctp.SctpServerAssociationConfig;
 import com.unifun.sigproxy.models.config.sctp.SctpServerConfig;
@@ -91,5 +91,30 @@ public class CreatorDataAccessObjectService {
         m3uaAsConfig.setRoutingContexts(m3uaAsConfigDto.getRoutingContexts());
         m3uaAsConfig.setSigtranStack(sigtranStack);
         return m3uaAsConfig;
+    }
+
+    public M3uaRouteConfig createM3uaRouteConfigDao(M3uaRouteConfigDto m3uaRouteConfigDto, M3uaAsConfig m3uaAsConfig) {
+        M3uaRouteConfig m3uaRouteConfig = new M3uaRouteConfig();
+        m3uaRouteConfig.setAs(m3uaAsConfig);
+        m3uaRouteConfig.setDpc(m3uaRouteConfigDto.getDpc());
+        m3uaRouteConfig.setOpc(m3uaRouteConfigDto.getOpc());
+        m3uaRouteConfig.setTrafficModeType(m3uaRouteConfigDto.getTrafficModeType());
+        m3uaRouteConfig.setSi(m3uaRouteConfigDto.getSi());
+        return m3uaRouteConfig;
+    }
+
+    public M3uaStackSettingsConfig createM3uaStackSettingsConfigDao(M3uaStackSettingsConfigDto m3uaStackSettingsConfigDto, SigtranStack sigtranStack) {
+        M3uaStackSettingsConfig m3uaStackSettingsConfig = new M3uaStackSettingsConfig();
+        m3uaStackSettingsConfig.setId(m3uaStackSettingsConfigDto.getId());
+        m3uaStackSettingsConfig.setDeliveryMessageThreadCount(m3uaStackSettingsConfigDto.getDeliveryMessageThreadCount());
+        m3uaStackSettingsConfig.setHeartbeatTime(m3uaStackSettingsConfigDto.getHeartbeatTime());
+        m3uaStackSettingsConfig.setMaxAsForRoute(m3uaStackSettingsConfigDto.getMaxAsForRoute());
+        m3uaStackSettingsConfig.setMaxSequenceNumber(m3uaStackSettingsConfigDto.getMaxSequenceNumber());
+        m3uaStackSettingsConfig.setRoutingKeyManagementEnabled(m3uaStackSettingsConfigDto.isRoutingKeyManagementEnabled());
+        m3uaStackSettingsConfig.setRoutingLabelFormat(m3uaStackSettingsConfigDto.getRoutingLabelFormat());
+        m3uaStackSettingsConfig.setStatisticsEnabled(m3uaStackSettingsConfigDto.isStatisticsEnabled());
+        m3uaStackSettingsConfig.setUseLsbForLinksetSelection(m3uaStackSettingsConfigDto.isUseLsbForLinksetSelection());
+        m3uaStackSettingsConfig.setSigtranStack(sigtranStack);
+        return m3uaStackSettingsConfig;
     }
 }
