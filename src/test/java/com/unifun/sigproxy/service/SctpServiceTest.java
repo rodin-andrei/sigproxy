@@ -17,6 +17,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.restcomm.protocols.ss7.m3ua.As;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.testng.annotations.Test;
 
 import java.util.*;
@@ -27,6 +28,7 @@ import static org.mockito.Mockito.*;
 
 
 @Slf4j
+
 public class SctpServiceTest {
 
 
@@ -223,7 +225,6 @@ public class SctpServiceTest {
         List<SctpServerConfig> sctpServerConfigs = new ArrayList<>();
         sctpServerConfigs.add(sctpServerConfig);
         given(sctpServerRepository.findAll()).willReturn(sctpServerConfigs);
-
         List<SctpServerConfig> sctpServerConfigsTestRepo = sctpServerRepository.findAll();
         if (sctpServerConfigsTestRepo.isEmpty()){
             log.info("Incorrect emulation of sctpServerRepository");
@@ -257,9 +258,8 @@ public class SctpServiceTest {
         ArgumentCaptor<SctpServerConfig> captorSctpServerConf = ArgumentCaptor.forClass(SctpServerConfig.class);
         sctpConfigService.addSctpServer(sctpServerConfig);
         verify(sctpServerRepository,atLeastOnce()).save(captorSctpServerConf.capture());
-
         Assertions.assertThat(captorSctpServerConf.getValue()).isEqualTo(sctpServerConfig);
-        //TODO change asert if service will return something
+        Assertions.assertThat(sctpConfigService.addSctpServer(sctpServerConfig)).isEqualTo(sctpServerConfig);
     }
 
     @Test
@@ -271,7 +271,8 @@ public class SctpServiceTest {
         sctpConfigService.addServerLink(sctpServerAssociationConfig);
         verify(remoteSctpLinkRepository,atLeastOnce()).save(captorSctpServerAssociationConfig.capture());
         Assertions.assertThat(captorSctpServerAssociationConfig.getValue()).isEqualTo(sctpServerAssociationConfig);
-        //TODO change asert if service will return something
+        Assertions.assertThat(sctpConfigService.addServerLink(sctpServerAssociationConfig)).isEqualTo(sctpServerAssociationConfig);
+
     }
 
     @Test
@@ -283,6 +284,6 @@ public class SctpServiceTest {
         sctpConfigService.addClinetLink(sctpClientAssociationConfig);
         verify(sctpLinkRepository,atLeastOnce()).save(captorSctpClientAssociationConfig.capture());
         Assertions.assertThat(captorSctpClientAssociationConfig.getValue()).isEqualTo(sctpClientAssociationConfig);
-        //TODO change asert if service will return something
+        Assertions.assertThat(sctpConfigService.addClinetLink(sctpClientAssociationConfig)).isEqualTo(sctpClientAssociationConfig);
     }
 }
