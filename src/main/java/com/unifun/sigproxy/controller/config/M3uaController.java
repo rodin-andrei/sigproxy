@@ -6,6 +6,7 @@ import com.unifun.sigproxy.controller.dto.m3ua.M3uaRouteConfigDto;
 import com.unifun.sigproxy.controller.dto.m3ua.M3uaStackSettingsConfigDto;
 import com.unifun.sigproxy.controller.dto.service.CreatorDataAccessObjectService;
 import com.unifun.sigproxy.controller.dto.service.CreatorDataObjectService;
+import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.m3ua.M3uaAsConfig;
 import com.unifun.sigproxy.models.config.m3ua.M3uaAspConfig;
@@ -13,6 +14,7 @@ import com.unifun.sigproxy.models.config.m3ua.M3uaRouteConfig;
 import com.unifun.sigproxy.models.config.m3ua.M3uaStackSettingsConfig;
 import com.unifun.sigproxy.service.SigtranConfigService;
 import com.unifun.sigproxy.service.m3ua.M3uaConfigService;
+import com.unifun.sigproxy.service.m3ua.M3uaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class M3uaController {
 
+    private final M3uaService m3uaService;
     private final SigtranConfigService sigtranConfigService;
     private final M3uaConfigService m3uaConfigService;
     private final CreatorDataObjectService creatorDto;
@@ -66,15 +69,17 @@ public class M3uaController {
                                        @RequestBody M3uaAsConfigDto m3uaAsConfigDto) {
         SigtranStack sigtranStack = sigtranConfigService.getSigtranStackById(sigtranStackId);
         M3uaAsConfig m3uaAsConfig = m3uaConfigService.addM3uaAsConfig(creatorDao.createM3uaAsConfigDao(m3uaAsConfigDto, sigtranStack));
+        m3uaService.addAs(m3uaAsConfig);
         return creatorDto.createM3uaAsConfigDto(m3uaAsConfig);
     }
 
     @PostMapping(value = "/addAspConfig", produces = "application/json")
     @ResponseBody
-    public M3uaAspConfigDto addAspConfig(@RequestParam Long sigtranStackId,
+    public M3uaAspConfigDto addAspConfig(@RequestParam Long m3uaAsId,
                                          @RequestBody M3uaAspConfigDto m3uaAspConfigDto) {
-        SigtranStack sigtranStack = sigtranConfigService.getSigtranStackById(sigtranStackId);
-        M3uaAspConfig m3uaAspConfig = m3uaConfigService.addM3uaAspConfig(creatorDao.createM3uaAspConfigDao(m3uaAspConfigDto, sigtranStack));
+        M3uaAsConfig m3uaAsConfig = m3uaConfigService.getM3uaAsConfigById(m3uaAsId);
+        M3uaAspConfig m3uaAspConfig = m3uaConfigService.addM3uaAspConfig(creatorDao.createM3uaAspConfigDao(m3uaAspConfigDto, m3uaAsConfig));
+        m3uaService.addAsp(m3uaAspConfig, m3uaAsConfig.getSigtranStack().getStackName());
         return creatorDto.createM3uaAspConfigDto(m3uaAspConfig);
     }
 
@@ -84,15 +89,17 @@ public class M3uaController {
                                              @RequestBody M3uaRouteConfigDto m3uaRouteConfigDto) {
         M3uaAsConfig m3uaAsConfig = m3uaConfigService.getM3uaAsConfigById(m3uaAsId);
         M3uaRouteConfig m3uaRouteConfig = m3uaConfigService.addM3uaRouteConfig(creatorDao.createM3uaRouteConfigDao(m3uaRouteConfigDto, m3uaAsConfig));
+        m3uaService.addRoute(m3uaRouteConfig);
         return creatorDto.createM3uaRouteConfigDto(m3uaRouteConfig);
     }
 
     @PostMapping(value = "/addStackSettingsConfig", produces = "application/json")
     @ResponseBody
     public M3uaStackSettingsConfigDto addStackSettingsConfig(@RequestParam Long sigtranStackId,
-                                                             @RequestBody M3uaStackSettingsConfigDto m3uaStackSettingsConfigDto) {
+                                                             @RequestBody M3uaStackSettingsConfigDto m3uaStackSettingsConfigDto) throws InitializingException {
         SigtranStack sigtranStack = sigtranConfigService.getSigtranStackById(sigtranStackId);
         M3uaStackSettingsConfig m3uaStackSettingsConfig = m3uaConfigService.addM3uaStackSettingsConfig(creatorDao.createM3uaStackSettingsConfigDao(m3uaStackSettingsConfigDto, sigtranStack));
+        m3uaService.initM3uaManagement(sigtranStack);
         return creatorDto.createM3uaStackSettingsConfigDto(m3uaStackSettingsConfig);
     }
 

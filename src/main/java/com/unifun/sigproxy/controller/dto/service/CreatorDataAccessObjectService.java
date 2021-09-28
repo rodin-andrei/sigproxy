@@ -20,11 +20,14 @@ import org.restcomm.protocols.ss7.m3ua.ExchangeType;
 import org.restcomm.protocols.ss7.m3ua.IPSPType;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class CreatorDataAccessObjectService {
 
-    public SctpServerAssociationConfig createSctpServerAssociationConfigDao(SctpServerAssociationConfigDto sctpServerAssociationConfigDto, SctpServerConfig sctpServerConfig){
+    public SctpServerAssociationConfig createSctpServerAssociationConfigDao(SctpServerAssociationConfigDto sctpServerAssociationConfigDto, SctpServerConfig sctpServerConfig) {
         SctpServerAssociationConfig sctpServerAssociationConfig = new SctpServerAssociationConfig();
         sctpServerAssociationConfig.setLinkName(sctpServerAssociationConfigDto.getLinkName());
         sctpServerAssociationConfig.setRemotePort(sctpServerAssociationConfigDto.getRemotePort());
@@ -68,12 +71,15 @@ public class CreatorDataAccessObjectService {
         return sctpClientAssociationConfig;
     }
 
-    public M3uaAspConfig createM3uaAspConfigDao(M3uaAspConfigDto m3uaAspConfigDto, SigtranStack sigtranStack){
+    public M3uaAspConfig createM3uaAspConfigDao(M3uaAspConfigDto m3uaAspConfigDto, M3uaAsConfig m3uaAsConfig) {
         M3uaAspConfig m3uaAspConfig = new M3uaAspConfig();
         m3uaAspConfig.setName(m3uaAspConfigDto.getName());
         m3uaAspConfig.setHeartbeat(m3uaAspConfigDto.isHeartbeat());
         m3uaAspConfig.setSctpAssocName(m3uaAspConfigDto.getSctpAssocName());
-        m3uaAspConfig.setSigtranStack(sigtranStack);
+        if (Optional.ofNullable(m3uaAspConfig.getApplicationServers()).isEmpty()) {
+            m3uaAspConfig.setApplicationServers(new HashSet<>());
+        }
+        m3uaAspConfig.getApplicationServers().add(m3uaAsConfig);
         return m3uaAspConfig;
 
 
