@@ -1,8 +1,5 @@
 package com.unifun.sigproxy.service.map.impl;
 
-import com.unifun.sigproxy.aaaaa.TestMAPServiceSupplementaryListener;
-import com.unifun.sigproxy.aaaaa.TestMapDialogListener;
-import com.unifun.sigproxy.aaaaa.TestMapServiceSmsListener;
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.exception.NoConfigurationException;
 import com.unifun.sigproxy.models.config.SigtranStack;
@@ -10,7 +7,8 @@ import com.unifun.sigproxy.service.map.MapService;
 import com.unifun.sigproxy.service.map.listeners.MAPDialogListenerImpl;
 import com.unifun.sigproxy.service.map.listeners.MAPServiceSmsListenerImpl;
 import com.unifun.sigproxy.service.map.listeners.MAPServiceSupplementaryListenerImpl;
-import com.unifun.sigproxy.service.rabbit.pojo.MapMessage;
+import com.unifun.sigproxy.service.rabbit.ProducerService;
+import com.unifun.sigproxy.service.rabbit.pojo.MapSupplementaryMessageRabbit;
 import com.unifun.sigproxy.service.sccp.SccpService;
 import com.unifun.sigproxy.service.sccp.impl.SccpParametersServiceImpl;
 import com.unifun.sigproxy.service.sccp.impl.SccpServiceImpl;
@@ -25,8 +23,8 @@ import org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan;
 import org.restcomm.protocols.ss7.map.api.service.supplementary.MAPDialogSupplementary;
 import org.restcomm.protocols.ss7.map.datacoding.CBSDataCodingSchemeImpl;
 import org.restcomm.protocols.ss7.map.primitives.AlertingPatternImpl;
+import org.restcomm.protocols.ss7.map.primitives.ISDNAddressStringImpl;
 import org.restcomm.protocols.ss7.map.primitives.USSDStringImpl;
-import org.restcomm.protocols.ss7.sccp.impl.parameter.SccpAddressImpl;
 import org.restcomm.protocols.ss7.sccp.parameter.SccpAddress;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +39,7 @@ public class MapServiceImpl implements MapService {
     private final TcapService tcapService;
     private final SccpService sccpService;
     private final SccpParametersServiceImpl sccpParametersService;
+    private final ProducerService producerService;
 
     private final Map<String, MAPStackImpl> mapStacks = new HashMap<>();
 
@@ -62,14 +61,19 @@ public class MapServiceImpl implements MapService {
         }
 
         MAPProvider mapProvider = mapStack.getMAPProvider();
-        mapProvider.addMAPDialogListener(new TestMapDialogListener(mapStack));
+
+        mapProvider.addMAPDialogListener(new MAPDialogListenerImpl(mapStack));
         mapProvider.getMAPServiceSms().acivate();
-        mapProvider.getMAPServiceSms().addMAPServiceListener(new TestMapServiceSmsListener(mapStack));
+        mapProvider.getMAPServiceSms().addMAPServiceListener(new MAPServiceSmsListenerImpl(mapStack));
         mapProvider.getMAPServiceSupplementary().acivate();
-        mapProvider.getMAPServiceSupplementary().addMAPServiceListener(new TestMAPServiceSupplementaryListener(mapStack));
-
-
+        mapProvider.getMAPServiceSupplementary()
+                .addMAPServiceListener(new MAPServiceSupplementaryListenerImpl(mapStack, this.producerService, this.sccpParametersService));
     }
+
+    public MAPStackImpl getMapStack(String stackName){
+        return this.mapStacks.get(stackName);
+    }
+
 
     @Override
     public void test(String stackName, int addrA, int addrB) {
@@ -78,7 +82,6 @@ public class MapServiceImpl implements MapService {
         MAPApplicationContextName networkUnstructuredSsContext = MAPApplicationContextName.networkUnstructuredSsContext;
         MAPApplicationContextVersion version = MAPApplicationContextVersion.version2;
         MAPApplicationContext mapContext = MAPApplicationContext.getInstance(networkUnstructuredSsContext, version);
-
         SccpAddress sccpAddressA = ((SccpServiceImpl) this.sccpService).addressMap.get(addrA);
         SccpAddress sccpAddressB = ((SccpServiceImpl) this.sccpService).addressMap.get(addrB);
 
@@ -106,16 +109,18 @@ public class MapServiceImpl implements MapService {
 
     }
 
-    //TODO fill default if empty message parameters
-    public MAPDialogSupplementary createDialogProcessUnstructuredSSRequest(String stackName, MapMessage mapMessage) {
+
+    //TODO delete
+    @Deprecated
+    public MAPDialogSupplementary createDialogProcessUnstructuredSSRequest(MapSupplementaryMessageRabbit mapSupplementaryMessageRabbit) {
+        final String stackName = mapSupplementaryMessageRabbit.getStackName();
         MAPProvider mapProvider = this.mapStacks.get(stackName).getMAPProvider();
         MAPParameterFactory mapParameterFactory = mapProvider.getMAPParameterFactory();
-        MAPApplicationContextName networkUnstructuredSsContext = MAPApplicationContextName.networkUnstructuredSsContext;
+        MAPApplicationContextName networkUnstructuredSsContext = MAPApplicationContextName.networkUnstructuredSsContext; //TODO check params
         MAPApplicationContextVersion version = MAPApplicationContextVersion.version2;
         MAPApplicationContext mapContext = MAPApplicationContext.getInstance(networkUnstructuredSsContext, version);
-        SccpAddress callingParty = this.sccpParametersService.createSccpAddress(mapMessage.getCallingParty(), stackName);
-        SccpAddressImpl sccpAddress = new SccpAddressImpl();
-        SccpAddress calledParty = this.sccpParametersService.createSccpAddress(mapMessage.getCalledParty(), stackName);
+        SccpAddress callingParty = this.sccpParametersService.createSccpAddress(mapSupplementaryMessageRabbit.getCallingParty(), stackName);
+        SccpAddress calledParty = this.sccpParametersService.createSccpAddress(mapSupplementaryMessageRabbit.getCalledParty(), stackName);
 
         ISDNAddressString isdnAddressStringA = mapParameterFactory
                 .createISDNAddressString(AddressNature.international_number,
@@ -127,18 +132,23 @@ public class MapServiceImpl implements MapService {
                         calledParty.getGlobalTitle().getDigits());
 
         try {
-            MAPDialogSupplementary newDialog = mapProvider.getMAPServiceSupplementary().createNewDialog(mapContext,
+            MAPDialogSupplementary newDialog = mapProvider.getMAPServiceSupplementary().createNewDialog(
+                    mapContext,
                     callingParty,
                     isdnAddressStringA,
                     calledParty,
                     isdnAddressStringB);
 
-            CBSDataCodingSchemeImpl cbsDataCodingScheme = new CBSDataCodingSchemeImpl(15);
+            ISDNAddressString msisdn = new ISDNAddressStringImpl(
+                    AddressNature.international_number,
+                    NumberingPlan.ISDN,
+                    mapSupplementaryMessageRabbit.getMsisdn()); //TODO investigate if msisdn is by deafult with this parameters only
+            CBSDataCodingSchemeImpl cbsDataCodingScheme = new CBSDataCodingSchemeImpl(15); //TODO
             newDialog.addProcessUnstructuredSSRequest(cbsDataCodingScheme,
-                    new USSDStringImpl(mapMessage.getUssdString(), cbsDataCodingScheme, StandardCharsets.UTF_8),
+                    new USSDStringImpl(mapSupplementaryMessageRabbit.getUssdString(), cbsDataCodingScheme, StandardCharsets.UTF_8),
                     new AlertingPatternImpl(),
-                    isdnAddressStringB);
-
+                    msisdn
+                    );
             //newDialog.send();
             return newDialog;
         } catch (MAPException e) {
@@ -146,5 +156,4 @@ public class MapServiceImpl implements MapService {
         }
         return null;
     }
-
 }

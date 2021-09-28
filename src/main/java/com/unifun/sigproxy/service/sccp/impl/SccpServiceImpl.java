@@ -22,8 +22,10 @@ import org.restcomm.protocols.ss7.sccp.impl.parameter.ImportanceImpl;
 import org.restcomm.protocols.ss7.sccp.impl.parameter.SccpAddressImpl;
 import org.restcomm.protocols.ss7.sccp.message.SccpDataMessage;
 import org.restcomm.protocols.ss7.sccp.parameter.GlobalTitle;
+import org.restcomm.protocols.ss7.sccp.parameter.ParameterFactory;
 import org.restcomm.protocols.ss7.sccp.parameter.SccpAddress;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -293,5 +295,9 @@ public class SccpServiceImpl implements SccpService {
     @Override
     public SccpProvider getSccpProvider(String stackName) {
         return sccpStacks.get(stackName).getSccpProvider();
+    }
+
+    public ParameterFactory getSccpParameterFactory(String stackName) {
+        return this.sccpStacks.get(stackName).getSccpProvider().getParameterFactory();
     }
 }

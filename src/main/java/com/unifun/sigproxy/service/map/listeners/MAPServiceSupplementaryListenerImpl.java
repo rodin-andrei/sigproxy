@@ -1,16 +1,27 @@
 package com.unifun.sigproxy.service.map.listeners;
 
+import com.unifun.sigproxy.service.rabbit.ProducerService;
+import com.unifun.sigproxy.service.rabbit.pojo.MapSupplementaryMessageRabbit;
+import com.unifun.sigproxy.service.rabbit.pojo.SccpRabbitAddress;
+import com.unifun.sigproxy.service.sccp.SccpParametersService;
 import lombok.extern.slf4j.Slf4j;
 import org.restcomm.protocols.ss7.map.MAPStackImpl;
 import org.restcomm.protocols.ss7.map.api.MAPDialog;
 import org.restcomm.protocols.ss7.map.api.errors.MAPErrorMessage;
 import org.restcomm.protocols.ss7.map.api.service.supplementary.*;
 
+import java.util.Optional;
+
 
 @Slf4j
 public class MAPServiceSupplementaryListenerImpl extends MAPServiceListenerImpl implements MAPServiceSupplementaryListener {
-    public MAPServiceSupplementaryListenerImpl(MAPStackImpl mapStack) {
+    private final ProducerService producerService;
+    private final SccpParametersService sccpParametersService;
+    public MAPServiceSupplementaryListenerImpl(MAPStackImpl mapStack, ProducerService producerService, SccpParametersService sccpParametersService) {
         super(mapStack);
+        this.producerService = producerService;
+        this.sccpParametersService = sccpParametersService;
+
     }
 
     @Override
@@ -96,33 +107,105 @@ public class MAPServiceSupplementaryListenerImpl extends MAPServiceListenerImpl 
 
     }
 
+    //TODO create autonomous process of responding if possible
     @Override
-    public void onProcessUnstructuredSSRequest(ProcessUnstructuredSSRequest processUnstructuredSSRequest) {
+    public void onProcessUnstructuredSSRequest(ProcessUnstructuredSSRequest processUnstructuredSSRequest) { //TODO creates service for converting pussr to rabbit message
         log.info("onProcessUnstructuredSSRequest  " + mapStack.getName());
+
+        MapSupplementaryMessageRabbit message = new MapSupplementaryMessageRabbit();
+        processUnstructuredSSRequest.getMAPDialog().getIdleTaskTimeout();
+        message.setStackName(this.mapStack.getName());
+        SccpRabbitAddress calledParty = this.sccpParametersService
+                .createSccpRabbitAddress(processUnstructuredSSRequest.getMAPDialog().getLocalAddress());
+        SccpRabbitAddress callingParty = this.sccpParametersService
+                .createSccpRabbitAddress(processUnstructuredSSRequest.getMAPDialog().getRemoteAddress());
+        message.setCalledParty(calledParty);
+        message.setCallingParty(callingParty);
+        message.setOperation(processUnstructuredSSRequest.getMessageType().name());
+        message.setType(processUnstructuredSSRequest.getMAPDialog().getTCAPMessageType().name());
+        message.setTcapId(processUnstructuredSSRequest.getMAPDialog().getLocalDialogId()); //TODO check continue
+        message.setUssdString(processUnstructuredSSRequest.getUSSDString().toString()); //TODO work with encoding schemas
+        message.setMsisdn((processUnstructuredSSRequest.getMSISDNAddressString() != null)
+                ? processUnstructuredSSRequest.getMSISDNAddressString().getAddress()
+                : processUnstructuredSSRequest.getMAPDialog().getReceivedDestReference().getAddress());
+
+        this.producerService.send(message);
     }
 
     @Override
     public void onProcessUnstructuredSSResponse(ProcessUnstructuredSSResponse processUnstructuredSSResponse) {
         log.info("onProcessUnstructuredSSResponse  " + mapStack.getName());
 
+        MapSupplementaryMessageRabbit message = new MapSupplementaryMessageRabbit();
+        message.setStackName(this.mapStack.getName());
+        SccpRabbitAddress calledParty = this.sccpParametersService
+                .createSccpRabbitAddress(processUnstructuredSSResponse.getMAPDialog().getLocalAddress());
+        SccpRabbitAddress callingParty = this.sccpParametersService
+                .createSccpRabbitAddress(processUnstructuredSSResponse.getMAPDialog().getRemoteAddress());
+        message.setCalledParty(calledParty);
+        message.setCallingParty(callingParty);
+        message.setOperation(processUnstructuredSSResponse.getMessageType().name());
+        message.setType(processUnstructuredSSResponse.getMAPDialog().getTCAPMessageType().name());
+        message.setTcapId(processUnstructuredSSResponse.getMAPDialog().getLocalDialogId()); //TODO check continue
+        message.setUssdString(processUnstructuredSSResponse.getUSSDString().toString()); //TODO work with encoding schemas
+        message.setMsisdn(Optional
+                .ofNullable(processUnstructuredSSResponse.getMAPDialog().getReceivedDestReference().getAddress())
+                .orElse(null));
+
+        this.producerService.send(message);
     }
 
     @Override
     public void onUnstructuredSSRequest(UnstructuredSSRequest unstructuredSSRequest) {
         log.info("onUnstructuredSSRequest  " + mapStack.getName());
 
+        MapSupplementaryMessageRabbit message = new MapSupplementaryMessageRabbit();
+        message.setStackName(this.mapStack.getName());
+        SccpRabbitAddress calledParty = this.sccpParametersService
+                .createSccpRabbitAddress(unstructuredSSRequest.getMAPDialog().getLocalAddress());
+        SccpRabbitAddress callingParty = this.sccpParametersService
+                .createSccpRabbitAddress(unstructuredSSRequest.getMAPDialog().getRemoteAddress());
+        message.setCalledParty(calledParty);
+        message.setCallingParty(callingParty);
+        message.setOperation(unstructuredSSRequest.getMessageType().name());
+        message.setType(unstructuredSSRequest.getMAPDialog().getTCAPMessageType().name());
+        message.setTcapId(unstructuredSSRequest.getMAPDialog().getLocalDialogId()); //TODO check continue
+        message.setContinueTcapId(unstructuredSSRequest.getMAPDialog().getRemoteDialogId());
+        message.setUssdString(unstructuredSSRequest.getUSSDString().toString()); //TODO work with encoding schemas
+        message.setMsisdn(Optional
+                .ofNullable(unstructuredSSRequest.getMAPDialog().getReceivedDestReference().getAddress())
+                .orElse(null));
+
+        this.producerService.send(message);
     }
 
     @Override
     public void onUnstructuredSSResponse(UnstructuredSSResponse unstructuredSSResponse) {
         log.info("onUnstructuredSSResponse  " + mapStack.getName());
 
+        MapSupplementaryMessageRabbit message = new MapSupplementaryMessageRabbit();
+        message.setStackName(this.mapStack.getName());
+        SccpRabbitAddress calledParty = this.sccpParametersService
+                .createSccpRabbitAddress(unstructuredSSResponse.getMAPDialog().getLocalAddress());
+        SccpRabbitAddress callingParty = this.sccpParametersService
+                .createSccpRabbitAddress(unstructuredSSResponse.getMAPDialog().getRemoteAddress());
+        message.setCalledParty(calledParty);
+        message.setCallingParty(callingParty);
+        message.setOperation(unstructuredSSResponse.getMessageType().name());
+        message.setType(unstructuredSSResponse.getMAPDialog().getTCAPMessageType().name());
+        message.setTcapId(unstructuredSSResponse.getMAPDialog().getLocalDialogId()); //TODO check continue
+        message.setContinueTcapId(unstructuredSSResponse.getMAPDialog().getRemoteDialogId());
+        message.setUssdString(unstructuredSSResponse.getUSSDString().toString()); //TODO work with encoding schemas
+        message.setMsisdn(Optional
+                .ofNullable(unstructuredSSResponse.getMAPDialog().getReceivedDestReference().getAddress())
+                .orElse(null));
+
+        this.producerService.send(message);
     }
 
     @Override
     public void onUnstructuredSSNotifyRequest(UnstructuredSSNotifyRequest unstructuredSSNotifyRequest) {
         log.info("onUnstructuredSSNotifyRequest  " + mapStack.getName());
-
     }
 
     @Override
@@ -133,7 +216,6 @@ public class MAPServiceSupplementaryListenerImpl extends MAPServiceListenerImpl 
     @Override
     public void onUnstructuredSSNotifyResponse(UnstructuredSSNotifyResponse unstructuredSSNotifyResponse) {
         log.info("onUnstructuredSSNotifyResponse  " + mapStack.getName());
-
     }
 }
 
