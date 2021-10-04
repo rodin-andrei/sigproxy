@@ -1,4 +1,4 @@
-package com.unifun.sigproxy.service;
+package com.unifun.sigproxy.service.sctp;
 
 import com.unifun.sigproxy.exception.SS7NotFoundException;
 import com.unifun.sigproxy.models.config.SigtranStack;
@@ -45,7 +45,7 @@ public class SctpServiceTest {
     private SctpLinkRepository sctpLinkRepository;
 
 
-    private SctpConfigService sctpConfigService;
+    private final SctpConfigService sctpConfigService;
 
 
     public SctpServiceTest() {
