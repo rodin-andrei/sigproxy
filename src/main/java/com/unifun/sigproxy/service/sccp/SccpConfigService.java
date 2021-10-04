@@ -7,7 +7,7 @@ import java.util.Set;
 public interface SccpConfigService {
     Set<SccpAddressConfig> getAddressConfigByStackId(Long sigtranStackId);
 
-    SccpAddressRuleConfig getAddressRuleConfigByRuleConfigId(Long sccpRuleConfigId);
+    SccpAddressRuleConfig getAddressRuleConfigByRuleConfigId(Integer sccpRuleConfigId);
 
     Set<SccpConcernedSignalingPointCodeConfig> getConcernedSignalingPointCodeConfigByStackId(Long sigtranStackId);
 
@@ -25,41 +25,41 @@ public interface SccpConfigService {
 
     SccpSettingsConfig getSettingsConfigByStackId(Long sigtranStackId);
 
-    SccpAddressConfig getAddressConfigById(Long sccpAddressConfigId);
+    SccpAddressConfig getAddressConfigById(Integer sccpAddressConfigId);
 
     SccpAddressRuleConfig getAddressRuleConfigById(Long sccpAddressRuleConfigId);
 
-    SccpConcernedSignalingPointCodeConfig getConcernedSignalingPointCodeConfigById(Long sccpConcernedSignalingPointCodeConfigId);
+    SccpConcernedSignalingPointCodeConfig getConcernedSignalingPointCodeConfigById(Integer sccpConcernedSignalingPointCodeConfigId);
 
-    SccpLongMessageRuleConfig getLongMessageRuleConfigById(Long sccpLongMessageRuleConfigId);
+    SccpLongMessageRuleConfig getLongMessageRuleConfigById(Integer sccpLongMessageRuleConfigId);
 
-    SccpMtp3DestinationConfig getMtp3DestinationConfigById(Long sccpMtp3DestinationConfigId);
+    SccpMtp3DestinationConfig getMtp3DestinationConfigById(Integer sccpMtp3DestinationConfigId);
 
-    SccpRemoteSignalingPointConfig getRemoteSignalingPointConfigById(Long sccpRemoteSignalingPointConfigId);
+    SccpRemoteSignalingPointConfig getRemoteSignalingPointConfigById(Integer sccpRemoteSignalingPointConfigId);
 
-    SccpRemoteSubsystemConfig getRemoteSubsystemConfigById(Long sccpRemoteSubsystemConfigId);
+    SccpRemoteSubsystemConfig getRemoteSubsystemConfigById(Integer sccpRemoteSubsystemConfigId);
 
-    SccpRuleConfig getRuleConfigById(Long sccpRuleConfigId);
+    SccpRuleConfig getRuleConfigById(Integer sccpRuleConfigId);
 
     SccpServiceAccessPointConfig getServiceAccessPointConfigById(Integer sccpServiceAccessPointConfigId);
 
     SccpSettingsConfig getSettingsConfigById(Long sccpSettingsConfigId);
 
-    void removeAddressConfig(Long sccpAddressConfigId);
+    void removeAddressConfig(Integer sccpAddressConfigId);
 
     void removeAddressRuleConfig(Long sccpAddressRuleConfigId);
 
-    void removeConcernedSignalingPointCodeConfig(Long sccpConcernedSignalingPointCodeConfigId);
+    void removeConcernedSignalingPointCodeConfig(Integer sccpConcernedSignalingPointCodeConfigId);
 
-    void removeLongMessageRuleConfig(Long sccpLongMessageRuleConfigId);
+    void removeLongMessageRuleConfig(Integer sccpLongMessageRuleConfigId);
 
-    void removeMtp3DestinationConfig(Long sccpMtp3DestinationConfigId);
+    void removeMtp3DestinationConfig(Integer sccpMtp3DestinationConfigId);
 
-    void removeRemoteSignalingPointConfig(Long sccpRemoteSignalingPointConfigId);
+    void removeRemoteSignalingPointConfig(Integer sccpRemoteSignalingPointConfigId);
 
-    void removeRemoteSubsystemConfig(Long sccpRemoteSubsystemConfigId);
+    void removeRemoteSubsystemConfig(Integer sccpRemoteSubsystemConfigId);
 
-    void removeRuleConfig(Long sccpRuleConfigId);
+    void removeRuleConfig(Integer sccpRuleConfigId);
 
     void removeServiceAccessPointConfig(Integer sccpServiceAccessPointConfigId);
 

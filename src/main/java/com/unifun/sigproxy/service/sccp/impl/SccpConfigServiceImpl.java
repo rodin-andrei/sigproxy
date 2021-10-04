@@ -38,7 +38,7 @@ public class SccpConfigServiceImpl implements SccpConfigService {
     }
 
     @Override
-    public SccpAddressRuleConfig getAddressRuleConfigByRuleConfigId(Long sccpRuleConfigId) {
+    public SccpAddressRuleConfig getAddressRuleConfigByRuleConfigId(Integer sccpRuleConfigId) {
         SccpRuleConfig sccpRuleConfig = sccpRuleConfigRepository.findById(sccpRuleConfigId)
                 .orElseThrow(() -> new SS7NotFoundException("Not found stack with id " + sccpRuleConfigId));
         return Optional.ofNullable(sccpRuleConfig.getSccpAddressRuleConfig())
@@ -112,7 +112,7 @@ public class SccpConfigServiceImpl implements SccpConfigService {
     }
 
     @Override
-    public SccpAddressConfig getAddressConfigById(Long sccpAddressConfigId) {
+    public SccpAddressConfig getAddressConfigById(Integer sccpAddressConfigId) {
         return sccpAddressConfigRepository.findById(sccpAddressConfigId)
                 .orElseThrow(() -> new SS7NotFoundException("Not found Sccp Address Config with Id " + sccpAddressConfigId));
     }
@@ -124,37 +124,37 @@ public class SccpConfigServiceImpl implements SccpConfigService {
     }
 
     @Override
-    public SccpConcernedSignalingPointCodeConfig getConcernedSignalingPointCodeConfigById(Long sccpConcernedSignalingPointCodeConfigId) {
+    public SccpConcernedSignalingPointCodeConfig getConcernedSignalingPointCodeConfigById(Integer sccpConcernedSignalingPointCodeConfigId) {
         return sccpConcernedSignalingPointCodeConfigRepository.findById(sccpConcernedSignalingPointCodeConfigId)
                 .orElseThrow(() -> new SS7NotFoundException("Not found Sccp Concerned Signaling Point Code Config with Id " + sccpConcernedSignalingPointCodeConfigId));
     }
 
     @Override
-    public SccpLongMessageRuleConfig getLongMessageRuleConfigById(Long sccpLongMessageRuleConfigId) {
+    public SccpLongMessageRuleConfig getLongMessageRuleConfigById(Integer sccpLongMessageRuleConfigId) {
         return sccpLongMessageRuleConfigRepository.findById(sccpLongMessageRuleConfigId)
                 .orElseThrow(() -> new SS7NotFoundException("Not found Sccp Long Message Rule Config with Id " + sccpLongMessageRuleConfigId));
     }
 
     @Override
-    public SccpMtp3DestinationConfig getMtp3DestinationConfigById(Long sccpMtp3DestinationConfigId) {
+    public SccpMtp3DestinationConfig getMtp3DestinationConfigById(Integer sccpMtp3DestinationConfigId) {
         return sccpMtp3DestinationConfigRepository.findById(sccpMtp3DestinationConfigId)
                 .orElseThrow(() -> new SS7NotFoundException("Not found Sccp Mtp3 Destination Config with Id " + sccpMtp3DestinationConfigId));
     }
 
     @Override
-    public SccpRemoteSignalingPointConfig getRemoteSignalingPointConfigById(Long sccpRemoteSignalingPointConfigId) {
+    public SccpRemoteSignalingPointConfig getRemoteSignalingPointConfigById(Integer sccpRemoteSignalingPointConfigId) {
         return sccpRemoteSignalingPointConfigRepository.findById(sccpRemoteSignalingPointConfigId)
                 .orElseThrow(() -> new SS7NotFoundException("Not found Sccp Remote Signaling Point Config with Id " + sccpRemoteSignalingPointConfigId));
     }
 
     @Override
-    public SccpRemoteSubsystemConfig getRemoteSubsystemConfigById(Long sccpRemoteSubsystemConfigId) {
+    public SccpRemoteSubsystemConfig getRemoteSubsystemConfigById(Integer sccpRemoteSubsystemConfigId) {
         return sccpRemoteSubsystemConfigRepository.findById(sccpRemoteSubsystemConfigId)
                 .orElseThrow(() -> new SS7NotFoundException("Not found Sccp Remote Subsystem Config with Id " + sccpRemoteSubsystemConfigId));
     }
 
     @Override
-    public SccpRuleConfig getRuleConfigById(Long sccpRuleConfigId) {
+    public SccpRuleConfig getRuleConfigById(Integer sccpRuleConfigId) {
         return sccpRuleConfigRepository.findById(sccpRuleConfigId)
                 .orElseThrow(() -> new SS7NotFoundException("Not found Sccp Rule Config with Id " + sccpRuleConfigId));
     }
@@ -173,7 +173,7 @@ public class SccpConfigServiceImpl implements SccpConfigService {
     }
 
     @Override
-    public void removeAddressConfig(Long sccpAddressConfigId) {
+    public void removeAddressConfig(Integer sccpAddressConfigId) {
         try {
             sccpAddressConfigRepository.deleteById(sccpAddressConfigId);
         } catch (Exception e) {
@@ -191,7 +191,7 @@ public class SccpConfigServiceImpl implements SccpConfigService {
     }
 
     @Override
-    public void removeConcernedSignalingPointCodeConfig(Long sccpConcernedSignalingPointCodeConfigId) {
+    public void removeConcernedSignalingPointCodeConfig(Integer sccpConcernedSignalingPointCodeConfigId) {
         try {
             sccpConcernedSignalingPointCodeConfigRepository.deleteById(sccpConcernedSignalingPointCodeConfigId);
         } catch (Exception e) {
@@ -200,7 +200,7 @@ public class SccpConfigServiceImpl implements SccpConfigService {
     }
 
     @Override
-    public void removeLongMessageRuleConfig(Long sccpLongMessageRuleConfigId) {
+    public void removeLongMessageRuleConfig(Integer sccpLongMessageRuleConfigId) {
         try {
             sccpLongMessageRuleConfigRepository.deleteById(sccpLongMessageRuleConfigId);
         } catch (Exception e) {
@@ -209,7 +209,7 @@ public class SccpConfigServiceImpl implements SccpConfigService {
     }
 
     @Override
-    public void removeMtp3DestinationConfig(Long sccpMtp3DestinationConfigId) {
+    public void removeMtp3DestinationConfig(Integer sccpMtp3DestinationConfigId) {
         try {
             sccpMtp3DestinationConfigRepository.deleteById(sccpMtp3DestinationConfigId);
         } catch (Exception e) {
@@ -218,7 +218,7 @@ public class SccpConfigServiceImpl implements SccpConfigService {
     }
 
     @Override
-    public void removeRemoteSignalingPointConfig(Long sccpRemoteSignalingPointConfigId) {
+    public void removeRemoteSignalingPointConfig(Integer sccpRemoteSignalingPointConfigId) {
         try {
             sccpRemoteSignalingPointConfigRepository.deleteById(sccpRemoteSignalingPointConfigId);
         } catch (Exception e) {
@@ -227,7 +227,7 @@ public class SccpConfigServiceImpl implements SccpConfigService {
     }
 
     @Override
-    public void removeRemoteSubsystemConfig(Long sccpRemoteSubsystemConfigId) {
+    public void removeRemoteSubsystemConfig(Integer sccpRemoteSubsystemConfigId) {
         try {
             sccpRemoteSubsystemConfigRepository.deleteById(sccpRemoteSubsystemConfigId);
         } catch (Exception e) {
@@ -236,7 +236,7 @@ public class SccpConfigServiceImpl implements SccpConfigService {
     }
 
     @Override
-    public void removeRuleConfig(Long sccpRuleConfigId) {
+    public void removeRuleConfig(Integer sccpRuleConfigId) {
         try {
             sccpRuleConfigRepository.deleteById(sccpRuleConfigId);
         } catch (Exception e) {

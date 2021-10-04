@@ -38,7 +38,7 @@ public class SccpController {
 
     @GetMapping(value = "/getAddressRuleConfig", produces = "application/json")
     @ResponseBody
-    public SccpAddressRuleConfigDto getAddressRuleConfig(@RequestParam Long sccpRuleConfigId) {
+    public SccpAddressRuleConfigDto getAddressRuleConfig(@RequestParam Integer sccpRuleConfigId) {
         return creatorDto.createSccpAddressRuleConfigDto(sccpConfigService.getAddressRuleConfigByRuleConfigId(sccpRuleConfigId));
     }
 
@@ -116,7 +116,7 @@ public class SccpController {
 
     @DeleteMapping(value = "/removeAddressConfig", produces = "application/json")
     @ResponseBody
-    public SccpAddressConfigDto removeAddressConfig(@RequestParam Long sccpAddressConfigId) {
+    public SccpAddressConfigDto removeAddressConfig(@RequestParam Integer sccpAddressConfigId) {
         SccpAddressConfigDto sccpAddressConfigDto = creatorDto.createSccpAddressConfigDto(sccpConfigService.getAddressConfigById(sccpAddressConfigId));
         sccpConfigService.removeAddressConfig(sccpAddressConfigId);
         return sccpAddressConfigDto;
@@ -132,7 +132,7 @@ public class SccpController {
 
     @DeleteMapping(value = "/removeConcernedSignalingPointCodeConfig", produces = "application/json")
     @ResponseBody
-    public SccpConcernedSignalingPointCodeConfigDto removeConcernedSignalingPointCodeConfig(@RequestParam Long sccpConcernedSignalingPointCodeConfigId) {
+    public SccpConcernedSignalingPointCodeConfigDto removeConcernedSignalingPointCodeConfig(@RequestParam Integer sccpConcernedSignalingPointCodeConfigId) {
         SccpConcernedSignalingPointCodeConfigDto sccpConcernedSignalingPointCodeConfigDto =
                 creatorDto.createSccpConcernedSignalingPointCodeConfigDto(sccpConfigService.getConcernedSignalingPointCodeConfigById(sccpConcernedSignalingPointCodeConfigId));
         sccpConfigService.removeConcernedSignalingPointCodeConfig(sccpConcernedSignalingPointCodeConfigId);
@@ -141,7 +141,7 @@ public class SccpController {
 
     @DeleteMapping(value = "/removeLongMessageRuleConfig", produces = "application/json")
     @ResponseBody
-    public SccpLongMessageRuleConfigDto removeLongMessageRuleConfig(@RequestParam Long sccpLongMessageRuleConfigId) {
+    public SccpLongMessageRuleConfigDto removeLongMessageRuleConfig(@RequestParam Integer sccpLongMessageRuleConfigId) {
         SccpLongMessageRuleConfigDto sccpLongMessageRuleConfigDto =
                 creatorDto.createSccpLongMessageRuleConfigDto(sccpConfigService.getLongMessageRuleConfigById(sccpLongMessageRuleConfigId));
         sccpConfigService.removeLongMessageRuleConfig(sccpLongMessageRuleConfigId);
@@ -150,7 +150,7 @@ public class SccpController {
 
     @DeleteMapping(value = "/removeMtp3DestinationConfig", produces = "application/json")
     @ResponseBody
-    public SccpMtp3DestinationConfigDto removeMtp3DestinationConfig(@RequestParam Long sccpMtp3DestinationConfigId) {
+    public SccpMtp3DestinationConfigDto removeMtp3DestinationConfig(@RequestParam Integer sccpMtp3DestinationConfigId) {
         SccpMtp3DestinationConfigDto sccpMtp3DestinationConfigDto =
                 creatorDto.createSccpMtp3DestinationConfigDto(sccpConfigService.getMtp3DestinationConfigById(sccpMtp3DestinationConfigId));
         sccpConfigService.removeMtp3DestinationConfig(sccpMtp3DestinationConfigId);
@@ -159,7 +159,7 @@ public class SccpController {
 
     @DeleteMapping(value = "/removeRemoteSignalingPointConfig", produces = "application/json")
     @ResponseBody
-    public SccpRemoteSignalingPointConfigDto removeRemoteSignalingPointConfig(@RequestParam Long sccpRemoteSignalingPointConfigId) {
+    public SccpRemoteSignalingPointConfigDto removeRemoteSignalingPointConfig(@RequestParam Integer sccpRemoteSignalingPointConfigId) {
         SccpRemoteSignalingPointConfigDto sccpRemoteSignalingPointConfigDto =
                 creatorDto.createSccpRemoteSignalingPointConfigDto(sccpConfigService.getRemoteSignalingPointConfigById(sccpRemoteSignalingPointConfigId));
         sccpConfigService.removeRemoteSignalingPointConfig(sccpRemoteSignalingPointConfigId);
@@ -169,7 +169,7 @@ public class SccpController {
 
     @DeleteMapping(value = "/removeRemoteSubsystemConfig", produces = "application/json")
     @ResponseBody
-    public SccpRemoteSubsystemConfigDto removeRemoteSubsystemConfig(@RequestParam Long sccpRemoteSubsystemConfigId) {
+    public SccpRemoteSubsystemConfigDto removeRemoteSubsystemConfig(@RequestParam Integer sccpRemoteSubsystemConfigId) {
         SccpRemoteSubsystemConfigDto sccpRemoteSubsystemConfigDto = creatorDto.createSccpRemoteSubsystemConfigDto(sccpConfigService.getRemoteSubsystemConfigById(sccpRemoteSubsystemConfigId));
         sccpConfigService.removeRemoteSubsystemConfig(sccpRemoteSubsystemConfigId);
         return sccpRemoteSubsystemConfigDto;
@@ -177,7 +177,7 @@ public class SccpController {
 
     @DeleteMapping(value = "/removeRuleConfig", produces = "application/json")
     @ResponseBody
-    public SccpRuleConfigDto removeRuleConfig(@RequestParam Long sccpRuleConfigId) {
+    public SccpRuleConfigDto removeRuleConfig(@RequestParam Integer sccpRuleConfigId) {
         SccpRuleConfigDto sccpRuleConfigDto = creatorDto.createSccpRuleConfigDto(sccpConfigService.getRuleConfigById(sccpRuleConfigId));
         sccpConfigService.removeRuleConfig(sccpRuleConfigId);
         return sccpRuleConfigDto;
