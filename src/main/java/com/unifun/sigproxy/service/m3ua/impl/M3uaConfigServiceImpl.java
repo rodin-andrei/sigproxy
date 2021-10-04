@@ -42,7 +42,7 @@ public class M3uaConfigServiceImpl implements M3uaConfigService {
     }
 
     @Override
-    public Set<M3uaAspConfig> getM3uaAspConfigByStackId(Long sigtranStackId) {
+    public Set<M3uaAspConfig> getM3uaAspConfigByAsId(Long sigtranStackId) {
         M3uaAsConfig m3uaAsConfig = asRepository.findById(sigtranStackId)
                 .orElseThrow(() -> new SS7NotFoundException("Not found Sigtran Stack with id " + sigtranStackId));
         return Optional.ofNullable(m3uaAsConfig.getApplicationServerPoints())

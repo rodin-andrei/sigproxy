@@ -44,7 +44,7 @@ public class M3uaController {
     @GetMapping(value = "/getAspConfig", produces = "application/json")
     @ResponseBody
     public Set<M3uaAspConfigDto> getM3uaAspConfig(@RequestParam Long sigtranStackId) {
-        return m3uaConfigService.getM3uaAspConfigByStackId(sigtranStackId).stream()
+        return m3uaConfigService.getM3uaAspConfigByAsId(sigtranStackId).stream()
                 .map(this.creatorDto::createM3uaAspConfigDto)
                 .collect(Collectors.toSet());
     }
