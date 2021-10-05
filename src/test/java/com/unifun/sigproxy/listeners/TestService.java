@@ -119,7 +119,6 @@ public class TestService {
         m3uaAsConfig = asRepository.save(m3uaAsConfig);
 
         m3uaAspConfig.getApplicationServers().add(m3uaAsConfig);
-        m3uaAspConfig.setSigtranStack(sigtranStack);
         m3uaAspConfig = aspRepository.save(m3uaAspConfig);
 
         M3uaRouteConfig m3uaRouteConfig = new M3uaRouteConfig();
@@ -270,7 +269,6 @@ public class TestService {
         m3uaAsConfig = asRepository.save(m3uaAsConfig);
 
         m3uaAspConfig.getApplicationServers().add(m3uaAsConfig);
-        m3uaAspConfig.setSigtranStack(sigtranStack);
         m3uaAspConfig = aspRepository.save(m3uaAspConfig);
 
         M3uaRouteConfig m3uaRouteConfig = new M3uaRouteConfig();

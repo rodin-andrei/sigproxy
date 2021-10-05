@@ -3,6 +3,7 @@ package com.unifun.sigproxy.service.tcap.impl;
 import com.unifun.sigproxy.exception.SS7AddException;
 import com.unifun.sigproxy.exception.SS7NotContentException;
 import com.unifun.sigproxy.exception.SS7NotFoundException;
+import com.unifun.sigproxy.exception.SS7RemoveException;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.models.config.tcap.TcapConfig;
 import com.unifun.sigproxy.repository.SigtranStackRepository;
@@ -38,8 +39,17 @@ public class TcapConfigServiceImpl implements TcapConfigService {
     public TcapConfig addTcapConfig(TcapConfig tcapConfig) {
         try {
             return tcapConfigRepository.save(tcapConfig);
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new SS7AddException("Add failed new Tcap config");
+        }
+    }
+
+    @Override
+    public void removeTcap(Long tcapId) {
+        try {
+            tcapConfigRepository.deleteById(tcapId);
+        } catch (Exception e) {
+            throw new SS7RemoveException("Remove tcap with Id "+tcapId+" failed.");
         }
     }
 }

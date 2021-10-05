@@ -46,4 +46,12 @@ public class TcapController {
         }
         return creatorDto.createTcapConfigDto(tcapConfig);
     }
+
+    @GetMapping(value = "/removeTcapConfig")
+    @ResponseBody
+    public TcapConfigDto removeTcapConfig(@RequestParam Long tcapId){
+        TcapConfigDto tcapConfigDto = creatorDto.createTcapConfigDto(tcapConfigService.getTcapConfigById(tcapId));
+        tcapConfigService.removeTcap(tcapId);
+        return tcapConfigDto;
+    }
 }

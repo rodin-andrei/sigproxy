@@ -10,7 +10,7 @@ import java.util.Set;
 public interface M3uaConfigService {
     Set<M3uaAsConfig> getM3uaAsConfigByStackId(Long sigtranStackId);
 
-    Set<M3uaAspConfig> getM3uaAspConfigByStackId(Long sigtranStackId);
+    Set<M3uaAspConfig> getM3uaAspConfigByAsId(Long sigtranStackId);
 
     Set<M3uaRouteConfig> getM3uaRouteConfigByM3UaAsId(Long m3uaAsId);
 
