@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -172,6 +173,145 @@ public class CreatorDataObjectService {
 
     }
 
+
+    public SccpAddressRuleConfigDto createSccpAddressRuleConfigDto(SccpAddressRuleConfig sccpAddressRuleConfig) {
+        if (sccpAddressRuleConfig == null) return null;
+        return SccpAddressRuleConfigDto.builder()
+                .id(sccpAddressRuleConfig.getId())
+                .addressIndicator(sccpAddressRuleConfig.getAddressIndicator())
+                .pointCode(sccpAddressRuleConfig.getPointCode())
+                .ssn(sccpAddressRuleConfig.getSsn())
+                .translationType(sccpAddressRuleConfig.getTranslationType())
+                .numberingPlan(sccpAddressRuleConfig.getNumberingPlan())
+                .natureOfAddress(sccpAddressRuleConfig.getNatureOfAddress())
+                .digits(sccpAddressRuleConfig.getDigits())
+                .build();
+    }
+
+    public SccpRuleConfigDto createSccpRuleConfigsDto(SccpRuleConfig sccpRuleConfig) {
+        if (sccpRuleConfig == null) return null;
+        return SccpRuleConfigDto.builder()
+                .id(sccpRuleConfig.getId())
+                .mask(sccpRuleConfig.getMask())
+                .sccpAddressRuleConfig(createSccpAddressRuleConfigDto(sccpRuleConfig.getSccpAddressRuleConfig()))
+                .ruleType(sccpRuleConfig.getRuleType())
+                .primaryAddressId(sccpRuleConfig.getPrimaryAddressId())
+                .loadSharingAlgorithm(sccpRuleConfig.getLoadSharingAlgorithm())
+                .originationType(sccpRuleConfig.getOriginationType())
+                .secondaryAddressId(sccpRuleConfig.getSecondaryAddressId())
+                .newCallingPartyAddressAddressId(sccpRuleConfig.getNewCallingPartyAddressAddressId())
+                .networkId(sccpRuleConfig.getNetworkId())
+                .callingSccpAddressRuleConfig(createSccpAddressRuleConfigDto(sccpRuleConfig.getCallingSccpAddressRuleConfig()))
+                .build();
+    }
+
+    public SccpRemoteSignalingPointConfigDto createSccpRemoteSignalingPointConfigsDto(SccpRemoteSignalingPointConfig sccpRemoteSignalingPointConfig) {
+        if (sccpRemoteSignalingPointConfig == null) return null;
+        return SccpRemoteSignalingPointConfigDto
+                .builder()
+                .id(sccpRemoteSignalingPointConfig.getId())
+                .remoteSignalingPointCode(sccpRemoteSignalingPointConfig.getRemoteSignalingPointCode())
+                .rspcFlag(sccpRemoteSignalingPointConfig.getRspcFlag())
+                .mask(sccpRemoteSignalingPointConfig.getMask())
+                .build();
+    }
+
+    public SccpAddressConfigDto createSccpAddressConfigsDto(SccpAddressConfig sccpAddressConfig) {
+        if (sccpAddressConfig == null) return null;
+        return SccpAddressConfigDto
+                .builder()
+                .id(sccpAddressConfig.getId())
+                .addressIndicator(sccpAddressConfig.getAddressIndicator())
+                .pointCode(sccpAddressConfig.getPointCode())
+                .ssn(sccpAddressConfig.getSsn())
+                .translationType(sccpAddressConfig.getTranslationType())
+                .numberingPlan(sccpAddressConfig.getNumberingPlan())
+                .natureOfAddress(sccpAddressConfig.getNatureOfAddress())
+                .digits(sccpAddressConfig.getDigits())
+                .build();
+    }
+
+    public SccpRemoteSubsystemConfigDto createSccpRemoteSubsystemConfigDto(SccpRemoteSubsystemConfig sccpRemoteSubsystemConfig) {
+        if (sccpRemoteSubsystemConfig == null) return null;
+        return SccpRemoteSubsystemConfigDto.builder()
+                .id(sccpRemoteSubsystemConfig.getId())
+                .remoteSignalingPointCode(sccpRemoteSubsystemConfig.getRemoteSignalingPointCode())
+                .remoteSubsystemNumber(sccpRemoteSubsystemConfig.getRemoteSubsystemNumber())
+                .remoteSubsystemFlag(sccpRemoteSubsystemConfig.getRemoteSubsystemFlag())
+                .markProhibitedWhenSpcResuming(sccpRemoteSubsystemConfig.isMarkProhibitedWhenSpcResuming())
+                .build();
+    }
+
+    public SccpMtp3DestinationConfigDto createSccpMtp3DestinationConfigDto(SccpMtp3DestinationConfig sccpMtp3DestinationConfig) {
+        if (sccpMtp3DestinationConfig == null) return null;
+        return SccpMtp3DestinationConfigDto.builder()
+                .id(sccpMtp3DestinationConfig.getId())
+                .firstSignalingPointCode(sccpMtp3DestinationConfig.getFirstSignalingPointCode())
+                .lastSignalingPointCode(sccpMtp3DestinationConfig.getLastSignalingPointCode())
+                .firstSls(sccpMtp3DestinationConfig.getFirstSls())
+                .lastSls(sccpMtp3DestinationConfig.getLastSls())
+                .slsMask(sccpMtp3DestinationConfig.getSlsMask())
+                .build();
+
+    }
+
+    public SccpServiceAccessPointConfigDto createSccpServiceAccessPointConfigDto(SccpServiceAccessPointConfig sccpServiceAccessPointConfig) {
+        if (sccpServiceAccessPointConfig == null) return null;
+        return SccpServiceAccessPointConfigDto.builder()
+                .id(sccpServiceAccessPointConfig.getId())
+                .mtp3Id(sccpServiceAccessPointConfig.getMtp3Id())
+                .opc(sccpServiceAccessPointConfig.getOpc())
+                .ni(sccpServiceAccessPointConfig.getNi())
+                .networkId(sccpServiceAccessPointConfig.getNetworkId())
+                .localGlobalTitleDigits(sccpServiceAccessPointConfig.getLocalGlobalTitleDigits())
+                .sccpMtp3DestinationConfigs(
+                        Optional.ofNullable(sccpServiceAccessPointConfig.getSccpMtp3DestinationConfigs()).orElse(new HashSet<>())
+                                .stream()
+                                .map(this::createSccpMtp3DestinationConfigDto)
+                                .collect(Collectors.toSet())
+                )
+                .build();
+    }
+
+    public SccpConcernedSignalingPointCodeConfigDto createSccpConcernedSignalingPointCodeConfigDto(SccpConcernedSignalingPointCodeConfig sccpConcernedSignalingPointCodeConfig) {
+        if (sccpConcernedSignalingPointCodeConfig == null) return null;
+        return SccpConcernedSignalingPointCodeConfigDto.builder()
+                .id(sccpConcernedSignalingPointCodeConfig.getId())
+                .signalingPointCode(sccpConcernedSignalingPointCodeConfig.getSignalingPointCode())
+                .build();
+    }
+
+    public SccpSettingsConfigDto createSccpSettingsConfigDto(SccpSettingsConfig sccpSettingsConfig) {
+        if (sccpSettingsConfig == null) return null;
+        return SccpSettingsConfigDto.builder()
+                .id(sccpSettingsConfig.getId())
+                .zmarginxudtmessage(sccpSettingsConfig.getZmarginxudtmessage())
+                .reassemblytimerdelay(sccpSettingsConfig.getReassemblytimerdelay())
+                .maxdatamessage(sccpSettingsConfig.getMaxdatamessage())
+                .periodoflogging(sccpSettingsConfig.getPeriodoflogging())
+                .removespc(sccpSettingsConfig.isRemovespc())
+                .previewmode(sccpSettingsConfig.isPreviewmode())
+                .ssttimerduration_min(sccpSettingsConfig.getSsttimerduration_min())
+                .ssttimerduration_max(sccpSettingsConfig.getSsttimerduration_max())
+                .ssttimerduration_increasefactor(sccpSettingsConfig.getSsttimerduration_increasefactor())
+                .sccpprotocolversion(sccpSettingsConfig.getSccpprotocolversion())
+                .cc_timer_a(sccpSettingsConfig.getCc_timer_a())
+                .cc_timer_d(sccpSettingsConfig.getCc_timer_d())
+                .canrelay(sccpSettingsConfig.isCanrelay())
+                .connesttimerdelay(sccpSettingsConfig.getConnesttimerdelay())
+                .iastimerdelay(sccpSettingsConfig.getIastimerdelay())
+                .iartimerdelay(sccpSettingsConfig.getIartimerdelay())
+                .reltimerdelay(sccpSettingsConfig.getReltimerdelay())
+                .repeatreltimerdelay(sccpSettingsConfig.getRepeatreltimerdelay())
+                .inttimerdelay(sccpSettingsConfig.getInttimerdelay())
+                .guardtimerdelay(sccpSettingsConfig.getGuardtimerdelay())
+                .resettimerdelay(sccpSettingsConfig.getResettimerdelay())
+                .timerexecutors_threadcount(sccpSettingsConfig.getTimerexecutors_threadcount())
+                .cc_algo(sccpSettingsConfig.getCc_algo())
+                .cc_blockingoutgoungsccpmessages(sccpSettingsConfig.isCc_blockingoutgoungsccpmessages())
+                .build();
+    }
+
     public TcapConfigDto createTcapConfigDto(TcapConfig tcapConfig) {
         if (tcapConfig == null) return null;
         return TcapConfigDto.builder()
@@ -207,18 +347,18 @@ public class CreatorDataObjectService {
                 .sccpRuleConfigsDto(
                         Optional.ofNullable(sigtranStack.getSccpRuleConfigs()).orElse(new HashSet<>())
                                 .stream()
-                                .map(this::createSccpRuleConfigDto)
+                                .map(this::createSccpRuleConfigsDto)
                                 .collect(Collectors.toSet()))
                 .sccpRemoteSignalingPointConfigsDto(
                         Optional.ofNullable(sigtranStack.getSccpRemoteSignalingPointConfigs()).orElse(new HashSet<>())
                                 .stream()
-                                .map(this::createSccpRemoteSignalingPointConfigDto)
+                                .map(this::createSccpRemoteSignalingPointConfigsDto)
                                 .collect(Collectors.toSet())
                 )
                 .sccpAddressConfigsDto(
                         Optional.ofNullable(sigtranStack.getSccpAddressConfigs()).orElse(new HashSet<>())
                                 .stream()
-                                .map(this::createSccpAddressConfigDto)
+                                .map(this::createSccpAddressConfigsDto)
                                 .collect(Collectors.toSet())
                 )
                 .sccpRemoteSubsystemConfigsDto(
@@ -241,155 +381,6 @@ public class CreatorDataObjectService {
                 )
                 .sccpSettingsConfigDto(createSccpSettingsConfigDto(sigtranStack.getSccpSettingsConfig()))
                 .tcapConfigDto(createTcapConfigDto(sigtranStack.getTcapConfig()))
-                .build();
-    }
-
-    public SccpAddressConfigDto createSccpAddressConfigDto(SccpAddressConfig sccpAddressConfig) {
-        if (sccpAddressConfig == null) return null;
-        return SccpAddressConfigDto
-                .builder()
-                .id(sccpAddressConfig.getId())
-                .addressIndicator(sccpAddressConfig.getAddressIndicator())
-                .pointCode(sccpAddressConfig.getPointCode())
-                .ssn(sccpAddressConfig.getSsn())
-                .translationType(sccpAddressConfig.getTranslationType())
-                .numberingPlan(sccpAddressConfig.getNumberingPlan())
-                .natureOfAddress(sccpAddressConfig.getNatureOfAddress())
-                .digits(sccpAddressConfig.getDigits())
-                .build();
-    }
-
-    public SccpAddressRuleConfigDto createSccpAddressRuleConfigDto(SccpAddressRuleConfig sccpAddressRuleConfig) {
-        if (sccpAddressRuleConfig == null) return null;
-        return SccpAddressRuleConfigDto.builder()
-                .id(sccpAddressRuleConfig.getId())
-                .addressIndicator(sccpAddressRuleConfig.getAddressIndicator())
-                .pointCode(sccpAddressRuleConfig.getPointCode())
-                .ssn(sccpAddressRuleConfig.getSsn())
-                .translationType(sccpAddressRuleConfig.getTranslationType())
-                .numberingPlan(sccpAddressRuleConfig.getNumberingPlan())
-                .natureOfAddress(sccpAddressRuleConfig.getNatureOfAddress())
-                .digits(sccpAddressRuleConfig.getDigits())
-                .build();
-    }
-
-    public SccpConcernedSignalingPointCodeConfigDto createSccpConcernedSignalingPointCodeConfigDto(SccpConcernedSignalingPointCodeConfig sccpConcernedSignalingPointCodeConfig) {
-        if (sccpConcernedSignalingPointCodeConfig == null) return null;
-        return SccpConcernedSignalingPointCodeConfigDto.builder()
-                .id(sccpConcernedSignalingPointCodeConfig.getId())
-                .signalingPointCode(sccpConcernedSignalingPointCodeConfig.getSignalingPointCode())
-                .build();
-    }
-
-    public SccpLongMessageRuleConfigDto createSccpLongMessageRuleConfigDto(SccpLongMessageRuleConfig sccpLongMessageRuleConfig) {
-        if(sccpLongMessageRuleConfig == null) return null;
-        return SccpLongMessageRuleConfigDto.builder()
-                .id(sccpLongMessageRuleConfig.getId())
-                .firstSignalingPointCode(sccpLongMessageRuleConfig.getFirstSignalingPointCode())
-                .lastSignalingPointCode(sccpLongMessageRuleConfig.getLastSignalingPointCode())
-                .longMessageRuleType(sccpLongMessageRuleConfig.getLongMessageRuleType())
-                .build();
-    }
-
-    public SccpMtp3DestinationConfigDto createSccpMtp3DestinationConfigDto(SccpMtp3DestinationConfig sccpMtp3DestinationConfig) {
-        if (sccpMtp3DestinationConfig == null) return null;
-        return SccpMtp3DestinationConfigDto.builder()
-                .id(sccpMtp3DestinationConfig.getId())
-                .firstSignalingPointCode(sccpMtp3DestinationConfig.getFirstSignalingPointCode())
-                .lastSignalingPointCode(sccpMtp3DestinationConfig.getLastSignalingPointCode())
-                .firstSls(sccpMtp3DestinationConfig.getFirstSls())
-                .lastSls(sccpMtp3DestinationConfig.getLastSls())
-                .slsMask(sccpMtp3DestinationConfig.getSlsMask())
-                .build();
-
-    }
-
-
-    public SccpRemoteSignalingPointConfigDto createSccpRemoteSignalingPointConfigDto(SccpRemoteSignalingPointConfig sccpRemoteSignalingPointConfig) {
-        if (sccpRemoteSignalingPointConfig == null) return null;
-        return SccpRemoteSignalingPointConfigDto
-                .builder()
-                .id(sccpRemoteSignalingPointConfig.getId())
-                .remoteSignalingPointCode(sccpRemoteSignalingPointConfig.getRemoteSignalingPointCode())
-                .rspcFlag(sccpRemoteSignalingPointConfig.getRspcFlag())
-                .mask(sccpRemoteSignalingPointConfig.getMask())
-                .build();
-    }
-
-    public SccpRemoteSubsystemConfigDto createSccpRemoteSubsystemConfigDto(SccpRemoteSubsystemConfig sccpRemoteSubsystemConfig) {
-        if (sccpRemoteSubsystemConfig == null) return null;
-        return SccpRemoteSubsystemConfigDto.builder()
-                .id(sccpRemoteSubsystemConfig.getId())
-                .remoteSignalingPointCode(sccpRemoteSubsystemConfig.getRemoteSignalingPointCode())
-                .remoteSubsystemNumber(sccpRemoteSubsystemConfig.getRemoteSubsystemNumber())
-                .remoteSubsystemFlag(sccpRemoteSubsystemConfig.getRemoteSubsystemFlag())
-                .markProhibitedWhenSpcResuming(sccpRemoteSubsystemConfig.isMarkProhibitedWhenSpcResuming())
-                .build();
-    }
-
-    public SccpRuleConfigDto createSccpRuleConfigDto(SccpRuleConfig sccpRuleConfig) {
-        if (sccpRuleConfig == null) return null;
-        return SccpRuleConfigDto.builder()
-                .id(sccpRuleConfig.getId())
-                .mask(sccpRuleConfig.getMask())
-                .sccpAddressRuleConfig(createSccpAddressRuleConfigDto(sccpRuleConfig.getSccpAddressRuleConfig()))
-                .ruleType(sccpRuleConfig.getRuleType())
-                .primaryAddressId(sccpRuleConfig.getPrimaryAddressId())
-                .loadSharingAlgorithm(sccpRuleConfig.getLoadSharingAlgorithm())
-                .originationType(sccpRuleConfig.getOriginationType())
-                .secondaryAddressId(sccpRuleConfig.getSecondaryAddressId())
-                .newCallingPartyAddressAddressId(sccpRuleConfig.getNewCallingPartyAddressAddressId())
-                .networkId(sccpRuleConfig.getNetworkId())
-                .callingSccpAddressRuleConfig(createSccpAddressRuleConfigDto(sccpRuleConfig.getCallingSccpAddressRuleConfig()))
-                .build();
-    }
-
-    public SccpServiceAccessPointConfigDto createSccpServiceAccessPointConfigDto(SccpServiceAccessPointConfig sccpServiceAccessPointConfig) {
-        if (sccpServiceAccessPointConfig == null) return null;
-        return SccpServiceAccessPointConfigDto.builder()
-                .id(sccpServiceAccessPointConfig.getId())
-                .mtp3Id(sccpServiceAccessPointConfig.getMtp3Id())
-                .opc(sccpServiceAccessPointConfig.getOpc())
-                .ni(sccpServiceAccessPointConfig.getNi())
-                .networkId(sccpServiceAccessPointConfig.getNetworkId())
-                .localGlobalTitleDigits(sccpServiceAccessPointConfig.getLocalGlobalTitleDigits())
-                .sccpMtp3DestinationConfigs(
-                        Optional.ofNullable(sccpServiceAccessPointConfig.getSccpMtp3DestinationConfigs()).orElse(new HashSet<>())
-                                .stream()
-                                .map(this::createSccpMtp3DestinationConfigDto)
-                                .collect(Collectors.toSet())
-                )
-                .build();
-    }
-
-    public SccpSettingsConfigDto createSccpSettingsConfigDto(SccpSettingsConfig sccpSettingsConfig) {
-        if (sccpSettingsConfig == null) return null;
-        return SccpSettingsConfigDto.builder()
-                .id(sccpSettingsConfig.getId())
-                .zmarginxudtmessage(sccpSettingsConfig.getZmarginxudtmessage())
-                .reassemblytimerdelay(sccpSettingsConfig.getReassemblytimerdelay())
-                .maxdatamessage(sccpSettingsConfig.getMaxdatamessage())
-                .periodoflogging(sccpSettingsConfig.getPeriodoflogging())
-                .removespc(sccpSettingsConfig.isRemovespc())
-                .previewmode(sccpSettingsConfig.isPreviewmode())
-                .ssttimerduration_min(sccpSettingsConfig.getSsttimerduration_min())
-                .ssttimerduration_max(sccpSettingsConfig.getSsttimerduration_max())
-                .ssttimerduration_increasefactor(sccpSettingsConfig.getSsttimerduration_increasefactor())
-                .sccpprotocolversion(sccpSettingsConfig.getSccpprotocolversion())
-                .cc_timer_a(sccpSettingsConfig.getCc_timer_a())
-                .cc_timer_d(sccpSettingsConfig.getCc_timer_d())
-                .canrelay(sccpSettingsConfig.isCanrelay())
-                .connesttimerdelay(sccpSettingsConfig.getConnesttimerdelay())
-                .iastimerdelay(sccpSettingsConfig.getIastimerdelay())
-                .iartimerdelay(sccpSettingsConfig.getIartimerdelay())
-                .reltimerdelay(sccpSettingsConfig.getReltimerdelay())
-                .repeatreltimerdelay(sccpSettingsConfig.getRepeatreltimerdelay())
-                .inttimerdelay(sccpSettingsConfig.getInttimerdelay())
-                .guardtimerdelay(sccpSettingsConfig.getGuardtimerdelay())
-                .resettimerdelay(sccpSettingsConfig.getResettimerdelay())
-                .timerexecutors_threadcount(sccpSettingsConfig.getTimerexecutors_threadcount())
-                .cc_algo(sccpSettingsConfig.getCc_algo())
-                .cc_blockingoutgoungsccpmessages(sccpSettingsConfig.isCc_blockingoutgoungsccpmessages())
                 .build();
     }
 

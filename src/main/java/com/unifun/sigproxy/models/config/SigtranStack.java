@@ -44,6 +44,11 @@ public class SigtranStack {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "sigtranStack")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    private Set<M3uaAspConfig> applicationServerPoints;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "sigtranStack")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<SccpRuleConfig> sccpRuleConfigs;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "sigtranStack")

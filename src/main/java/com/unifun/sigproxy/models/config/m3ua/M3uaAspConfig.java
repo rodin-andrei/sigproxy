@@ -33,4 +33,8 @@ public class M3uaAspConfig {
     @EqualsAndHashCode.Exclude
     private Set<M3uaAsConfig> applicationServers;
 
+    @ManyToOne
+    @ToString.Exclude
+    @JoinColumn(name = "stack_id", nullable = false)
+    private SigtranStack sigtranStack;
 }

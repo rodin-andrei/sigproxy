@@ -3,9 +3,7 @@ package com.unifun.sigproxy.service.m3ua.impl;
 
 import com.unifun.sigproxy.exception.InitializingException;
 import com.unifun.sigproxy.models.config.SigtranStack;
-import com.unifun.sigproxy.models.config.m3ua.M3uaAsConfig;
 import com.unifun.sigproxy.models.config.m3ua.M3uaAspConfig;
-import com.unifun.sigproxy.models.config.m3ua.M3uaRouteConfig;
 import com.unifun.sigproxy.service.m3ua.M3uaService;
 import com.unifun.sigproxy.service.sctp.SctpService;
 import lombok.RequiredArgsConstructor;
@@ -33,21 +31,6 @@ public class M3uaServiceImpl implements M3uaService {
 
     @Override
     public void initialize(SigtranStack sigtranStack) throws InitializingException {
-
-        this.initM3uaManagement(sigtranStack);
-
-        sigtranStack.getApplicationServers().forEach(asConfig -> {
-
-            this.addAs(asConfig);
-
-            asConfig.getRoutes().forEach(this::addRoute);
-
-            asConfig.getApplicationServerPoints().forEach(m3uaAspConfig -> this.addAsp(m3uaAspConfig, sigtranStack.getStackName()));
-        });
-
-    }
-
-    public void initM3uaManagement(SigtranStack sigtranStack) throws InitializingException {
         log.info("Initializing M3UA management...");
         if (m3uaManagements.containsKey(sigtranStack.getStackName())) {
             throw new InitializingException("SctpManagement: " + sigtranStack.getStackName() + " already exist");
@@ -64,77 +47,75 @@ public class M3uaServiceImpl implements M3uaService {
         } catch (Exception e) {
             throw new InitializingException("Can't initialize M3ua Layer. ", e);
         }
+
+
+        sigtranStack.getApplicationServers().forEach(asConfig -> {
+            try {
+                As as = m3uaManagements.get(sigtranStack.getStackName())
+                        .createAs(
+                                asConfig.getName(),
+                                asConfig.getFunctionality(),
+                                asConfig.getExchangeType(),
+                                asConfig.getIpspType(),
+                                parameterFactory.createRoutingContext(asConfig.getRoutingContexts()),
+                                parameterFactory.createTrafficModeType(asConfig.getTrafficModeType().getType()),
+                                1,
+                                parameterFactory.createNetworkAppearance(asConfig.getNetworkAppearance())
+                        );
+                log.info("Created AS: {}, sigtran stack: {}", asConfig.getName(), sigtranStack.getStackName());
+            } catch (Exception e) {
+                log.error("Error created AS:" + asConfig.getName(), e);
+            }
+
+            asConfig.getRoutes().forEach(routeConfig -> {
+                try {
+                    m3uaManagements.get(sigtranStack.getStackName())
+                            .addRoute(routeConfig.getDpc(),
+                                    routeConfig.getOpc(),
+                                    routeConfig.getSi(),
+                                    asConfig.getName(),
+                                    routeConfig.getTrafficModeType().getType());
+                    log.info("Added route to AS:{}, DPC: {}, OPC: {}, SSN: {}, Traffic-mode: {}",
+                            asConfig.getName(),
+                            routeConfig.getDpc(),
+                            routeConfig.getOpc(),
+                            routeConfig.getSi(),
+                            routeConfig.getTrafficModeType());
+                } catch (Exception e) {
+                    log.error("Error add Route to AS:" + asConfig.getName(), e);
+
+                }
+            });
+        });
+
+        sigtranStack.getApplicationServerPoints().forEach(aspConfig -> {
+            try {
+                AspFactory aspFactory = m3uaManagements.get(sigtranStack.getStackName())
+                        .createAspFactory(aspConfig.getName(), aspConfig.getSctpAssocName(), aspConfig.isHeartbeat());
+                log.info("Created ASP {}, sigtran stack: {}", aspConfig.getName(), sigtranStack.getStackName());
+            } catch (Exception e) {
+                log.warn("Error created ASP:" + aspConfig.getName(), e);
+            }
+
+            aspConfig.getApplicationServers()
+                    .forEach(asConfig -> {
+                        try {
+                            m3uaManagements.get(sigtranStack.getStackName()).assignAspToAs(asConfig.getName(), aspConfig.getName());
+                            log.info("Assign asp {} to as {}", aspConfig.getName(), asConfig.getName());
+                        } catch (Exception e) {
+                            log.warn("Error create simple dimple:" + aspConfig.getName() + " it's popit:" + asConfig.getName(), e);
+                        }
+                    });
+
+            try {
+                m3uaManagements.get(sigtranStack.getStackName()).startAsp(aspConfig.getName());
+                log.info("Started asp {}", aspConfig.getName());
+
+            } catch (Exception e) {
+                log.warn("Error started ASP:" + aspConfig.getName(), e);
+            }
+        });
     }
-
-    @Override
-    public void addAs(M3uaAsConfig m3uaAsConfig) {
-        try {
-            As as = m3uaManagements.get(m3uaAsConfig.getSigtranStack().getStackName())
-                    .createAs(
-                            m3uaAsConfig.getName(),
-                            m3uaAsConfig.getFunctionality(),
-                            m3uaAsConfig.getExchangeType(),
-                            m3uaAsConfig.getIpspType(),
-                            parameterFactory.createRoutingContext(m3uaAsConfig.getRoutingContexts()),
-                            parameterFactory.createTrafficModeType(m3uaAsConfig.getTrafficModeType().getType()),
-                            1,
-                            parameterFactory.createNetworkAppearance(m3uaAsConfig.getNetworkAppearance())
-                    );
-            log.info("Created AS: {}, sigtran stack: {}", m3uaAsConfig.getName(), m3uaAsConfig.getSigtranStack().getStackName());
-        } catch (Exception e) {
-            log.error("Error created AS:" + m3uaAsConfig.getName(), e);
-        }
-    }
-
-    @Override
-    public void addAsp(M3uaAspConfig m3uaAspConfig, String sigtranStackName) {
-        try {
-            AspFactory aspFactory = m3uaManagements.get(sigtranStackName)
-                    .createAspFactory(m3uaAspConfig.getName(), m3uaAspConfig.getSctpAssocName(), m3uaAspConfig.isHeartbeat());
-            log.info("Created ASP {}, sigtran stack: {}", m3uaAspConfig.getName(), sigtranStackName);
-        } catch (Exception e) {
-            log.warn("Error created ASP:" + m3uaAspConfig.getName(), e);
-        }
-
-        m3uaAspConfig.getApplicationServers()
-                .forEach(asConfig -> {
-                    try {
-                        m3uaManagements.get(sigtranStackName).assignAspToAs(asConfig.getName(), m3uaAspConfig.getName());
-                        log.info("Assign asp {} to as {}", m3uaAspConfig.getName(), asConfig.getName());
-                    } catch (Exception e) {
-                        log.warn("Error create simple dimple:" + m3uaAspConfig.getName() + " it's popit:" + asConfig.getName(), e);
-                    }
-                });
-
-        try {
-            m3uaManagements.get(sigtranStackName).startAsp(m3uaAspConfig.getName());
-            log.info("Started asp {}", m3uaAspConfig.getName());
-
-        } catch (Exception e) {
-            log.warn("Error started ASP:" + m3uaAspConfig.getName(), e);
-        }
-    }
-
-    @Override
-    public void addRoute(M3uaRouteConfig m3uaRouteConfig) {
-        try {
-            m3uaManagements.get(m3uaRouteConfig.getAs().getSigtranStack().getStackName())
-                    .addRoute(m3uaRouteConfig.getDpc(),
-                            m3uaRouteConfig.getOpc(),
-                            m3uaRouteConfig.getSi(),
-                            m3uaRouteConfig.getAs().getName(),
-                            m3uaRouteConfig.getTrafficModeType().getType());
-            log.info("Added route to AS:{}, DPC: {}, OPC: {}, SSN: {}, Traffic-mode: {}",
-                    m3uaRouteConfig.getAs().getName(),
-                    m3uaRouteConfig.getDpc(),
-                    m3uaRouteConfig.getOpc(),
-                    m3uaRouteConfig.getSi(),
-                    m3uaRouteConfig.getTrafficModeType());
-        } catch (Exception e) {
-            log.error("Error add Route to AS:" + m3uaRouteConfig.getAs().getName(), e);
-        }
-    }
-
 
     @Override
     public void stop(String stackName) {

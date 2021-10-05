@@ -1,5 +1,6 @@
 package com.unifun.sigproxy.service.m3ua;
 
+import com.unifun.sigproxy.exception.SS7AddException;
 import com.unifun.sigproxy.exception.SS7NotContentException;
 import com.unifun.sigproxy.exception.SS7NotFoundException;
 import com.unifun.sigproxy.models.config.SigtranStack;
@@ -28,18 +29,18 @@ import java.util.Set;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class M3uaConfigServiceTest {
 
-    private M3uaConfigService m3uaConfigService;
+    private  M3uaConfigService m3uaConfigService;
 
     @Mock
-    private AsRepository asRepository;
+    private  AsRepository asRepository;
 
     @Mock
-    private StackSettingsReposidory stackSettingsReposidory;
+    private   StackSettingsReposidory stackSettingsReposidory;
 
     @Mock
     private AspRepository aspRepository;
@@ -52,13 +53,13 @@ public class M3uaConfigServiceTest {
 
 
     @BeforeEach
-    public void setUp() {
-        this.m3uaConfigService = new M3uaConfigServiceImpl(asRepository, stackSettingsReposidory, aspRepository, routeRepository, sigtranStackRepository);
+     public void setUp() {
+        this.m3uaConfigService = new M3uaConfigServiceImpl(asRepository,stackSettingsReposidory,aspRepository,routeRepository,sigtranStackRepository);
     }
 
 
     @Test
-    public void testGetM3uaAsConfigByIdNotNull() {
+    public void testGetM3uaAsConfigByStackIdNotNull() {
         //given
         M3uaAsConfig m3uaAsConfig = new M3uaAsConfig();
         m3uaAsConfig.setId(1L);
@@ -73,46 +74,44 @@ public class M3uaConfigServiceTest {
     }
 
     @Test
-    public void testGetM3uaAsConfigByIdShouldReturnNull() {
-        Assertions.assertThatThrownBy(() -> m3uaConfigService.getM3uaAsConfigById(1L)).isInstanceOf(SS7NotFoundException.class);
+    public void testGetM3uaAsConfigByStackIdShouldReturnNull() {
+        Assertions.assertThatThrownBy(()->m3uaConfigService.getM3uaAsConfigById(1L)).isInstanceOf(SS7NotFoundException.class);
     }
 
     @Test
-    public void testGetM3uaAspConfigAsId_Return_Value() {
+    public void testGetM3uaAspConfigByStackId_Return_Value() {
         //given
         Set<M3uaAspConfig> m3uaAspConfigSet = new HashSet<>();
         M3uaAspConfig m3uaAspConfig = new M3uaAspConfig();
-        M3uaAsConfig m3uaAsConfig = new M3uaAsConfig();
-        m3uaAsConfig.setApplicationServerPoints(m3uaAspConfigSet);
+        SigtranStack sigtranStack = new SigtranStack();
         m3uaAspConfig.setId(1L);
         m3uaAspConfigSet.add(m3uaAspConfig);
-//        sigtranStack.setApplicationServerPoints(m3uaAspConfigSet);
-
-        given(asRepository.findById(1L)).willReturn(Optional.of(m3uaAsConfig));
+        sigtranStack.setApplicationServerPoints(m3uaAspConfigSet);
+        given(sigtranStackRepository.findById(1L)).willReturn(Optional.of(sigtranStack));
 
         //when
-        m3uaConfigService.getM3uaAspConfigByAsId(1L);
+        m3uaConfigService.getM3uaAspConfigByStackId(1L);
 
         //verify
-        verify(asRepository).findById(1L);
-        assertThat(m3uaConfigService.getM3uaAspConfigByAsId(1L)).isEqualTo(m3uaAspConfigSet);
+        verify(sigtranStackRepository).findById(1L);
+        assertThat(m3uaConfigService.getM3uaAspConfigByStackId(1L)).isEqualTo(m3uaAspConfigSet);
 
     }
 
     @Test
-    public void testGetM3uaAspConfigByAsId_Return_SS7NotFoundException() {
+    public void testGetM3uaAspConfigByStackId_Return_SS7NotFoundException() {
         //verify
-        Assertions.assertThatThrownBy(() -> m3uaConfigService.getM3uaAspConfigByAsId(1L)).isInstanceOf(SS7NotFoundException.class);
-    }
+        Assertions.assertThatThrownBy(()->m3uaConfigService.getM3uaAspConfigByStackId(1L)).isInstanceOf(SS7NotFoundException.class);
 
+    }
     @Test
-    public void testGetM3uaAspConfigByAsId_Return_SS7NotContentException() {
+    public void testGetM3uaAspConfigByStackId_Return_SS7NotContentException() {
         //given
-        M3uaAsConfig asConfig = new M3uaAsConfig();
-        given(asRepository.findById(1L)).willReturn(Optional.of(asConfig));
+        SigtranStack sigtranStack = new SigtranStack();
+        given(sigtranStackRepository.findById(1L)).willReturn(Optional.of(sigtranStack));
 
         //verify
-        Assertions.assertThatThrownBy(() -> m3uaConfigService.getM3uaAspConfigByAsId(1L)).isInstanceOf(SS7NotContentException.class);
+        Assertions.assertThatThrownBy(()->m3uaConfigService.getM3uaAspConfigByStackId(1L)).isInstanceOf(SS7NotContentException.class);
     }
 
     @Test
@@ -140,14 +139,14 @@ public class M3uaConfigServiceTest {
 
         //when
         //verify
-        Assertions.assertThatThrownBy(() -> m3uaConfigService.getM3uaRouteConfigByM3UaAsId(1L)).isInstanceOf(SS7NotContentException.class);
+        Assertions.assertThatThrownBy(()->m3uaConfigService.getM3uaRouteConfigByM3UaAsId(1L)).isInstanceOf(SS7NotContentException.class);
     }
 
     @Test
     public void testGetM3uaRouteConfigByM3UaAsId_Return_SS7NotFoundException() {
         //when
         //verify
-        Assertions.assertThatThrownBy(() -> m3uaConfigService.getM3uaAsConfigByStackId(1L)).isInstanceOf(SS7NotFoundException.class);
+        Assertions.assertThatThrownBy(()->m3uaConfigService.getM3uaAsConfigByStackId(1L)).isInstanceOf(SS7NotFoundException.class);
     }
 
 
@@ -165,7 +164,7 @@ public class M3uaConfigServiceTest {
         //verify
         verify(sigtranStackRepository).findById(1L);
         assertThat(m3uaConfigService.getM3uaStackSettingsConfigByStackId(1L)).isEqualTo(m3uaStackSettingsConfig);
-    }
+}
 
     @Test
     public void testGetM3uaStackSettingsConfigByStackId_Return_SS7NotContentException() {
@@ -175,7 +174,7 @@ public class M3uaConfigServiceTest {
 
         //when
         //verify
-        Assertions.assertThatThrownBy(() -> m3uaConfigService.getM3uaStackSettingsConfigByStackId(id)).isInstanceOf(SS7NotContentException.class);
+        Assertions.assertThatThrownBy(()->m3uaConfigService.getM3uaStackSettingsConfigByStackId(id)).isInstanceOf(SS7NotContentException.class);
     }
 
 
@@ -184,7 +183,7 @@ public class M3uaConfigServiceTest {
         Long id = 1L;
         //when
         //verify
-        Assertions.assertThatThrownBy(() -> m3uaConfigService.getM3uaStackSettingsConfigByStackId(id)).isInstanceOf(SS7NotFoundException.class);
+        Assertions.assertThatThrownBy(()->m3uaConfigService.getM3uaStackSettingsConfigByStackId(id)).isInstanceOf(SS7NotFoundException.class);
     }
 
 
@@ -200,7 +199,7 @@ public class M3uaConfigServiceTest {
 
         //verify
         verify(asRepository).findById(id);
-        assertThat(m3uaConfigService.getM3uaAsConfigById(id)).isEqualTo(m3uaAsConfig);
+        assertThat( m3uaConfigService.getM3uaAsConfigById(id)).isEqualTo(m3uaAsConfig);
     }
 
     @Test
@@ -208,7 +207,7 @@ public class M3uaConfigServiceTest {
         Long id = 1L;
         //when
         //verify
-        Assertions.assertThatThrownBy(() -> m3uaConfigService.getM3uaAsConfigById(id)).isInstanceOf(SS7NotFoundException.class);
+        Assertions.assertThatThrownBy(()->m3uaConfigService.getM3uaAsConfigById(id)).isInstanceOf(SS7NotFoundException.class);
     }
 
 
@@ -225,7 +224,7 @@ public class M3uaConfigServiceTest {
 
         //verify
         verify(aspRepository).findById(id);
-        assertThat(m3uaConfigService.getM3uaAspConfigById(id)).isEqualTo(m3uaAspConfig);
+        assertThat( m3uaConfigService.getM3uaAspConfigById(id)).isEqualTo(m3uaAspConfig);
     }
 
     @Test
@@ -233,7 +232,7 @@ public class M3uaConfigServiceTest {
         Long id = 1L;
         //when
         //verify
-        Assertions.assertThatThrownBy(() -> m3uaConfigService.getM3uaAspConfigById(id)).isInstanceOf(SS7NotFoundException.class);
+        Assertions.assertThatThrownBy(()->m3uaConfigService.getM3uaAspConfigById(id)).isInstanceOf(SS7NotFoundException.class);
     }
 
 
@@ -249,7 +248,7 @@ public class M3uaConfigServiceTest {
 
         //verify
         verify(routeRepository).findById(id);
-        assertThat(m3uaConfigService.getM3uaRouteConfigById(id)).isEqualTo(m3uaRouteConfig);
+        assertThat( m3uaConfigService.getM3uaRouteConfigById(id)).isEqualTo(m3uaRouteConfig);
 
     }
 
@@ -260,7 +259,7 @@ public class M3uaConfigServiceTest {
 
         //when
         //verify
-        assertThatThrownBy(() -> m3uaConfigService.getM3uaRouteConfigById(id)).isInstanceOf(SS7NotFoundException.class);
+        assertThatThrownBy(()->m3uaConfigService.getM3uaRouteConfigById(id)).isInstanceOf(SS7NotFoundException.class);
     }
 
     @Test
@@ -275,7 +274,7 @@ public class M3uaConfigServiceTest {
 
         //verify
         verify(stackSettingsReposidory).findById(id);
-        assertThat(m3uaConfigService.get3uaStackSettingsConfigById(id)).isEqualTo(m3uaStackSettingsConfig);
+        assertThat( m3uaConfigService.get3uaStackSettingsConfigById(id)).isEqualTo( m3uaStackSettingsConfig);
     }
 
     @Test
@@ -285,7 +284,7 @@ public class M3uaConfigServiceTest {
 
         //when
         //verify
-        assertThatThrownBy(() -> m3uaConfigService.get3uaStackSettingsConfigById(id)).isInstanceOf(SS7NotFoundException.class);
+        assertThatThrownBy(()->m3uaConfigService.get3uaStackSettingsConfigById(id)).isInstanceOf(SS7NotFoundException.class);
     }
 
     @Test
@@ -304,10 +303,11 @@ public class M3uaConfigServiceTest {
     }
 
 
+
     @Test
     public void testAddM3uaStackSettingsConfig_Succes_Save() {
         //given
-        M3uaStackSettingsConfig m3uaStackSettingsConfig = new M3uaStackSettingsConfig();
+        M3uaStackSettingsConfig m3uaStackSettingsConfig = new  M3uaStackSettingsConfig();
         given(stackSettingsReposidory.save(m3uaStackSettingsConfig)).willReturn(m3uaStackSettingsConfig);
         ArgumentCaptor<M3uaStackSettingsConfig> captor = ArgumentCaptor.forClass(M3uaStackSettingsConfig.class);
         //when
@@ -364,7 +364,7 @@ public class M3uaConfigServiceTest {
     public void testRemoveM3uaStackSettingsConfig() {
         Long deletedId = 1L;
         ArgumentCaptor<Long> captor = ArgumentCaptor.forClass(Long.class);
-        m3uaConfigService.removeM3uaStackSettingsConfig(deletedId);
+       m3uaConfigService.removeM3uaStackSettingsConfig(deletedId);
         verify(stackSettingsReposidory).deleteById(captor.capture());
         Assertions.assertThat(captor.getValue()).isEqualTo(deletedId);
     }
