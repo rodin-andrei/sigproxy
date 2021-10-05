@@ -34,28 +34,12 @@ public class SctpServiceImpl implements SctpService {
 
     @Override
     public void initialize(SigtranStack sigtranStack) throws NoConfigurationException, InitializingException {
-        try {
-            log.info("Initializing SCTP management...");
-            if (sctpManagements.containsKey(sigtranStack.getStackName())) {
-                throw new InitializingException("SctpManagement: " + sigtranStack.getStackName() + " already exist");
-            }
-            var sctpManagement = new NettySctpManagementImpl(sigtranStack.getStackName());
-            sctpManagements.put(sigtranStack.getStackName(), sctpManagement);
-            sctpManagement.setPersistDir(this.jssPersistDir);
-            sctpManagement.start();
-            sctpManagement.removeAllResourses();
-            this.initSettings(sigtranStack, sctpManagement);
-        } catch (Exception e) {
-            throw new InitializingException("Can't initialize sctp management: " + sigtranStack.getStackName(), e);
-        }
-
-
+        addSigtranStack(sigtranStack);
         var clientAssociations = sigtranStack.getAssociations();
         var sctpServers = sigtranStack.getSctpServerConfigs();
         if (clientAssociations.isEmpty() && sctpServers.isEmpty()) {
             throw new NoConfigurationException("No links or servers to configure for SCTP managment: " + sigtranStack.getStackName());
         }
-
         addServers(sctpServers, sigtranStack.getStackName());
         addLinks(clientAssociations, sigtranStack.getStackName());
 
