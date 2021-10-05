@@ -53,7 +53,7 @@ public class M3uaConfigServiceTest {
 
 
     @BeforeEach
-     public void setUp() {
+    public void setUp() {
         this.m3uaConfigService = new M3uaConfigServiceImpl(asRepository,stackSettingsReposidory,aspRepository,routeRepository,sigtranStackRepository);
     }
 
@@ -79,39 +79,37 @@ public class M3uaConfigServiceTest {
     }
 
     @Test
-    public void testGetM3uaAspConfigByStackId_Return_Value() {
+    public void testGetM3uaAspConfigByAsId_Return_Value() {
         //given
         Set<M3uaAspConfig> m3uaAspConfigSet = new HashSet<>();
-        M3uaAspConfig m3uaAspConfig = new M3uaAspConfig();
-        SigtranStack sigtranStack = new SigtranStack();
-        m3uaAspConfig.setId(1L);
-        m3uaAspConfigSet.add(m3uaAspConfig);
-        sigtranStack.setApplicationServerPoints(m3uaAspConfigSet);
-        given(sigtranStackRepository.findById(1L)).willReturn(Optional.of(sigtranStack));
+        M3uaAsConfig m3uaAsConfig = new M3uaAsConfig();
+        m3uaAsConfig.setApplicationServerPoints(m3uaAspConfigSet);
+
+        given(asRepository.findById(1L)).willReturn(Optional.of(m3uaAsConfig));
 
         //when
-        m3uaConfigService.getM3uaAspConfigByStackId(1L);
+        m3uaConfigService.getM3uaAspConfigByAsId(1L);
 
         //verify
-        verify(sigtranStackRepository).findById(1L);
-        assertThat(m3uaConfigService.getM3uaAspConfigByStackId(1L)).isEqualTo(m3uaAspConfigSet);
+        verify(asRepository).findById(1L);
+        assertThat(m3uaConfigService.getM3uaAspConfigByAsId(1L)).isEqualTo(m3uaAspConfigSet);
 
     }
 
     @Test
     public void testGetM3uaAspConfigByStackId_Return_SS7NotFoundException() {
         //verify
-        Assertions.assertThatThrownBy(()->m3uaConfigService.getM3uaAspConfigByStackId(1L)).isInstanceOf(SS7NotFoundException.class);
+        Assertions.assertThatThrownBy(()->m3uaConfigService.getM3uaAspConfigByAsId(1L)).isInstanceOf(SS7NotFoundException.class);
 
     }
     @Test
     public void testGetM3uaAspConfigByStackId_Return_SS7NotContentException() {
         //given
-        SigtranStack sigtranStack = new SigtranStack();
-        given(sigtranStackRepository.findById(1L)).willReturn(Optional.of(sigtranStack));
+        M3uaAsConfig m3uaAsConfig = new M3uaAsConfig();
+        given(asRepository.findById(1L)).willReturn(Optional.of(m3uaAsConfig));
 
         //verify
-        Assertions.assertThatThrownBy(()->m3uaConfigService.getM3uaAspConfigByStackId(1L)).isInstanceOf(SS7NotContentException.class);
+        Assertions.assertThatThrownBy(()->m3uaConfigService.getM3uaAspConfigByAsId(1L)).isInstanceOf(SS7NotContentException.class);
     }
 
     @Test
@@ -164,7 +162,7 @@ public class M3uaConfigServiceTest {
         //verify
         verify(sigtranStackRepository).findById(1L);
         assertThat(m3uaConfigService.getM3uaStackSettingsConfigByStackId(1L)).isEqualTo(m3uaStackSettingsConfig);
-}
+    }
 
     @Test
     public void testGetM3uaStackSettingsConfigByStackId_Return_SS7NotContentException() {
@@ -364,7 +362,7 @@ public class M3uaConfigServiceTest {
     public void testRemoveM3uaStackSettingsConfig() {
         Long deletedId = 1L;
         ArgumentCaptor<Long> captor = ArgumentCaptor.forClass(Long.class);
-       m3uaConfigService.removeM3uaStackSettingsConfig(deletedId);
+        m3uaConfigService.removeM3uaStackSettingsConfig(deletedId);
         verify(stackSettingsReposidory).deleteById(captor.capture());
         Assertions.assertThat(captor.getValue()).isEqualTo(deletedId);
     }
