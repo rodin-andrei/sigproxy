@@ -4,13 +4,10 @@ import com.unifun.sigproxy.exception.SS7NotContentException;
 import com.unifun.sigproxy.exception.SS7NotFoundException;
 import com.unifun.sigproxy.exception.SS7RemoveException;
 import com.unifun.sigproxy.models.config.SigtranStack;
-import com.unifun.sigproxy.models.config.m3ua.M3uaAspConfig;
-import com.unifun.sigproxy.models.config.sccp.SccpAddressConfig;
 import com.unifun.sigproxy.models.config.tcap.TcapConfig;
 import com.unifun.sigproxy.repository.SigtranStackRepository;
 import com.unifun.sigproxy.repository.tcap.TcapConfigRepository;
 import com.unifun.sigproxy.service.tcap.impl.TcapConfigServiceImpl;
-import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.AfterEach;
@@ -19,17 +16,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.EmptyResultDataAccessException;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,7 +50,7 @@ public class TcapServiceTest {
     }
 
     @Test
-    public void getTcapConfigById_Return_Value(){
+    public void testGetTcapConfigById_Return_Value(){
         TcapConfig tcapConfig = new TcapConfig();
         tcapConfig.setLocalSsn(1);
         int[] i = {2,3,4,5};
@@ -68,7 +63,7 @@ public class TcapServiceTest {
     }
 
     @Test
-    public void getTcapConfigByStackId__Throw_SS7NotFoundException(){
+    public void testGetTcapConfigByStackId__Throw_SS7NotFoundException(){
         //given
         Long id = 1L;
         //verify
@@ -76,7 +71,7 @@ public class TcapServiceTest {
     }
 
     @Test
-    public void getTcapConfigByStackId_Return_Value(){
+    public void testGetTcapConfigByStackId_Return_Value(){
         //given
         Long id = 1L;
         SigtranStack sigtranStack = new SigtranStack();
@@ -93,7 +88,7 @@ public class TcapServiceTest {
     }
 
     @Test
-    void getTcapConfigByStackId_Throw_SS7NotContentException() {
+    void testGetTcapConfigByStackId_Throw_SS7NotContentException() {
         //given
         Long id = 1L;
         given(sigtranStackRepository.findById(id)).willReturn(Optional.of(new SigtranStack()));
@@ -106,7 +101,7 @@ public class TcapServiceTest {
     }
 
     @Test
-    void getTcapConfigByStackId_Throw_SS7NotFoundException() {
+    void testGetTcapConfigByStackId_Throw_SS7NotFoundException() {
         //given
         Long id = 1L;
 
@@ -117,7 +112,7 @@ public class TcapServiceTest {
     }
 
     @Test
-    public void testRemoveTcap() {
+    public void testRemoveTcap_Succes_Remove() {
         Long removeId = 1L;
         ArgumentCaptor<Long> captor = ArgumentCaptor.forClass(Long.class);
         tcapConfigService.removeTcap(removeId);
@@ -125,8 +120,17 @@ public class TcapServiceTest {
         Assertions.assertThat(captor.getValue()).isEqualTo(removeId);
     }
 
+
     @Test
-    public void testTcapConfig_Succes_Save() {
+    public void testRemoveTcap_SS7RemoveException() {
+        Long id = 1L;
+        doThrow(EmptyResultDataAccessException.class).when(tcapConfigRepository).deleteById(id);
+        //when-verify
+        assertThatThrownBy(() -> tcapConfigService.removeTcap(id)).isInstanceOf(SS7RemoveException.class);
+    }
+
+    @Test
+    public void testAddTcapConfig_Succes_Save() {
         //given
         TcapConfig tcapConfig = new TcapConfig();
         given(tcapConfigRepository.save(tcapConfig)).willReturn(tcapConfig);
