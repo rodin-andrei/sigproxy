@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SigtranServiceImpl implements SigtranService {
+public class SigtranServiceImpl implements SigtranService { //TODO configuration service ? to create Beans from stacks
     private final SigtranStackRepository sigtranStackRepository;
     private final M3uaService m3uaService;
     private final SctpService sctpService;
@@ -43,6 +43,7 @@ public class SigtranServiceImpl implements SigtranService {
                                 sigtranStack.getStackName(), e.getMessage(), e);
                     }
                 });
+        log.info("Initialized Sigtran stacks.");
     }
 
     private void initMap(SigtranStack sigtranStack) throws NoConfigurationException, InitializingException {
