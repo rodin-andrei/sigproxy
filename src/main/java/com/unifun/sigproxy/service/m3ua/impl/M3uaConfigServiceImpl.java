@@ -67,6 +67,7 @@ public class M3uaConfigServiceImpl implements M3uaConfigService {
 
     @Override
     public M3uaAsConfig getM3uaAsConfigById(Long m3uaAsId) {
+
         return asRepository.findById(m3uaAsId).orElseThrow(() -> new SS7NotFoundException("Not found m3ua As with Id " + m3uaAsId));
     }
 

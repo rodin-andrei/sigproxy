@@ -22,7 +22,7 @@ public interface M3uaConfigService {
 
     M3uaRouteConfig getM3uaRouteConfigById(Long m3uaRouteId);
 
-    M3uaStackSettingsConfig get3uaStackSettingsConfigById(Long m3uaStackSettingsId);
+    M3uaStackSettingsConfig get3uaStackSettingsConfigById(Long m3uaStackSettingsId); //todo Change 3ua to M3ua
 
     M3uaAsConfig addM3uaAsConfig(M3uaAsConfig m3uaAsConfig);
 

@@ -10,6 +10,7 @@ import com.unifun.sigproxy.repository.SigtranStackRepository;
 import com.unifun.sigproxy.repository.sccp.*;
 import com.unifun.sigproxy.service.sccp.SccpConfigService;
 import lombok.AllArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.Set;
@@ -176,7 +177,7 @@ public class SccpConfigServiceImpl implements SccpConfigService {
     public void removeAddressConfig(Integer sccpAddressConfigId) {
         try {
             sccpAddressConfigRepository.deleteById(sccpAddressConfigId);
-        } catch (Exception e) {
+        } catch (EmptyResultDataAccessException e) {
             throw new SS7RemoveException("Remove Sccp Address Config with id " + sccpAddressConfigId + " failed", e);
         }
     }

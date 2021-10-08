@@ -12,7 +12,7 @@ public interface SctpConfigService {
 
     SctpClientAssociationConfig getClientLinkById(Long clientLinkId);
 
-    void removeClientLinkById(Long linkId);
+    void removeClientLinkById(Long linkId); //todo return removed id or object
 
     Set<SctpServerAssociationConfig> getServerLinksBySctpServerId(Long serverId);
 
