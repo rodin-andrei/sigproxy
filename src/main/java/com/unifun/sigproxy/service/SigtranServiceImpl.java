@@ -43,6 +43,7 @@ public class SigtranServiceImpl implements SigtranService { //TODO configuration
                                 sigtranStack.getStackName(), e.getMessage(), e);
                     }
                 });
+        log.info("Initialized Sigtran stacks.");
     }
 
     private void initMap(SigtranStack sigtranStack) throws NoConfigurationException, InitializingException {
