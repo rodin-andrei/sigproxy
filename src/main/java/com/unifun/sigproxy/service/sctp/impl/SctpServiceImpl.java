@@ -226,6 +226,7 @@ public class SctpServiceImpl implements SctpService {
     public void stopServer(String serverName, String sigtranStack) {
         try {
             sctpManagements.get(sigtranStack).stopServer(serverName);
+            log.info("Stopped server: {}, sigtran stack: {}", serverName, sigtranStack);
         } catch (Exception e) {
             log.warn(e.getMessage(), e);
         }
@@ -233,7 +234,6 @@ public class SctpServiceImpl implements SctpService {
 
     @Override
     public boolean getLinkStatus(String sigtranStack, String linkName) {
-
         try {
             return this.getTransportManagement(sigtranStack)
                     .getAssociation(linkName).isConnected();
@@ -244,13 +244,11 @@ public class SctpServiceImpl implements SctpService {
 
     @Override
     public void removeServer(SctpServerConfig serverConfig, String sigtranStack) {
-        try {
-            sctpManagements.get(sigtranStack).stopServer(serverConfig.getName());
-        } catch (Exception e) {
-            log.warn(e.getMessage(), e);
-        }
+        stopServer(serverConfig.getName(), sigtranStack);
+        //TODO check is work
         try {
             sctpManagements.get(sigtranStack).removeServer(serverConfig.getName());
+            log.info("Server removed: {}, sigtranStack: {}", serverConfig.getName(), sigtranStack);
         } catch (Exception e) {
             log.warn(e.getMessage(), e);
         }
@@ -261,16 +259,7 @@ public class SctpServiceImpl implements SctpService {
         Management sctpManagement = sctpManagements.get(sigtranStack);
         sctpManagement.getServers()
                 .forEach(server -> {
-                    try {
-                        sctpManagement.stopServer(server.getName());
-                    } catch (Exception e) {
-                        log.warn("Can't stop association: {}. {}", server.getName(), e.getMessage(), e);
-                    }
-                    try {
-                        sctpManagement.removeServer(server.getName());
-                    } catch (Exception e) {
-                        log.warn("Can't remove association: {}. {}", server.getName(), e.getMessage(), e);
-                    }
+                    stopServer(server.getName(), sigtranStack);
                 });
     }
 
