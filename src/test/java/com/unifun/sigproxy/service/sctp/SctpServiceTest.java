@@ -9,6 +9,7 @@ import com.unifun.sigproxy.repository.SigtranStackRepository;
 import com.unifun.sigproxy.repository.sctp.RemoteSctpLinkRepository;
 import com.unifun.sigproxy.repository.sctp.SctpLinkRepository;
 import com.unifun.sigproxy.repository.sctp.SctpServerRepository;
+import com.unifun.sigproxy.repository.sctp.SctpStackSettingsConfigRepository;
 import com.unifun.sigproxy.service.sctp.SctpConfigService;
 import com.unifun.sigproxy.service.sctp.impl.SctpConfigServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -44,13 +45,16 @@ public class SctpServiceTest {
     @Mock
     private SctpLinkRepository sctpLinkRepository;
 
+    @Mock
+    private SctpStackSettingsConfigRepository sctpStackSettingsConfigRepository;
+
 
     private final SctpConfigService sctpConfigService;
 
 
     public SctpServiceTest() {
         MockitoAnnotations.initMocks(this);
-        this.sctpConfigService = new SctpConfigServiceImpl(sigtranStackRepository, remoteSctpLinkRepository, sctpLinkRepository, sctpServerRepository);
+        this.sctpConfigService = new SctpConfigServiceImpl(sigtranStackRepository, remoteSctpLinkRepository, sctpLinkRepository, sctpServerRepository, sctpStackSettingsConfigRepository);
     }
 
 
@@ -61,7 +65,7 @@ public class SctpServiceTest {
         sctpServerConfig.setName("test");
         sctpServerConfig.setId(1L);
         given(sctpServerRepository.findById(1L)).willReturn(Optional.of(sctpServerConfig));
-        SctpServerConfig test = sctpConfigService.getSctpServerById(1L);
+        SctpServerConfig test = sctpConfigService.getSctpServerConfigById(1L);
         log.info("Test: SctpConfigService with sctpServerRepository ===>Expect result:" +
                 "\n{Local Adress} = 1.1.1.1" +
                 "\n{Name} = test" +
@@ -77,7 +81,7 @@ public class SctpServiceTest {
     @Test(expectedExceptions = SS7NotFoundException.class)
     public void getSctpServerConfig_ById_Should_Return_Null() {
         given(sctpServerRepository.findById(1L)).willReturn(Optional.empty());
-        Optional<SctpServerConfig> test = Optional.ofNullable(sctpConfigService.getSctpServerById(1L));
+        Optional<SctpServerConfig> test = Optional.ofNullable(sctpConfigService.getSctpServerConfigById(1L));
         Assertions.assertThat(test).isEmpty();
     }
 
@@ -93,7 +97,7 @@ public class SctpServiceTest {
         s.setMultihomingAddresses(new String[]{"a", "b", "c", "d", "e", "f", "g", "h", "t", "k", "k", "k", "l", "k"});
         s.setSigtranStack(new SigtranStack());
         given(sctpLinkRepository.save(s)).willReturn(s);
-        sctpConfigService.addClinetLink(s);
+        sctpConfigService.addSctpClientAssociationConfig(s);
         Assertions.assertThat(sctpLinkRepository.save(s)).isEqualTo(s);
     }
 
@@ -111,7 +115,7 @@ public class SctpServiceTest {
         given(sctpLinkRepository.save(s)).willReturn(s);
 
         ArgumentCaptor<SctpClientAssociationConfig> captor = ArgumentCaptor.forClass(SctpClientAssociationConfig.class);
-        sctpConfigService.addClinetLink(anyObject());
+        sctpConfigService.addSctpClientAssociationConfig(anyObject());
         verify(sctpLinkRepository, atLeastOnce()).save(captor.capture());
         Assertions.assertThat(captor.getValue()).isNotEqualTo(s);
 
@@ -122,7 +126,7 @@ public class SctpServiceTest {
     public void removeSctpClientAssociationConfig_With_Right_Id() {
         Long deletedId = 1L;
         ArgumentCaptor<Long> captor = ArgumentCaptor.forClass(Long.class);
-        sctpConfigService.removeClientLinkById(deletedId);
+        sctpConfigService.removeSctpClientAssociationConfigById(deletedId);
         verify(sctpLinkRepository, atLeastOnce()).deleteById(captor.capture());
         Assertions.assertThat(captor.getValue()).isEqualTo(deletedId);
     }
@@ -143,7 +147,7 @@ public class SctpServiceTest {
             log.info("error: sctpServerRepository wasn't emulated");
         }
 
-        Set<SctpServerAssociationConfig> sctpServerAssociationConfigSetTest = sctpConfigService.getServerLinksBySctpServerId(1L);
+        Set<SctpServerAssociationConfig> sctpServerAssociationConfigSetTest = sctpConfigService.getSctpServerAssociationConfigBySctpServerConfigId(1L);
         verify(sctpServerRepository,atLeast(2)).findById(1L);
         Assertions.assertThat( sctpServerAssociationConfigSetTest).isEqualTo(sctpServerConfig.getSctpServerAssociationConfigs());
         log.info("sctpConfigService.getServerLinksBySctpServerId() Successful pass test");
@@ -164,7 +168,7 @@ public class SctpServiceTest {
             log.info("error: SctpLinkRepository wasn't emulated");
         }
         log.info("Start verification sctpConfigService.getClientLinkById(...) ....");
-        Optional<SctpClientAssociationConfig> containerWithObject = Optional.of(sctpConfigService.getClientLinkById(1L));
+        Optional<SctpClientAssociationConfig> containerWithObject = Optional.of(sctpConfigService.getSctpClientAssociationConfigById(1L));
         Assertions.assertThat(containerWithObject.get()).isEqualTo(s);
         log.info("sctpConfigService.getClientLinkById(...)  success pass verification !");
         log.info("<==============================TEST========================================>");    }
@@ -182,7 +186,7 @@ public class SctpServiceTest {
             log.info("error: sctpServerRepository wasn't emulated");
         }
         log.info("Start verification sctpConfigService.getSctpServerById(...) ....");
-        Assertions.assertThat(sctpConfigService.getSctpServerById(1L)).isEqualTo(s);
+        Assertions.assertThat(sctpConfigService.getSctpServerConfigById(1L)).isEqualTo(s);
         log.info("sctpConfigService.getSctpServerById(...)  success pass verification !");
         log.info("<==============================TEST========================================>");
     }
@@ -200,7 +204,7 @@ public class SctpServiceTest {
             log.info("Incorrect emulation of remoteSctpLinkRepository");
         }
         log.info("Starting test for service ...");
-        Assertions.assertThat(sctpConfigService.getServerLinkById(1L)).isEqualTo(association);
+        Assertions.assertThat(sctpConfigService.getSctpServerAssociationConfigById(1L)).isEqualTo(association);
         log.info("sctpConfigService.getServerLinkById(...) succes passed test");
         log.info("<==============================TEST========================================>");
     }
@@ -212,7 +216,7 @@ public class SctpServiceTest {
         given(remoteSctpLinkRepository.findById(1L)).willReturn(Optional.of(s));
         Long deletedId = 1L;
         ArgumentCaptor<Long> captor = ArgumentCaptor.forClass(Long.class);
-        sctpConfigService.removeServerLinkById(deletedId);
+        sctpConfigService.removeSctpServerAssociationConfigById(deletedId);
         verify(remoteSctpLinkRepository, atLeastOnce()).deleteById(captor.capture());
         Assertions.assertThat(captor.getValue()).isEqualTo(deletedId);
     }
@@ -231,7 +235,7 @@ public class SctpServiceTest {
         } else {
             log.info("sctpServerRepository success emulated for  findAll() method");
         }
-        List<SctpServerConfig> sctpServerConfigsTestService = sctpConfigService.getSctpServersByStackId(1L);
+        Set<SctpServerConfig> sctpServerConfigsTestService = sctpConfigService.getSctpServerConfigByStackId(1L);
         verify(sctpServerRepository,atLeastOnce()).findAll();
         Assertions.assertThat(sctpServerConfigsTestService.isEmpty()).isEqualTo(false);
     }
@@ -244,9 +248,9 @@ public class SctpServiceTest {
         sctpClientAssociationConfigs.add(new SctpClientAssociationConfig());
         sigtranStack.setAssociations(sctpClientAssociationConfigs);
         given(sigtranStackRepository.findById(1L)).willReturn(Optional.of(sigtranStack));
-        sctpConfigService.getClientLinksByStackId(1L);
+        sctpConfigService.getSctpClientAssociationConfigByStackId(1L);
         verify(sigtranStackRepository,atLeastOnce()).findById(1L);
-        Assertions.assertThat(sctpConfigService.getClientLinksByStackId(1L)).isEqualTo(sigtranStack.getAssociations());
+        Assertions.assertThat(sctpConfigService.getSctpClientAssociationConfigByStackId(1L)).isEqualTo(sigtranStack.getAssociations());
     }
 
 
@@ -256,10 +260,10 @@ public class SctpServiceTest {
         sctpServerConfig.setId(1L);
         given(sctpServerRepository.save(sctpServerConfig)).willReturn(sctpServerConfig);
         ArgumentCaptor<SctpServerConfig> captorSctpServerConf = ArgumentCaptor.forClass(SctpServerConfig.class);
-        sctpConfigService.addSctpServer(sctpServerConfig);
+        sctpConfigService.addSctpServerConfig(sctpServerConfig);
         verify(sctpServerRepository,atLeastOnce()).save(captorSctpServerConf.capture());
         Assertions.assertThat(captorSctpServerConf.getValue()).isEqualTo(sctpServerConfig);
-        Assertions.assertThat(sctpConfigService.addSctpServer(sctpServerConfig)).isEqualTo(sctpServerConfig);
+        Assertions.assertThat(sctpConfigService.addSctpServerConfig(sctpServerConfig)).isEqualTo(sctpServerConfig);
     }
 
     @Test
@@ -268,10 +272,10 @@ public class SctpServiceTest {
         sctpServerAssociationConfig.setId(1L);
         given(remoteSctpLinkRepository.save(sctpServerAssociationConfig)).willReturn(sctpServerAssociationConfig);
         ArgumentCaptor<SctpServerAssociationConfig> captorSctpServerAssociationConfig = ArgumentCaptor.forClass(SctpServerAssociationConfig.class); //todo change
-        sctpConfigService.addServerLink(sctpServerAssociationConfig);
+        sctpConfigService.addSctpServerAssociationConfig(sctpServerAssociationConfig);
         verify(remoteSctpLinkRepository,atLeastOnce()).save(captorSctpServerAssociationConfig.capture());
         Assertions.assertThat(captorSctpServerAssociationConfig.getValue()).isEqualTo(sctpServerAssociationConfig);
-        Assertions.assertThat(sctpConfigService.addServerLink(sctpServerAssociationConfig)).isEqualTo(sctpServerAssociationConfig);
+        Assertions.assertThat(sctpConfigService.addSctpServerAssociationConfig(sctpServerAssociationConfig)).isEqualTo(sctpServerAssociationConfig);
 
     }
 
@@ -281,9 +285,9 @@ public class SctpServiceTest {
         sctpClientAssociationConfig.setId(1L);
         given(sctpLinkRepository.save(sctpClientAssociationConfig)).willReturn(sctpClientAssociationConfig);
         ArgumentCaptor<SctpClientAssociationConfig> captorSctpClientAssociationConfig = ArgumentCaptor.forClass(SctpClientAssociationConfig.class); //todo change
-        sctpConfigService.addClinetLink(sctpClientAssociationConfig);
+        sctpConfigService.addSctpClientAssociationConfig(sctpClientAssociationConfig);
         verify(sctpLinkRepository,atLeastOnce()).save(captorSctpClientAssociationConfig.capture());
         Assertions.assertThat(captorSctpClientAssociationConfig.getValue()).isEqualTo(sctpClientAssociationConfig);
-        Assertions.assertThat(sctpConfigService.addClinetLink(sctpClientAssociationConfig)).isEqualTo(sctpClientAssociationConfig);
+        Assertions.assertThat(sctpConfigService.addSctpClientAssociationConfig(sctpClientAssociationConfig)).isEqualTo(sctpClientAssociationConfig);
     }
 }

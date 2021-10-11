@@ -3,32 +3,37 @@ package com.unifun.sigproxy.service.sctp;
 import com.unifun.sigproxy.models.config.sctp.SctpClientAssociationConfig;
 import com.unifun.sigproxy.models.config.sctp.SctpServerAssociationConfig;
 import com.unifun.sigproxy.models.config.sctp.SctpServerConfig;
-import javassist.NotFoundException;
+import com.unifun.sigproxy.models.config.sctp.SctpStackSettingsConfig;
 
-import java.util.List;
 import java.util.Set;
 
 public interface SctpConfigService {
 
-    SctpClientAssociationConfig getClientLinkById(Long clientLinkId);
+    SctpClientAssociationConfig getSctpClientAssociationConfigById(Long SctpClientAssociationConfigId);
 
-    void removeClientLinkById(Long linkId); //todo return removed id or object
+    SctpServerAssociationConfig getSctpServerAssociationConfigById(Long SctpServerAssociationConfigId);
 
-    Set<SctpServerAssociationConfig> getServerLinksBySctpServerId(Long serverId);
+    SctpServerConfig getSctpServerConfigById(Long SctpServerConfigId);
 
-    SctpServerConfig getSctpServerById(Long serverId);
+    SctpStackSettingsConfig getSctpStackSettingsConfigById(Long SctpStackSettingsConfigId);
 
-    SctpServerAssociationConfig getServerLinkById(Long serverLinkId);
+    Set<SctpClientAssociationConfig> getSctpClientAssociationConfigByStackId(Long stackId);
 
-    SctpServerAssociationConfig removeServerLinkById(Long serverLinkId);
+    Set<SctpServerAssociationConfig> getSctpServerAssociationConfigBySctpServerConfigId(Long SctpServerConfig);
 
-    List<SctpServerConfig> getSctpServersByStackId(Long stackId);
+    Set<SctpServerConfig> getSctpServerConfigByStackId(Long stackId);
 
-    Set<SctpClientAssociationConfig> getClientLinksByStackId(Long stackId);
+    SctpClientAssociationConfig addSctpClientAssociationConfig(SctpClientAssociationConfig sctpClientAssociationConfig);
 
-    SctpServerConfig addSctpServer(SctpServerConfig sctpServer);
+    SctpServerAssociationConfig addSctpServerAssociationConfig(SctpServerAssociationConfig sctpServerAssociationConfig);
 
-    SctpServerAssociationConfig addServerLink(SctpServerAssociationConfig sctpServerAssociationConfig);
+    SctpServerConfig addSctpServerConfig(SctpServerConfig sctpServer);
 
-    SctpClientAssociationConfig addClinetLink(SctpClientAssociationConfig sctpClientAssociationConfig);
+    void removeSctpClientAssociationConfigById(Long linkId);
+
+    void removeSctpServerAssociationConfigById(Long serverLinkId);
+
+    void removeSctpServerConfigById(Long sctpServerConfigId);
+
+    void removeSctpStackSettingsConfigById(Long sctpStackSettingsConfigId);
 }
