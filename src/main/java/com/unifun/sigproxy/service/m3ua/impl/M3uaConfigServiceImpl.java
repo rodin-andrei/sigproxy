@@ -50,7 +50,7 @@ public class M3uaConfigServiceImpl implements M3uaConfigService {
     }
 
     @Override
-    public Set<M3uaRouteConfig> getM3uaRouteConfigByM3UaAsId(Long m3uaAsId) {
+    public Set<M3uaRouteConfig> getM3uaRouteConfigByAsId(Long m3uaAsId) {
         M3uaAsConfig m3uaAsConfig = asRepository.findById(m3uaAsId)
                 .orElseThrow(() -> new SS7NotFoundException("Not found M3ua As with id " + m3uaAsId));
         return Optional.ofNullable(m3uaAsConfig.getRoutes())
@@ -82,7 +82,7 @@ public class M3uaConfigServiceImpl implements M3uaConfigService {
     }
 
     @Override
-    public M3uaStackSettingsConfig get3uaStackSettingsConfigById(Long m3uaStackSettingsId) {
+    public M3uaStackSettingsConfig getM3uaStackSettingsConfigById(Long m3uaStackSettingsId) {
         return stackSettingsReposidory.findById(m3uaStackSettingsId).orElseThrow(() -> new SS7NotFoundException("Not found M3ua Stack Settings with Id " + m3uaStackSettingsId));
     }
 

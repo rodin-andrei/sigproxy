@@ -2,6 +2,7 @@ package com.unifun.sigproxy.service;
 
 import com.unifun.sigproxy.exception.SS7AddException;
 import com.unifun.sigproxy.exception.SS7NotFoundException;
+import com.unifun.sigproxy.exception.SS7RemoveException;
 import com.unifun.sigproxy.models.config.SigtranStack;
 import com.unifun.sigproxy.repository.SigtranStackRepository;
 import com.unifun.sigproxy.service.m3ua.M3uaConfigService;
@@ -35,8 +36,17 @@ public class SigtranConfigServiceImpl implements SigtranConfigService {
     public SigtranStack addSigtranStack(SigtranStack sigtranStack) {
         try {
             return sigtranStackRepository.save(sigtranStack);
-        } catch (Exception e){
-            throw new SS7AddException("Add Sigtran stack with name "+sigtranStack+ "failed", e.getCause().getCause());
+        } catch (Exception e) {
+            throw new SS7AddException("Add Sigtran stack with name " + sigtranStack + "failed", e.getCause().getCause());
+        }
+    }
+
+    @Override
+    public void removeSigtranStack(Long sigtranStackId) {
+        try {
+            sigtranStackRepository.deleteById(sigtranStackId);
+        } catch (Exception e) {
+            throw new SS7RemoveException("Remove Sigtran Stack with id " + sigtranStackId + " failed", e);
         }
     }
 }

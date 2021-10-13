@@ -1,5 +1,6 @@
 package com.unifun.sigproxy.controller.config;
 
+import com.unifun.sigproxy.controller.dto.SigtranStackDto;
 import com.unifun.sigproxy.controller.dto.service.CreatorDataAccessObjectService;
 import com.unifun.sigproxy.controller.dto.service.CreatorDataObjectService;
 import com.unifun.sigproxy.controller.dto.sctp.SctpClientAssociationConfigDto;
@@ -31,47 +32,18 @@ public class SctpController {
     private final SctpConfigService sctpConfigService;
     private final SctpService sctpService;
 
-    @GetMapping(value = "/getClientLinks", produces = "application/json")
+    @GetMapping(value = "/getClientAssociationConfig", produces = "application/json")
     @ResponseBody
-    public List<SctpClientAssociationConfigDto> getLinksInfo(@RequestParam Long stackId) {
+    public List<SctpClientAssociationConfigDto> getClientAssociationConfig(@RequestParam Long stackId) {
 
         return sctpConfigService.getSctpClientAssociationConfigByStackId(stackId).stream()
                 .map(this.creatorDto::createSctpClientAssociationConfigDto)
                 .collect(Collectors.toList());
     }
 
-    @PostMapping(value = "/removeClientLink", produces = "application/json")
+    @GetMapping(value = "/getServerAssociationConfig", produces = "application/json")
     @ResponseBody
-    public SctpClientAssociationConfigDto removeClientLinkAsscociation(@RequestParam Long clientLinkId) {
-
-        SctpClientAssociationConfig sctpClientAssociationConfig = sctpConfigService.getSctpClientAssociationConfigById(clientLinkId);
-        sctpService.removeSctpLink(sctpClientAssociationConfig, sctpClientAssociationConfig.getSigtranStack().getStackName());
-        sctpConfigService.removeSctpClientAssociationConfigById(clientLinkId);
-        return creatorDto.createSctpClientAssociationConfigDto(sctpClientAssociationConfig);
-    }
-
-    @PostMapping(value = "/startClientLink", produces = "application/json")
-    @ResponseBody
-    public SctpClientAssociationConfigDto startClientLink(@RequestParam Long clientLinkId) {
-
-        SctpClientAssociationConfig sctpClientAssociationConfig = sctpConfigService.getSctpClientAssociationConfigById(clientLinkId);
-        sctpService.startLink(sctpClientAssociationConfig.getLinkName(), sctpClientAssociationConfig.getSigtranStack().getStackName());
-        return creatorDto.createSctpClientAssociationConfigDto(sctpClientAssociationConfig);
-    }
-
-
-    @PostMapping(value = "/stopClientLink", produces = "application/json")
-    @ResponseBody
-    public SctpClientAssociationConfigDto stopClientLink(@RequestParam Long clientLinkId) {
-
-        SctpClientAssociationConfig sctpClientAssociationConfig = sctpConfigService.getSctpClientAssociationConfigById(clientLinkId);
-        sctpService.stopLink(sctpClientAssociationConfig.getLinkName(), sctpClientAssociationConfig.getSigtranStack().getStackName());
-        return creatorDto.createSctpClientAssociationConfigDto(sctpClientAssociationConfig);
-    }
-
-    @GetMapping(value = "/getServerLinks", produces = "application/json")
-    @ResponseBody
-    public List<SctpServerAssociationConfigDto> srverLinks(@RequestParam Long serverId) {
+    public List<SctpServerAssociationConfigDto> getServerAssociationConfig(@RequestParam Long serverId) {
 
         Set<SctpServerAssociationConfig> sctpServerAssociationConfigs = sctpConfigService.getSctpServerAssociationConfigBySctpServerConfigId(serverId);
 
@@ -81,82 +53,118 @@ public class SctpController {
                 .collect(Collectors.toList());
     }
 
-    @PostMapping(value = "/removeServerLink", produces = "application/json")
+    @GetMapping(value = "/getServerConfig", produces = "application/json")
     @ResponseBody
-    public SctpServerAssociationConfigDto deleteServerLink(@RequestParam Long serverLinkId) {
-        SctpServerAssociationConfig sctpServerAssociationConfig = sctpConfigService.getSctpServerAssociationConfigById(serverLinkId);
-        sctpConfigService.removeSctpServerAssociationConfigById(serverLinkId);
-        return creatorDto.createSctpServerAssociationConfigDto(sctpServerAssociationConfig);
-    }
-
-
-    @PostMapping(value = "/startSrverLink", produces = "application/json")
-    @ResponseBody
-    public SctpServerAssociationConfigDto startSrverLink(@RequestParam Long serverLinkId) {
-
-        SctpServerAssociationConfig sctpServerAssociationConfig = sctpConfigService.getSctpServerAssociationConfigById(serverLinkId);
-        sctpService.startLink(sctpServerAssociationConfig.getLinkName(), sctpServerAssociationConfig.getSctpServerConfig().getSigtranStack().getStackName());
-        return creatorDto.createSctpServerAssociationConfigDto(sctpServerAssociationConfig);
-    }
-
-
-    @PostMapping(value = "/stopServerLink", produces = "application/json")
-    @ResponseBody
-    public SctpServerAssociationConfigDto stopServerLink(@RequestParam Long serverLinkId) {
-
-        SctpServerAssociationConfig sctpServerAssociationConfig = sctpConfigService.getSctpServerAssociationConfigById(serverLinkId);
-        sctpService.stopLink(sctpServerAssociationConfig.getLinkName(), sctpServerAssociationConfig.getSctpServerConfig().getSigtranStack().getStackName());
-        return creatorDto.createSctpServerAssociationConfigDto(sctpServerAssociationConfig);
-    }
-
-
-    @PostMapping(value = "/startServer", produces = "application/json")
-    public void startServer(@RequestParam Long serverId) {
-
-        SctpServerConfig sctpServer;
-        sctpServer = sctpConfigService.getSctpServerConfigById(serverId);
-        sctpService.startServer(sctpServer.getName(), sctpServer.getSigtranStack().getStackName());
-    }
-
-    @PostMapping(value = "/stopServer", produces = "application/json")
-    public void stopServer(@RequestParam Long serverId) {
-
-        SctpServerConfig sctpServer = sctpConfigService.getSctpServerConfigById(serverId);
-        sctpService.stopServer(sctpServer.getName(), sctpServer.getSigtranStack().getStackName());
-    }
-
-    @PostMapping(value = "/stopSigtranStack", produces = "application/json")
-    public void stopSigtranStack(@RequestParam Long sigtranStackId) {
-
-        SigtranStack sigtranStack = sigtranConfigService.getSigtranStackById(sigtranStackId);
-        sctpService.stopStack(sigtranStack.getStackName());
-    }
-
-    @GetMapping(value = "/getServers", produces = "application/json")
-    @ResponseBody
-    public Set<SctpServerConfigDto> getServerList(@RequestParam Long stackId) {
+    public Set<SctpServerConfigDto> getServerConfig(@RequestParam Long stackId) {
 
         return sctpConfigService.getSctpServerConfigByStackId(stackId).stream()
                 .map(this.creatorDto::createSctpServerConfigDto)
                 .collect(Collectors.toSet());
     }
 
-    @PostMapping(value = "/addServer", produces = "application/json")
+    @DeleteMapping(value = "/removeClientAssociationConfig", produces = "application/json")
     @ResponseBody
-    public SctpServerConfigDto addServer(@RequestBody SctpServerConfigDto sctpServerConfigDto,
-                                             @RequestParam Long sigtranStackId) {
+    public SctpClientAssociationConfigDto removeClientAssociationConfig(@RequestParam Long clientLinkId) {
 
-        SigtranStack sigtranStack = sigtranConfigService.getSigtranStackById(sigtranStackId);
-        SctpServerConfig sctpServerConfig = creatorDao.createSctpServerDao(sctpServerConfigDto, sigtranStack);
-        sctpServerConfig = sctpConfigService.addSctpServerConfig(sctpServerConfig);
-        sctpService.addServer(sctpServerConfig, sigtranStack.getStackName());
+        SctpClientAssociationConfig sctpClientAssociationConfig = sctpConfigService.getSctpClientAssociationConfigById(clientLinkId);
+        sctpService.removeSctpLink(sctpClientAssociationConfig, sctpClientAssociationConfig.getSigtranStack().getStackName());
+        sctpConfigService.removeSctpClientAssociationConfigById(clientLinkId);
+        return creatorDto.createSctpClientAssociationConfigDto(sctpClientAssociationConfig);
+    }
+
+    @DeleteMapping(value = "/removeServerAssociationConfig", produces = "application/json")
+    @ResponseBody
+    public SctpServerAssociationConfigDto removeServerAssociationConfig(@RequestParam Long serverLinkId) {
+        SctpServerAssociationConfig sctpServerAssociationConfig = sctpConfigService.getSctpServerAssociationConfigById(serverLinkId);
+        sctpConfigService.removeSctpServerAssociationConfigById(serverLinkId);
+        return creatorDto.createSctpServerAssociationConfigDto(sctpServerAssociationConfig);
+    }
+
+    @DeleteMapping(value = "/removeServerConfig", produces = "application/json")
+    @ResponseBody
+    public SctpServerConfigDto removeServerConfig(@RequestParam Long serverConfigId) {
+        SctpServerConfig sctpServerConfig = sctpConfigService.getSctpServerConfigById(serverConfigId);
+        sctpConfigService.removeSctpServerConfigById(serverConfigId);
         return creatorDto.createSctpServerConfigDto(sctpServerConfig);
     }
 
-    @PostMapping(value = "/addServerLink", produces = "application/json")
+    @PostMapping(value = "/startClientAssociationConfig", produces = "application/json")
     @ResponseBody
-    public SctpServerAssociationConfigDto addServerLinkAsscociation(@RequestParam Long serverId,
-                                                                    @RequestBody SctpServerAssociationConfigDto sctpserverAssConfigDto) {
+    public SctpClientAssociationConfigDto startClientAssociationConfig(@RequestParam Long clientLinkId) {
+
+        SctpClientAssociationConfig sctpClientAssociationConfig = sctpConfigService.getSctpClientAssociationConfigById(clientLinkId);
+        sctpService.startLink(sctpClientAssociationConfig.getLinkName(), sctpClientAssociationConfig.getSigtranStack().getStackName());
+        return creatorDto.createSctpClientAssociationConfigDto(sctpClientAssociationConfig);
+    }
+
+
+    @PostMapping(value = "/stopClientAssociationConfig", produces = "application/json")
+    @ResponseBody
+    public SctpClientAssociationConfigDto stopClientAssociationConfig(@RequestParam Long clientLinkId) {
+
+        SctpClientAssociationConfig sctpClientAssociationConfig = sctpConfigService.getSctpClientAssociationConfigById(clientLinkId);
+        sctpService.stopLink(sctpClientAssociationConfig.getLinkName(), sctpClientAssociationConfig.getSigtranStack().getStackName());
+        return creatorDto.createSctpClientAssociationConfigDto(sctpClientAssociationConfig);
+    }
+
+    @PostMapping(value = "/startServerAssociationConfig", produces = "application/json")
+    @ResponseBody
+    public SctpServerAssociationConfigDto startServerAssociationConfig(@RequestParam Long serverLinkId) {
+
+        SctpServerAssociationConfig sctpServerAssociationConfig = sctpConfigService.getSctpServerAssociationConfigById(serverLinkId);
+        sctpService.startLink(sctpServerAssociationConfig.getLinkName(), sctpServerAssociationConfig.getSctpServerConfig().getSigtranStack().getStackName());
+        return creatorDto.createSctpServerAssociationConfigDto(sctpServerAssociationConfig);
+    }
+
+    @PostMapping(value = "/stopServerAssociationConfig", produces = "application/json")
+    @ResponseBody
+    public SctpServerAssociationConfigDto stopServerAssociationConfig(@RequestParam Long serverLinkId) {
+
+        SctpServerAssociationConfig sctpServerAssociationConfig = sctpConfigService.getSctpServerAssociationConfigById(serverLinkId);
+        sctpService.stopLink(sctpServerAssociationConfig.getLinkName(), sctpServerAssociationConfig.getSctpServerConfig().getSigtranStack().getStackName());
+        return creatorDto.createSctpServerAssociationConfigDto(sctpServerAssociationConfig);
+    }
+
+    @PostMapping(value = "/startServerConfig", produces = "application/json")
+    public SctpServerConfigDto startServerConfig(@RequestParam Long serverId) {
+
+        SctpServerConfig sctpServer = sctpConfigService.getSctpServerConfigById(serverId);
+        sctpService.startServer(sctpServer.getName(), sctpServer.getSigtranStack().getStackName());
+        return creatorDto.createSctpServerConfigDto(sctpServer);
+    }
+
+    @PostMapping(value = "/stopServerConfig", produces = "application/json")
+    public SctpServerConfigDto stopServerConfi(@RequestParam Long serverId) {
+
+        SctpServerConfig sctpServer = sctpConfigService.getSctpServerConfigById(serverId);
+        sctpService.stopServer(sctpServer.getName(), sctpServer.getSigtranStack().getStackName());
+        return creatorDto.createSctpServerConfigDto(sctpServer);
+    }
+
+    @PostMapping(value = "/stopSigtranStack", produces = "application/json")
+    public SigtranStackDto stopSigtranStack(@RequestParam Long sigtranStackId) {
+
+        SigtranStack sigtranStack = sigtranConfigService.getSigtranStackById(sigtranStackId);
+        sctpService.stopStack(sigtranStack.getStackName());
+        return creatorDto.createSigtranStackDto(sigtranStack);
+    }
+
+    @PostMapping(value = "/addClientAssociationConfig", produces = "application/json")
+    @ResponseBody
+    public SctpClientAssociationConfigDto addClientAssociationConfig(@RequestParam Long stackId,
+                                                                    @RequestBody SctpClientAssociationConfigDto sctpClientDto) {
+
+        SigtranStack sigtranStack = sigtranConfigService.getSigtranStackById(stackId);
+        SctpClientAssociationConfig sctpClientAssociationConfig = creatorDao.createSctpClientAssociationConfigDao(sctpClientDto, sigtranStack);
+        sctpService.addLink(sctpClientAssociationConfig, sigtranStack.getStackName());
+        sctpConfigService.addSctpClientAssociationConfig(sctpClientAssociationConfig);
+        return creatorDto.createSctpClientAssociationConfigDto(sctpClientAssociationConfig);
+    }
+
+    @PostMapping(value = "/addServerAssociationConfig", produces = "application/json")
+    @ResponseBody
+    public SctpServerAssociationConfigDto addServerAssociationConfig(@RequestParam Long serverId,
+                                                                     @RequestBody SctpServerAssociationConfigDto sctpserverAssConfigDto) {
 
         SctpServerConfig sctpServerConfig = sctpConfigService.getSctpServerConfigById(serverId);
         SctpServerAssociationConfig sctpServerAssociationConfig = creatorDao.createSctpServerAssociationConfigDao(sctpserverAssConfigDto, sctpServerConfig);
@@ -165,15 +173,15 @@ public class SctpController {
         return creatorDto.createSctpServerAssociationConfigDto(sctpServerAssociationConfig);
     }
 
-    @PostMapping(value = "/addClientLink", produces = "application/json")
+    @PostMapping(value = "/addServerConfig", produces = "application/json")
     @ResponseBody
-    public SctpClientAssociationConfigDto addClientLinkAsscociation(@RequestParam Long stackId,
-                                                                    @RequestBody SctpClientAssociationConfigDto sctpClientDto) {
+    public SctpServerConfigDto addServerConfig(@RequestBody SctpServerConfigDto sctpServerConfigDto,
+                                               @RequestParam Long sigtranStackId) {
 
-        SigtranStack sigtranStack = sigtranConfigService.getSigtranStackById(stackId);
-        SctpClientAssociationConfig sctpClientAssociationConfig = creatorDao.createSctpClientAssociationConfigDao(sctpClientDto, sigtranStack);
-        sctpService.addLink(sctpClientAssociationConfig, sigtranStack.getStackName());
-        sctpConfigService.addSctpClientAssociationConfig(sctpClientAssociationConfig);
-        return creatorDto.createSctpClientAssociationConfigDto(sctpClientAssociationConfig);
+        SigtranStack sigtranStack = sigtranConfigService.getSigtranStackById(sigtranStackId);
+        SctpServerConfig sctpServerConfig = creatorDao.createSctpServerDao(sctpServerConfigDto, sigtranStack);
+        sctpServerConfig = sctpConfigService.addSctpServerConfig(sctpServerConfig);
+        sctpService.addServer(sctpServerConfig, sigtranStack.getStackName());
+        return creatorDto.createSctpServerConfigDto(sctpServerConfig);
     }
 }

@@ -1,6 +1,5 @@
 package com.unifun.sigproxy.service.m3ua;
 
-import com.unifun.sigproxy.exception.SS7AddException;
 import com.unifun.sigproxy.exception.SS7NotContentException;
 import com.unifun.sigproxy.exception.SS7NotFoundException;
 import com.unifun.sigproxy.models.config.SigtranStack;
@@ -121,11 +120,11 @@ public class M3uaConfigServiceTest {
         given(asRepository.findById(1L)).willReturn(Optional.of(m3uaAsConfig));
 
         //when
-        m3uaConfigService.getM3uaRouteConfigByM3UaAsId(1L);
+        m3uaConfigService.getM3uaRouteConfigByAsId(1L);
 
         //verify
         verify(asRepository).findById(1L);
-        assertThat(m3uaConfigService.getM3uaRouteConfigByM3UaAsId(1L)).isEqualTo(m3uaAsConfig.getRoutes());
+        assertThat(m3uaConfigService.getM3uaRouteConfigByAsId(1L)).isEqualTo(m3uaAsConfig.getRoutes());
     }
 
     @Test
@@ -137,7 +136,7 @@ public class M3uaConfigServiceTest {
 
         //when
         //verify
-        Assertions.assertThatThrownBy(()->m3uaConfigService.getM3uaRouteConfigByM3UaAsId(1L)).isInstanceOf(SS7NotContentException.class);
+        Assertions.assertThatThrownBy(()->m3uaConfigService.getM3uaRouteConfigByAsId(1L)).isInstanceOf(SS7NotContentException.class);
     }
 
     @Test
@@ -268,11 +267,11 @@ public class M3uaConfigServiceTest {
         given(stackSettingsReposidory.findById(id)).willReturn(Optional.of(m3uaStackSettingsConfig));
 
         //when
-        m3uaConfigService.get3uaStackSettingsConfigById(id);
+        m3uaConfigService.getM3uaStackSettingsConfigById(id);
 
         //verify
         verify(stackSettingsReposidory).findById(id);
-        assertThat( m3uaConfigService.get3uaStackSettingsConfigById(id)).isEqualTo( m3uaStackSettingsConfig);
+        assertThat( m3uaConfigService.getM3uaStackSettingsConfigById(id)).isEqualTo( m3uaStackSettingsConfig);
     }
 
     @Test
@@ -282,7 +281,7 @@ public class M3uaConfigServiceTest {
 
         //when
         //verify
-        assertThatThrownBy(()->m3uaConfigService.get3uaStackSettingsConfigById(id)).isInstanceOf(SS7NotFoundException.class);
+        assertThatThrownBy(()->m3uaConfigService.getM3uaStackSettingsConfigById(id)).isInstanceOf(SS7NotFoundException.class);
     }
 
     @Test

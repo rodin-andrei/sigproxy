@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Set;
 
 public interface SigtranConfigService {
-    SigtranStack getSigtranStackById(Long stackId);
     List<SigtranStack> getSigtranStacks();
+    SigtranStack getSigtranStackById(Long stackId);
     SigtranStack addSigtranStack(SigtranStack sigtranStackDao);
+    void removeSigtranStack(Long sigtranStackId);
 }

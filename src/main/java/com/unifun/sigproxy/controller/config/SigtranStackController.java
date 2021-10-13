@@ -51,4 +51,12 @@ public class SigtranStackController {
 
         return creatorDto.createSigtranStackDto(sigtranStack);
     }
+
+    @DeleteMapping(value = "/removeSigtranStack", produces = "application/json")
+    @ResponseBody
+    public SigtranStackDto removeSigtranStack(@RequestParam Long sigtranStackId){
+        SigtranStack sigtranStack = sigtranConfigService.getSigtranStackById(sigtranStackId);
+        sigtranConfigService.removeSigtranStack(sigtranStackId);
+        return creatorDto.createSigtranStackDto(sigtranStack);
+    }
 }

@@ -12,7 +12,7 @@ public interface M3uaConfigService {
 
     Set<M3uaAspConfig> getM3uaAspConfigByAsId(Long sigtranStackId);
 
-    Set<M3uaRouteConfig> getM3uaRouteConfigByM3UaAsId(Long m3uaAsId);
+    Set<M3uaRouteConfig> getM3uaRouteConfigByAsId(Long m3uaAsId);
 
     M3uaStackSettingsConfig getM3uaStackSettingsConfigByStackId(Long sigtranStackId);
 
@@ -22,7 +22,7 @@ public interface M3uaConfigService {
 
     M3uaRouteConfig getM3uaRouteConfigById(Long m3uaRouteId);
 
-    M3uaStackSettingsConfig get3uaStackSettingsConfigById(Long m3uaStackSettingsId); //todo Change 3ua to M3ua
+    M3uaStackSettingsConfig getM3uaStackSettingsConfigById(Long m3uaStackSettingsId);
 
     M3uaAsConfig addM3uaAsConfig(M3uaAsConfig m3uaAsConfig);
 

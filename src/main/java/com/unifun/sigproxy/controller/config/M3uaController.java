@@ -52,7 +52,7 @@ public class M3uaController {
     @GetMapping(value = "/getRouteConfig", produces = "application/json")
     @ResponseBody
     public Set<M3uaRouteConfigDto> getM3uaRouteConfig(@RequestParam Long m3uaAsId) {
-        return m3uaConfigService.getM3uaRouteConfigByM3UaAsId(m3uaAsId).stream()
+        return m3uaConfigService.getM3uaRouteConfigByAsId(m3uaAsId).stream()
                 .map(this.creatorDto::createM3uaRouteConfigDto)
                 .collect(Collectors.toSet());
     }
@@ -103,7 +103,7 @@ public class M3uaController {
         return creatorDto.createM3uaStackSettingsConfigDto(m3uaStackSettingsConfig);
     }
 
-    @PostMapping(value = "/removeAsConfig", produces = "application/json")
+    @DeleteMapping(value = "/removeAsConfig", produces = "application/json")
     @ResponseBody
     public M3uaAsConfigDto removeAsConfig(@RequestParam Long m3uaAsId) {
         M3uaAsConfig m3uaAsConfig = m3uaConfigService.getM3uaAsConfigById(m3uaAsId);
@@ -111,7 +111,7 @@ public class M3uaController {
         return creatorDto.createM3uaAsConfigDto(m3uaAsConfig);
     }
 
-    @PostMapping(value = "/removeAspConfig", produces = "application/json")
+    @DeleteMapping(value = "/removeAspConfig", produces = "application/json")
     @ResponseBody
     public M3uaAspConfigDto removeAspConfig(@RequestParam Long m3uaAspId) {
         M3uaAspConfig m3uaAspConfig = m3uaConfigService.getM3uaAspConfigById(m3uaAspId);
@@ -119,7 +119,7 @@ public class M3uaController {
         return creatorDto.createM3uaAspConfigDto(m3uaAspConfig);
     }
 
-    @PostMapping(value = "/removeRouteConfig", produces = "application/json")
+    @DeleteMapping(value = "/removeRouteConfig", produces = "application/json")
     @ResponseBody
     public M3uaRouteConfigDto removeRouteConfig(@RequestParam Long m3uaRouteId) {
         M3uaRouteConfig m3uaRouteConfig = m3uaConfigService.getM3uaRouteConfigById(m3uaRouteId);
@@ -127,10 +127,10 @@ public class M3uaController {
         return creatorDto.createM3uaRouteConfigDto(m3uaRouteConfig);
     }
 
-    @PostMapping(value = "/removeM3uaAsConfig", produces = "application/json")
+    @DeleteMapping(value = "/removeM3uaAsConfig", produces = "application/json")
     @ResponseBody
     public M3uaStackSettingsConfigDto removeStackSettingsConfig(@RequestParam Long m3uaStackSettingsId) {
-        M3uaStackSettingsConfig m3uaStackSettingsConfig = m3uaConfigService.get3uaStackSettingsConfigById(m3uaStackSettingsId);
+        M3uaStackSettingsConfig m3uaStackSettingsConfig = m3uaConfigService.getM3uaStackSettingsConfigById(m3uaStackSettingsId);
         m3uaConfigService.removeM3uaStackSettingsConfig(m3uaStackSettingsId);
         return creatorDto.createM3uaStackSettingsConfigDto(m3uaStackSettingsConfig);
     }

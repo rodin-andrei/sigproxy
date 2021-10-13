@@ -183,7 +183,7 @@ public class SccpController {
         return sccpRuleConfigDto;
     }
 
-    @PostMapping(value = "/removeServiceAccessPointConfig", produces = "application/json")
+    @DeleteMapping(value = "/removeServiceAccessPointConfig", produces = "application/json")
     @ResponseBody
     public SccpServiceAccessPointConfigDto removeServiceAccessPointConfig(@RequestParam Integer sccpServiceAccessPointConfigId) {
         SccpServiceAccessPointConfigDto sccpServiceAccessPointConfigDto =
