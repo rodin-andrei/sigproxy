@@ -40,7 +40,7 @@ public class M3uaAsConfig {
 
     private long[] routingContexts;
 
-    @ManyToMany(mappedBy = "applicationServers")
+    @ManyToMany(mappedBy = "applicationServers", fetch = FetchType.EAGER)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Set<M3uaAspConfig> applicationServerPoints;
