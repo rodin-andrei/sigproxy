@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.mobicents.protocols.api.Association;
 import org.mobicents.protocols.api.IpChannelType;
 import org.mobicents.protocols.api.Management;
+import org.mobicents.protocols.api.Server;
 import org.mobicents.protocols.sctp.netty.NettySctpManagementImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -66,7 +67,7 @@ public class SctpServiceImpl implements SctpService {
             sctpManagement.setPersistDir(this.jssPersistDir);
             sctpManagement.start();
             sctpManagement.removeAllResourses();
-            this.initSettings(sigtranStack, sctpManagement);
+//            this.initSettings(sigtranStack, sctpManagement);
         } catch (Exception e) {
             throw new InitializingException("Can't initialize sctp management: " + sigtranStack.getStackName(), e);
         }
@@ -188,7 +189,8 @@ public class SctpServiceImpl implements SctpService {
     @Override
     public void addServer(SctpServerConfig serverConfig, String sigtranStack) {
         try {
-            sctpManagements.get(sigtranStack)
+            Management management = sctpManagements.get(sigtranStack);
+            Server server = management
                     .addServer(
                             serverConfig.getName(),
                             serverConfig.getLocalAddress(),
@@ -208,6 +210,7 @@ public class SctpServiceImpl implements SctpService {
         newServers.forEach(sctpServer -> {
             addServer(sctpServer, sigtranStack);
             sctpServer.getSctpServerAssociationConfigs().forEach(sctpServerLink -> addServerLink(sctpServerLink, sigtranStack));
+            startServer(sctpServer.getName(), sigtranStack);
         });
     }
 
