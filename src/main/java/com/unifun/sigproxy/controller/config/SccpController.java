@@ -116,10 +116,10 @@ public class SccpController {
 
     @DeleteMapping(value = "/removeAddressConfig", produces = "application/json")
     @ResponseBody
-    public void removeAddressConfig(@RequestParam Integer sccpAddressConfigId) {
-//        SccpAddressConfigDto sccpAddressConfigDto = creatorDto.createSccpAddressConfigDto(sccpConfigService.getAddressConfigById(sccpAddressConfigId));
+    public SccpAddressConfigDto removeAddressConfig(@RequestParam Integer sccpAddressConfigId) {
+        SccpAddressConfigDto sccpAddressConfigDto = creatorDto.createSccpAddressConfigDto(sccpConfigService.getAddressConfigById(sccpAddressConfigId));
         sccpConfigService.removeAddressConfig(sccpAddressConfigId);
-//        return sccpAddressConfigDto;
+        return sccpAddressConfigDto;
     }
 
     @DeleteMapping(value = "/removeAddressRuleConfig", produces = "application/json")
