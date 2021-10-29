@@ -1,8 +1,10 @@
 package com.unifun.sigproxy.sigtran.controller.config;
 
+import com.unifun.sigproxy.sigtran.controller.dto.sccp.*;
 import com.unifun.sigproxy.sigtran.controller.dto.service.CreatorDataAccessObjectService;
 import com.unifun.sigproxy.sigtran.controller.dto.service.CreatorDataObjectService;
 import com.unifun.sigproxy.sigtran.models.config.SigtranStack;
+import com.unifun.sigproxy.sigtran.models.config.sccp.*;
 import com.unifun.sigproxy.sigtran.service.SigtranConfigService;
 import com.unifun.sigproxy.sigtran.service.sccp.SccpConfigService;
 import lombok.RequiredArgsConstructor;

@@ -1,5 +1,7 @@
 package com.unifun.sigproxy.sigtran.service.sccp;
 
+import com.unifun.sigproxy.sigtran.models.config.sccp.*;
+
 import java.util.Set;
 
 public interface SccpConfigService {

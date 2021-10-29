@@ -28,6 +28,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 @ExtendWith(MockitoExtension.class)
 public class M3uaConfigServiceTest {
 
@@ -150,6 +152,12 @@ public class M3uaConfigServiceTest {
     public void testGetM3uaStackSettingsConfigByStackId_Return_Value() {
         //given
         M3uaStackSettingsConfig m3uaStackSettingsConfig = new M3uaStackSettingsConfig();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
         SigtranStack sigtranStack = new SigtranStack();
         sigtranStack.setM3UaStackSettingsConfig(m3uaStackSettingsConfig);
         BDDMockito.given(sigtranStackRepository.findById(1L)).willReturn(Optional.of(sigtranStack));

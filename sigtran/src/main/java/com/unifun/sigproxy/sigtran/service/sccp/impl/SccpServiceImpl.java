@@ -3,6 +3,7 @@ package com.unifun.sigproxy.sigtran.service.sccp.impl;
 
 import com.unifun.sigproxy.sigtran.exception.InitializingException;
 import com.unifun.sigproxy.sigtran.models.config.SigtranStack;
+import com.unifun.sigproxy.sigtran.models.config.sccp.*;
 import com.unifun.sigproxy.sigtran.repository.sccp.SccpServiceAccessPointConfigRepository;
 import com.unifun.sigproxy.sigtran.service.m3ua.impl.M3uaServiceImpl;
 import com.unifun.sigproxy.sigtran.service.sccp.SccpService;

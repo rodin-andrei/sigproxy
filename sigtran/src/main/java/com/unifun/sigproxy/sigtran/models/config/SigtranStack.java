@@ -2,6 +2,7 @@ package com.unifun.sigproxy.sigtran.models.config;
 
 import com.unifun.sigproxy.sigtran.models.config.m3ua.M3uaAsConfig;
 import com.unifun.sigproxy.sigtran.models.config.m3ua.M3uaStackSettingsConfig;
+import com.unifun.sigproxy.sigtran.models.config.sccp.*;
 import com.unifun.sigproxy.sigtran.models.config.sctp.SctpClientAssociationConfig;
 import com.unifun.sigproxy.sigtran.models.config.sctp.SctpServerConfig;
 import com.unifun.sigproxy.sigtran.models.config.sctp.SctpStackSettingsConfig;

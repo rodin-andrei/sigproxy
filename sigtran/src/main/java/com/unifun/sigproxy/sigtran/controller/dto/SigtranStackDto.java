@@ -2,6 +2,7 @@ package com.unifun.sigproxy.sigtran.controller.dto;
 
 import com.unifun.sigproxy.sigtran.controller.dto.m3ua.M3uaAsConfigDto;
 import com.unifun.sigproxy.sigtran.controller.dto.m3ua.M3uaStackSettingsConfigDto;
+import com.unifun.sigproxy.sigtran.controller.dto.sccp.*;
 import com.unifun.sigproxy.sigtran.controller.dto.sctp.SctpClientAssociationConfigDto;
 import com.unifun.sigproxy.sigtran.controller.dto.sctp.SctpServerConfigDto;
 import com.unifun.sigproxy.sigtran.controller.dto.sctp.SctpStackSettingsConfigDto;
