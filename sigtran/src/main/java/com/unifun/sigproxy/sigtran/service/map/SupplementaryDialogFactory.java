@@ -1,0 +1,19 @@
+package com.unifun.sigproxy.sigtran.service.map;
+
+import com.unifun.sigproxy.sigtran.service.rabbit.pojo.MapSupplementaryMessageRabbit;
+import org.restcomm.protocols.ss7.map.api.service.supplementary.MAPDialogSupplementary;
+
+public interface SupplementaryDialogFactory {
+    MAPDialogSupplementary createDialogProcessUnstructuredSSRequest(MapSupplementaryMessageRabbit mapSupplementaryMessageRabbit);
+
+    MAPDialogSupplementary createDialogUnstructuredSSRequest(MapSupplementaryMessageRabbit mapSupplementaryMessageRabbit);
+
+    MAPDialogSupplementary createDialogProcessUnstructuredSSResponse(MapSupplementaryMessageRabbit mapSupplementaryMessageRabbit);
+
+    MAPDialogSupplementary createDialogUnstructuredSSResponse(MapSupplementaryMessageRabbit mapSupplementaryMessageRabbit);
+
+    MAPDialogSupplementary createDialogProcessUnstructuredSSNotifyRequest(MapSupplementaryMessageRabbit mapSupplementaryMessageRabbit);
+
+    MAPDialogSupplementary createDialogProcessUnstructuredSSNotifyResponse(MapSupplementaryMessageRabbit mapSupplementaryMessageRabbit);
+
+}

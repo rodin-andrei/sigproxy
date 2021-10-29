@@ -1,0 +1,10 @@
+package com.unifun.sigproxy.sigtran.service.sccp;
+
+import com.unifun.sigproxy.sigtran.service.rabbit.pojo.SccpRabbitAddress;
+import org.restcomm.protocols.ss7.sccp.impl.parameter.SccpAddressImpl;
+import org.restcomm.protocols.ss7.sccp.parameter.SccpAddress;
+
+public interface SccpParametersService {
+    SccpAddressImpl createSccpAddress(SccpRabbitAddress address, String stackName);
+    SccpRabbitAddress createSccpRabbitAddress(SccpAddress sccpAddress);
+}

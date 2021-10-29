@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="1">
+
+    <Properties>
+        <Property name="HOME_LOG_PATH">.</Property>
+        <Property name="LOG_PATTERN">%d %5p [%-27C{1}] %m%n</Property>
+        <Property name="MAX_ONE_FILE_SIZE">5000MB</Property>
+        <Property name="MAX_NUMBER_OF_FILES">7</Property>
+        <Property name="MAX_NUMBER_OF_DAYS">7d</Property>
+    </Properties>
+
+
+    <Appenders>
+        <Console name="consoleAppender" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+
+        <!--    #****************************************Root log*********************************#-->
+        <RollingFile name="ROOTAppender" fileName="${HOME_LOG_PATH}/gateway.log"
+                     filePattern="${HOME_LOG_PATH}/gateway.%d{yyyy-MM-dd}.%i.log.gz">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="${MAX_ONE_FILE_SIZE}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${MAX_NUMBER_OF_FILES}">
+                <Delete basePath="${HOME_LOG_PATH}" maxDepth="1">
+                    <IfFileName glob="*gateway*.log.gz"/>
+                    <IfLastModified age="${MAX_NUMBER_OF_DAYS}"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <!--    #****************************Current active dialogs log*********************************#-->
+
+        <RollingFile name="COUNTAppender" fileName="${HOME_LOG_PATH}/dialogCount.log"
+                     filePattern="${HOME_LOG_PATH}/dialogCount.%d{yyyy-MM-dd}.%i.log.gz">
+            <PatternLayout pattern="%d{ISO8601} %5p [%C{1}] Current Active Dialogs = %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="${MAX_ONE_FILE_SIZE}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${MAX_NUMBER_OF_FILES}">
+                <Delete basePath="${HOME_LOG_PATH}" maxDepth="1">
+                    <IfFileName glob="*dialogCount*.log.gz"/>
+                    <IfLastModified age="${MAX_NUMBER_OF_DAYS}"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <!--    #****************************Whole balance trace log***********************************#-->
+
+
+        <RollingFile name="APPLICATIONAppender" fileName="${HOME_LOG_PATH}/application.log"
+                     filePattern="${HOME_LOG_PATH}/application.%d{yyyy-MM-dd}.%i.log.gz">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="${MAX_ONE_FILE_SIZE}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${MAX_NUMBER_OF_FILES}">
+                <Delete basePath="${HOME_LOG_PATH}" maxDepth="1">
+                    <IfFileName glob="*application*.log.gz"/>
+                    <IfLastModified age="${MAX_NUMBER_OF_DAYS}"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+        <!--    #****************************SCTP and AS status log***********************************#-->
+
+        <RollingFile name="ASSOCIATIONAppender" fileName="${HOME_LOG_PATH}/association.log"
+                     filePattern="${HOME_LOG_PATH}/association.%d{yyyy-MM-dd}.%i.log.gz">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="${MAX_ONE_FILE_SIZE}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${MAX_NUMBER_OF_FILES}">
+                <Delete basePath="${HOME_LOG_PATH}" maxDepth="1">
+                    <IfFileName glob="*association*.log.gz"/>
+                    <IfLastModified age="${MAX_NUMBER_OF_DAYS}"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+    </Appenders>
+
+    <!--    #*************************************** LOGERs ***********************************#-->
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="consoleAppender"/>
+            <AppenderRef ref="ROOTAppender"/>
+        </Root>
+        <Logger name="DialogCount" level="info" additivity="false">
+            <AppenderRef ref="COUNTAppender"/>
+        </Logger>
+        <Logger name="HttpLogger" level="info" additivity="false">
+            <AppenderRef ref="APPLICATIONAppender"/>
+        </Logger>
+        <Logger name="MapLogger" level="info" additivity="false">
+            <AppenderRef ref="APPLICATIONAppender"/>
+        </Logger>
+        <Logger name="org.restcomm.protocols.ss7.m3ua.impl.fsm.FSM" level="DEBUG" additivity="true">
+            <AppenderRef ref="ASSOCIATIONAppender"/>
+        </Logger>
+        <Logger name="org.mobicents.protocols.sctp.netty.NettyAssociationImpl" level="info" additivity="true">
+            <AppenderRef ref="ASSOCIATIONAppender"/>
+        </Logger>
+        <Logger name="org.restcomm" level="warn" additivity="true"/>
+        <Logger name="org.mobicents" level="warn" additivity="true"/>
+        <Logger name="org.apache" level="warn" additivity="true"/>
+    </Loggers>
+
+</Configuration>
